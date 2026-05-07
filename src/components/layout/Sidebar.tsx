@@ -31,6 +31,8 @@ export const Sidebar: React.FC = () => {
   const { accounts, isLoading } = useAccounts();
   const location = useLocation();
 
+  const accountsList = Array.isArray(accounts) ? accounts : [];
+  
   const navItems = [
     { label: 'Dashboard', icon: LayoutDashboard, href: '/app/dashboard' },
     { label: 'Trades', icon: LineChart, href: '/app/trades', badge: '12' },
@@ -40,12 +42,12 @@ export const Sidebar: React.FC = () => {
     { label: 'Rapports', icon: BarChart3, href: '/app/reports' },
     { label: 'Notebook', icon: StickyNote, href: '/app/notebook' },
     { label: 'News', icon: Newspaper, href: '/app/economic', badge: '8' },
-    { label: 'Mes comptes', icon: Wallet, href: '/app/accounts', badge: accounts.length.toString() },
+    { label: 'Mes comptes', icon: Wallet, href: '/app/accounts', badge: accountsList.length.toString() },
     { label: 'Paiements', icon: CreditCard, href: '/app/payouts' },
     { label: 'Paramètres', icon: Settings, href: '/app/settings' },
   ];
 
-  const activeAccount = accounts.find(a => a.statut === 'actif') || accounts[0];
+  const activeAccount = accountsList.find((a: any) => a.statut === 'actif') || accountsList[0];
 
   return (
     <aside className="w-64 bg-surface border-r border-border flex flex-col h-screen sticky top-0 shrink-0">

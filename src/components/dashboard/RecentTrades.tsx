@@ -6,15 +6,20 @@ import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
 export const RecentTrades: React.FC = () => {
-  const { accounts } = useAccounts();
-  const activeAccount = accounts.find(a => a.statut === 'actif') || accounts[0];
-  const { trades, isLoading } = useTrades(activeAccount?.id);
+  const { accounts, isLoading: isAccountsLoading } = useAccounts();
+  
+  // Sécurisation : on s'assure que accounts est bien un tableau
+  const accountsList = Array.isArray(accounts) ? accounts : [];
+  const activeAccount = accountsList.find((a: any) => a.statut === 'actif') || accountsList[0];
+  
+  const { trades, isLoading: isTradesLoading } = useTrades(activeAccount?.id);
 
-  if (isLoading) {
+  if (isAccountsLoading || isTradesLoading) {
     return <div className="glass p-6 rounded-3xl h-[400px] animate-pulse bg-elevated/50" />;
   }
 
-  const recentTrades = trades.slice(0, 5);
+  const tradesList = Array.isArray(trades) ? trades : [];
+  const recentTrades = tradesList.slice(0, 5);
 
   return (
     <div className="glass rounded-3xl overflow-hidden group">
@@ -76,7 +81,7 @@ export const RecentTrades: React.FC = () => {
 
       <div className="p-4 bg-surface/30 border-t border-border">
         <a href="/app/trades" className="flex items-center justify-center gap-2 text-xs font-bold text-accent hover:text-accent-2 transition-all">
-          Voir tout l'historique ({trades.length} trades)
+          Voir tout l'historique ({tradesList.length} trades)
           <span className="group-hover:translate-x-1 transition-transform">→</span>
         </a>
       </div>
