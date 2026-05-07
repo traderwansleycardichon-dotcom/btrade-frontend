@@ -11,6 +11,12 @@ import AccountsPage from './pages/app/accounts/page';
 import PayoutsPage from './pages/app/payouts/page';
 import CalendarPage from './pages/app/calendar/page';
 import JournalPage from './pages/app/journal/page';
+import PsychologyPage from './pages/app/psychology/page';
+import PatrimoinePage from './pages/app/patrimoine/page';
+import FinancePage from './pages/app/finance/page';
+import GoalsPage from './pages/app/goals/page';
+import FormationPage from './pages/app/formation/page';
+import AIInsightsPage from './pages/app/ai-insights/page';
 import './styles/globals.css';
 
 const queryClient = new QueryClient();
@@ -39,9 +45,16 @@ const router = createBrowserRouter([
       { path: 'payouts', element: <PayoutsPage /> },
       { path: 'calendar', element: <CalendarPage /> },
       { path: 'journal', element: <JournalPage /> },
+      { path: 'psychology', element: <PsychologyPage /> },
+      { path: 'patrimoine', element: <PatrimoinePage /> },
+      { path: 'finance', element: <FinancePage /> },
+      { path: 'goals', element: <GoalsPage /> },
+      { path: 'formation', element: <FormationPage /> },
+      { path: 'ai-insights', element: <AIInsightsPage /> },
       { path: 'playbooks', element: <div className="glass p-12 text-center rounded-3xl text-txt-2 italic">Module Playbooks en cours de déploiement...</div> },
       { path: 'reports', element: <div className="glass p-12 text-center rounded-3xl text-txt-2 italic">Module Rapports en cours de déploiement...</div> },
       { path: 'settings', element: <div className="glass p-12 text-center rounded-3xl text-txt-2 italic">Paramètres du profil...</div> },
+      { path: 'economic', element: <div className="glass p-12 text-center rounded-3xl text-txt-2 italic">Module Économique en cours de déploiement...</div> },
     ],
   },
 ]);

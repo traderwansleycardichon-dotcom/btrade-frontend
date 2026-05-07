@@ -5,7 +5,8 @@ import { KpiCard } from '../../../components/ui/KpiCard';
 
 const PayoutsPage: React.FC = () => {
   const { accounts } = useAccounts();
-  const activeAccount = accounts.find(a => a.statut === 'actif') || accounts[0];
+  const safeAccounts = Array.isArray(accounts) ? accounts : [];
+  const activeAccount = safeAccounts.find(a => a.statut === 'actif') || safeAccounts[0];
 
   return (
     <div className="space-y-8 animate-[fadeIn_0.5s_ease-out]">

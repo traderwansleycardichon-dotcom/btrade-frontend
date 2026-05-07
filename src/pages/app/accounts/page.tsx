@@ -2,9 +2,11 @@ import React from 'react';
 import { AccountCard } from '../../../components/trading/AccountCard';
 import { useAccounts } from '../../../hooks/useAccounts';
 import { Plus } from 'lucide-react';
+import { AddAccountModal } from '../../../components/trading/AddAccountModal';
 
 const AccountsPage: React.FC = () => {
   const { accounts, isLoading } = useAccounts();
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
 
   const safeAccounts = Array.isArray(accounts) ? accounts : [];
   const totalCapital = safeAccounts.reduce((acc, a) => acc + Number(a.tailleCompte || 0), 0);
@@ -33,7 +35,10 @@ const AccountsPage: React.FC = () => {
 
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-bold">Mes Comptes Trading</h2>
-        <button className="btn-primary flex items-center gap-2">
+        <button 
+          onClick={() => setIsModalOpen(true)}
+          className="btn-primary flex items-center gap-2"
+        >
           <Plus size={18} />
           Ajouter un compte
         </button>
@@ -51,7 +56,10 @@ const AccountsPage: React.FC = () => {
             <AccountCard key={account.id} account={account} />
           ))}
           
-          <button className="glass rounded-3xl border-dashed border-2 border-border hover:border-accent/30 hover:bg-accent/5 transition-all flex flex-col items-center justify-center p-8 group min-h-[300px]">
+          <button 
+            onClick={() => setIsModalOpen(true)}
+            className="glass rounded-3xl border-dashed border-2 border-border hover:border-accent/30 hover:bg-accent/5 transition-all flex flex-col items-center justify-center p-8 group min-h-[300px]"
+          >
             <div className="w-12 h-12 rounded-full bg-elevated flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
               <Plus className="text-txt-3 group-hover:text-accent" />
             </div>
@@ -60,6 +68,8 @@ const AccountsPage: React.FC = () => {
           </button>
         </div>
       )}
+
+      <AddAccountModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </div>
   );
 };
