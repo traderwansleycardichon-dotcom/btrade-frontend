@@ -8,7 +8,16 @@ export const useAccounts = () => {
     queryKey: ['accounts'],
     queryFn: async () => {
       const { data } = await api.get('/api/comptes');
-      return data.data;
+      const results = data.data;
+      // Si c'est un objet groupé (evaluation, funded, personnel), on l'aplatit
+      if (results && !Array.isArray(results) && typeof results === 'object') {
+        return [
+          ...(results.evaluation || []),
+          ...(results.funded || []),
+          ...(results.personnel || [])
+        ];
+      }
+      return results || [];
     },
   });
 

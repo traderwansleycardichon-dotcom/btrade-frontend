@@ -5,14 +5,19 @@ import { LoginForm } from '../components/auth/LoginForm';
 import { HeroPane } from '../components/auth/HeroPane';
 
 const LoginPage: React.FC = () => {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, refreshUser, user } = useAuth();
   const navigate = useNavigate();
 
   React.useEffect(() => {
+    // Si on a un token mais pas de données user, on refresh
+    if (isAuthenticated && !user && isLoading) {
+      refreshUser();
+    }
+
     if (isAuthenticated && !isLoading) {
       navigate('/app/dashboard', { replace: true });
     }
-  }, [isAuthenticated, isLoading, navigate]);
+  }, [isAuthenticated, isLoading, navigate, user, refreshUser]);
 
   if (isLoading && isAuthenticated) {
     return (

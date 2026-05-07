@@ -4,46 +4,41 @@ import { ChevronDown } from 'lucide-react';
 export const FaqSection: React.FC = () => {
   const faqs = [
     {
-      q: "BTrade est-il compatible avec MetaTrader 4 & 5 ?",
-      a: "Oui ! Vous pouvez importer vos fichiers CSV MT4/MT5 ou utiliser notre extension de synchronisation automatique pour que vos trades apparaissent en temps réel."
+      q: "Compatible with MT4 & MT5?",
+      a: "Yes! Import CSV files or use our auto-sync extension for real-time trade tracking."
     },
     {
-      q: "Est-ce autorisé par les Prop Firms ?",
-      a: "Absolument. BTrade est un outil d'analyse et de journalisation. Il n'interfère pas avec votre trading et est même recommandé par de nombreux traders de FTMO et MyFundedFX."
+      q: "Is it Prop Firm friendly?",
+      a: "Absolutely. BTrade is an analysis tool. It doesn't interfere with trading and is used by traders worldwide."
     },
     {
-      q: "Puis-je l'essayer gratuitement ?",
-      a: "Nous offrons une période d'essai de 14 jours sur le plan Pro, sans engagement et sans carte bancaire requise."
+      q: "Is there a free trial?",
+      a: "We offer a 14-day trial on the Pro plan, no card required, no commitments."
     },
     {
-      q: "Comment fonctionne l'analyse de discipline ?",
-      a: "BTrade analyse chaque trade par rapport à vos règles définies (SL, Risk %, Heures). Il calcule ensuite un score de 0 à 100% pour identifier vos biais psychologiques."
-    },
-    {
-      q: "Puis-je annuler mon abonnement ?",
-      a: "Oui, à tout moment depuis vos paramètres. Aucun frais caché, aucun délai de préavis."
+      q: "How does AI Insights work?",
+      a: "Our AI analyzes your trade history and setups to calculate win probabilities and detect cognitive biases."
     }
   ];
 
   return (
-    <section className="py-32 bg-surface/30">
-      <div className="container mx-auto px-6 max-w-3xl">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl font-black mb-4">Questions Fréquentes</h2>
-          <p className="text-txt-2">Tout ce que vous devez savoir sur la plateforme.</p>
+    <section id="faq" className="py-32">
+      <div className="container mx-auto px-6 max-w-2xl">
+        <div className="text-center mb-24">
+          <h2 className="text-4xl md:text-6xl font-black mb-6 tracking-tighter uppercase">Questions.</h2>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-3">
           {faqs.map((faq, i) => (
             <details 
               key={i} 
-              className="group glass rounded-2xl border border-border/50 open:bg-elevated/50 transition-all duration-300"
+              className="group glass rounded-3xl border-white/5 transition-all duration-500 overflow-hidden"
             >
-              <summary className="flex items-center justify-between p-6 cursor-pointer list-none">
-                <span className="font-bold text-txt group-hover:text-accent transition-colors">{faq.q}</span>
-                <ChevronDown size={20} className="text-txt-3 group-open:rotate-180 transition-transform duration-300" />
+              <summary className="flex items-center justify-between p-8 cursor-pointer list-none">
+                <span className="text-sm font-bold text-txt-2 group-hover:text-white transition-colors">{faq.q}</span>
+                <ChevronDown size={18} className="text-txt-3 group-open:rotate-180 transition-transform duration-500" />
               </summary>
-              <div className="px-6 pb-6 text-sm text-txt-2 leading-relaxed animate-[slideDown_0.3s_ease-out]">
+              <div className="px-8 pb-8 text-xs font-medium text-txt-3 leading-loose animate-scale-in">
                 {faq.a}
               </div>
             </details>

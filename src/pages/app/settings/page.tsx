@@ -112,7 +112,7 @@ const SettingsPage: React.FC = () => {
   ];
 
   return (
-    <div className="max-w-6xl mx-auto space-y-8 animate-[fadeIn_0.5s_ease-out]">
+    <div className="space-y-8 animate-[fadeIn_0.5s_ease-out]">
       {/* Toast Message */}
       {message && (
         <div className={`fixed top-6 right-6 px-6 py-3 rounded-2xl shadow-2xl z-[200] animate-bounce-in flex items-center gap-3 ${

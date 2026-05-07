@@ -1,4 +1,5 @@
 import React from 'react';
+import { Navbar } from '../components/landing/Navbar';
 import { HeroSection } from '../components/landing/HeroSection';
 import { LiveTicker } from '../components/landing/LiveTicker';
 import { StatsSection } from '../components/landing/StatsSection';
@@ -9,14 +10,17 @@ import { FaqSection } from '../components/landing/FaqSection';
 
 const LandingPage: React.FC = () => {
   return (
-    <div className="min-h-screen bg-bg selection:bg-accent/30 overflow-x-hidden">
+    <div className="min-h-screen bg-bg selection:bg-accent/30 overflow-x-hidden selection:text-white">
+      <Navbar />
       <HeroSection />
       <LiveTicker />
-      <StatsSection />
-      <BentoFeatures />
-      <ComparisonTable />
-      <PricingSection />
-      <FaqSection />
+      <div className="space-y-32 pb-32">
+        <StatsSection />
+        <BentoFeatures />
+        <ComparisonTable />
+        <PricingSection />
+        <FaqSection />
+      </div>
       
       {/* Footer */}
       <footer className="py-20 border-t border-border">
