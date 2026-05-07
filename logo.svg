@@ -1,0 +1,7 @@
+<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="60" cy="60" r="60" fill="#F36C00"/>
+  <text x="60" y="46" text-anchor="middle" font-family="Inter, system-ui, -apple-system, sans-serif" font-weight="900" font-size="20" fill="#000" letter-spacing="-0.5">Behind</text>
+  <rect x="36" y="54" width="48" height="20" rx="10" fill="#fff"/>
+  <text x="60" y="69" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-weight="800" font-size="14" fill="#F36C00" font-style="italic">the</text>
+  <text x="60" y="92" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-weight="900" font-size="20" fill="#000" letter-spacing="-0.5">trades</text>
+</svg>

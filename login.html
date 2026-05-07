@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Connexion — Behind The Trades</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#0A0B0E; --surface:#11141B; --elevated:#181C25; --border:#1F2530; --text:#F5F6F8; --text-2:#B4BAC6; --muted:#6B7280; --accent:#F36C00; --accent-2:#E65C00; --success:#10B981; --danger:#EF4444; }
+  * { font-family:'Inter',system-ui,sans-serif; -webkit-font-smoothing:antialiased; }
+  .mono { font-family:'JetBrains Mono',monospace; font-feature-settings:'tnum' 1; }
+  body { background:var(--bg); color:var(--text); min-height:100vh; }
+  ::selection { background:var(--accent); color:white; }
+  *:focus-visible { outline:2px solid var(--accent); outline-offset:2px; border-radius:4px; }
+
+  .input { background:var(--bg); border:1px solid var(--border); color:var(--text); transition: all .2s ease; }
+  .input:focus { border-color:var(--accent); outline:none; box-shadow:0 0 0 3px rgba(243,108,0,.15); }
+  .input::placeholder { color:var(--muted); }
+
+  .btn-primary { background:var(--accent); color:#fff; transition: all .25s cubic-bezier(.4,0,.2,1); }
+  .btn-primary:hover { background:var(--accent-2); transform: translateY(-1px); box-shadow: 0 8px 24px -8px rgba(243,108,0,.5); }
+  .btn-primary:active { transform: translateY(0); }
+  .btn-ghost { background:var(--elevated); border:1px solid var(--border); color:var(--text); transition:all .2s ease; }
+  .btn-ghost:hover { border-color:var(--border-hover); background:var(--surface); }
+
+  .card-in { animation: cardIn .6s cubic-bezier(.4,0,.2,1); }
+  @keyframes cardIn { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+
+  .pane-bg {
+    background:
+      radial-gradient(ellipse 80% 60% at 0% 0%, rgba(243,108,0,.18), transparent 50%),
+      radial-gradient(ellipse 60% 60% at 100% 100%, rgba(243,108,0,.1), transparent 50%),
+      var(--surface);
+  }
+  .grid-bg {
+    background-image:
+      linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
+
+  @keyframes pulseDot { 0%,100% { box-shadow: 0 0 0 0 rgba(243,108,0,.7); } 50% { box-shadow: 0 0 0 6px rgba(243,108,0,0); } }
+  .live-dot { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; animation: pulseDot 1.8s ease-in-out infinite; display: inline-block; }
+
+  .draw-spark { stroke-dasharray: 1500; stroke-dashoffset: 1500; animation: drawSpark 2s cubic-bezier(.4,0,.2,1) forwards; animation-delay: .3s; }
+  @keyframes drawSpark { to { stroke-dashoffset: 0; } }
+
+  .floaty { animation: floaty 5s ease-in-out infinite; }
+  @keyframes floaty { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+
+  .grad-text { background: linear-gradient(135deg, #FF8A3D 0%, #F36C00 50%, #E65C00 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+</style>
+</head>
+<body>
+
+<div class="min-h-screen lg:grid lg:grid-cols-2">
+
+  <!-- LEFT — Hero panel -->
+  <div class="pane-bg relative overflow-hidden hidden lg:flex flex-col justify-between p-10 border-r" style="border-color:var(--border)">
+    <div class="absolute inset-0 grid-bg opacity-50"></div>
+
+    <!-- Top: brand + back -->
+    <div class="relative flex items-center justify-between">
+      <a href="index.html" class="flex items-center gap-2.5 group">
+        <img src="logo.svg" alt="Behind The Trades" class="w-10 h-10 transition-transform duration-300 group-hover:rotate-12" />
+        <span class="font-bold text-sm">Behind The Trades</span>
+      </a>
+      <a href="index.html" class="text-xs flex items-center gap-1.5 hover:text-white transition" style="color:var(--text-2)">
+        ← Retour
+      </a>
+    </div>
+
+    <!-- Center: pitch + mockup -->
+    <div class="relative">
+      <span class="inline-flex items-center gap-2 text-[11px] font-semibold px-3 py-1.5 rounded-full mb-6 border" style="background:rgba(243,108,0,.1); border-color:rgba(243,108,0,.3); color:var(--accent)">
+        <span class="live-dot"></span>
+        2,847 traders actifs
+      </span>
+      <h1 class="text-4xl font-black mb-4 leading-[1.1]">Le journal qui<br/>transforme tes trades en <span class="grad-text">edge</span>.</h1>
+      <p class="text-sm leading-relaxed mb-8 max-w-md" style="color:var(--text-2)">Suivi de trades, calendrier P&L, playbooks, journal d'exécution. Tout ce que les pro firms attendent de toi.</p>
+
+      <!-- Mock card -->
+      <div class="rounded-xl p-5 floaty max-w-md" style="background:var(--surface); border:1px solid var(--border); box-shadow: 0 24px 60px -20px rgba(0,0,0,.5);">
+        <div class="flex items-center justify-between mb-3">
+          <div>
+            <p class="text-[10px] uppercase tracking-widest" style="color:var(--text-2)">Net P&L · 30j</p>
+            <p class="text-3xl font-black mono mt-1">+$3,847<span class="text-base" style="color:var(--text-2)">.20</span></p>
+          </div>
+          <div class="text-right">
+            <span class="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-1 rounded" style="background:rgba(16,185,129,.15); color:#34D399">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M7 14l5-5 5 5z"/></svg>+7.69%
+            </span>
+            <p class="text-[10px] mt-1 mono" style="color:var(--text-2)">FTMO Eval</p>
+          </div>
+        </div>
+        <svg viewBox="0 0 400 100" class="w-full h-20">
+          <defs>
+            <linearGradient id="loginArea" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#F36C00" stop-opacity=".3"/>
+              <stop offset="100%" stop-color="#F36C00" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          <polyline fill="url(#loginArea)" stroke="none" points="0,80 30,75 60,72 90,68 120,65 150,55 180,58 210,45 240,42 270,32 300,28 330,20 360,15 390,10 400,8 400,100 0,100"/>
+          <polyline class="draw-spark" fill="none" stroke="#F36C00" stroke-width="2.5" points="0,80 30,75 60,72 90,68 120,65 150,55 180,58 210,45 240,42 270,32 300,28 330,20 360,15 390,10 400,8"/>
+          <circle cx="400" cy="8" r="3" fill="#F36C00"/>
+        </svg>
+        <div class="grid grid-cols-3 gap-3 mt-3 pt-3 border-t" style="border-color:var(--border)">
+          <div><p class="text-[9px] uppercase tracking-wider" style="color:var(--muted)">Win rate</p><p class="font-bold mono mt-0.5">63.4%</p></div>
+          <div><p class="text-[9px] uppercase tracking-wider" style="color:var(--muted)">PF</p><p class="font-bold mono mt-0.5">2.14</p></div>
+          <div><p class="text-[9px] uppercase tracking-wider" style="color:var(--muted)">Avg R</p><p class="font-bold mono mt-0.5">+0.81R</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom: testimonial -->
+    <div class="relative">
+      <div class="rounded-xl p-5 max-w-md" style="background:var(--surface); border:1px solid var(--border)">
+        <div class="flex gap-0.5 mb-3">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="#F36C00"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="#F36C00"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="#F36C00"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="#F36C00"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="#F36C00"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        </div>
+        <p class="text-sm leading-relaxed mb-3">"J'ai passé ma FTMO Eval en 12 jours grâce au calendrier P&L. J'ai vu que mes mardis étaient catastrophiques — j'ai arrêté de trader ce jour-là."</p>
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-black" style="background: linear-gradient(135deg, #F36C00, #E65C00);">M</div>
+          <div>
+            <p class="text-xs font-bold">Marc D.</p>
+            <p class="text-[10px] mono" style="color:var(--text-2)">Funded $200k · FundedNext</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT — Form -->
+  <div class="flex flex-col items-center justify-center p-6 lg:p-10">
+    <div class="w-full max-w-sm card-in">
+      <!-- Mobile-only logo -->
+      <a href="index.html" class="flex items-center gap-2.5 mb-8 lg:hidden">
+        <img src="logo.svg" alt="Behind The Trades" class="w-10 h-10" />
+        <span class="font-bold text-sm">Behind The Trades</span>
+      </a>
+
+      <h2 class="text-3xl font-black mb-2">Bon retour.</h2>
+      <p class="text-sm mb-8" style="color:var(--text-2)">Connecte-toi pour accéder à ton journal.</p>
+
+      <!-- Social -->
+      <div class="grid grid-cols-2 gap-2 mb-5">
+        <button class="btn-ghost flex items-center justify-center gap-2 rounded-lg py-2.5 text-xs font-semibold">
+          <svg width="14" height="14" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/></svg>
+          Google
+        </button>
+        <button class="btn-ghost flex items-center justify-center gap-2 rounded-lg py-2.5 text-xs font-semibold">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/></svg>
+          Apple
+        </button>
+      </div>
+
+      <div class="flex items-center gap-3 my-5 text-[11px] uppercase tracking-widest" style="color:var(--muted)">
+        <div class="flex-1 h-px" style="background:var(--border)"></div>
+        <span>ou</span>
+        <div class="flex-1 h-px" style="background:var(--border)"></div>
+      </div>
+
+      <form class="space-y-4" onsubmit="event.preventDefault(); window.location.href='app.html'">
+        <div>
+          <label class="block text-xs font-semibold mb-1.5">Email</label>
+          <input type="email" required placeholder="trader@email.com" class="input w-full rounded-lg px-3 py-2.5 text-sm" />
+        </div>
+        <div>
+          <div class="flex items-center justify-between mb-1.5">
+            <label class="block text-xs font-semibold">Mot de passe</label>
+            <a href="#" class="text-[11px] hover:underline" style="color:var(--accent)">Oublié ?</a>
+          </div>
+          <input type="password" required placeholder="••••••••••" class="input w-full rounded-lg px-3 py-2.5 text-sm" />
+        </div>
+        <div class="flex items-center gap-2">
+          <input type="checkbox" id="remember" class="w-4 h-4 rounded" style="accent-color:var(--accent)"/>
+          <label for="remember" class="text-xs" style="color:var(--text-2)">Rester connecté 30 jours</label>
+        </div>
+        <button type="submit" class="btn-primary w-full text-sm font-semibold rounded-lg py-3">
+          Se connecter →
+        </button>
+      </form>
+
+      <p class="mt-8 text-center text-xs" style="color:var(--text-2)">
+        Pas encore de compte ?
+        <a href="app.html" class="font-semibold hover:underline" style="color:var(--accent)">Créer un compte</a>
+      </p>
+
+      <p class="mt-8 text-center text-[10px] leading-relaxed" style="color:var(--muted)">
+        En continuant, tu acceptes nos <a href="#" class="underline">conditions</a> et notre <a href="#" class="underline">politique de confidentialité</a>.
+      </p>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

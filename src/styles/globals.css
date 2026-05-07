@@ -1,0 +1,73 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #06070A;
+  --surface: #0A0B0E;
+  --elevated: #181C25;
+  --accent: #F36C00;
+  --accent-2: #FF8A3D;
+  --txt: #FFFFFF;
+  --txt-2: #6B7280;
+  --border: #1F2530;
+}
+
+@layer base {
+  body {
+    @apply bg-bg text-txt font-sans antialiased selection:bg-accent/30;
+  }
+}
+
+@layer components {
+  .glass {
+    @apply bg-surface/70 backdrop-blur-md border border-border;
+  }
+  
+  .btn-primary {
+    @apply bg-accent hover:bg-accent-2 text-white font-medium py-2 px-4 rounded-lg transition-all duration-200 shadow-[0_0_20px_rgba(243,108,0,0.2)];
+  }
+
+  .btn-ghost {
+    @apply hover:bg-elevated text-txt-2 hover:text-txt font-medium py-2 px-4 rounded-lg transition-all duration-200;
+  }
+}
+
+/* Animations */
+@keyframes pulseDot {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(243, 108, 0, 0.7); }
+  70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(243, 108, 0, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(243, 108, 0, 0); }
+}
+
+@keyframes floaty {
+  0%, 100% { transform: translateY(0) rotate(0); }
+  50% { transform: translateY(-10px) rotate(1deg); }
+}
+
+@keyframes draw-spark {
+  from { stroke-dashoffset: 200; }
+  to { stroke-dashoffset: 0; }
+}
+
+.animate-float { animation: floaty 6s ease-in-out infinite; }
+.animate-pulse-dot { animation: pulseDot 2s infinite; }
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1F2530;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #2D3545;
+}
