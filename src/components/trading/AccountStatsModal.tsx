@@ -126,8 +126,14 @@ export const AccountStatsModal: React.FC<AccountStatsModalProps> = ({ account, i
           </div>
         </div>
       ) : (
-        <div className="text-center py-20">
-          <p className="text-txt-3 italic">Aucune statistique disponible pour le moment.</p>
+        <div className="flex flex-col items-center justify-center py-24 px-8 text-center animate-fade-in">
+          <div className="w-16 h-16 rounded-3xl bg-elevated flex items-center justify-center mb-6 text-txt-3">
+            <BarChart2 size={32} />
+          </div>
+          <h3 className="text-lg font-bold mb-2">Aucune donnée disponible</h3>
+          <p className="text-sm text-txt-3 max-w-xs mx-auto leading-relaxed">
+            Commencez à trader sur ce compte pour voir apparaître vos premières métriques de performance.
+          </p>
         </div>
       )}
     </Modal>
