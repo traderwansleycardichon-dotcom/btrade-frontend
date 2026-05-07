@@ -19,7 +19,7 @@ interface NavSection {
 }
 
 const SettingsPage: React.FC = () => {
-  const { user, logout } = useAuth();
+  const { user, logout, refreshUser } = useAuth();
   const queryClient = useQueryClient();
   
   // États pour les modales
@@ -27,6 +27,7 @@ const SettingsPage: React.FC = () => {
   
   // États pour les formulaires
   const [fullName, setFullName] = useState(user?.fullName || '');
+  const [avatarUrl, setAvatarUrl] = useState(user?.avatarUrl || '');
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
@@ -39,6 +40,7 @@ const SettingsPage: React.FC = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['me'] });
+      refreshUser(); // Update auth store
       setActiveModal(null);
       setMessage({ type: 'success', text: 'Profil mis à jour !' });
       setTimeout(() => setMessage(null), 3000);
@@ -72,9 +74,9 @@ const SettingsPage: React.FC = () => {
       title: 'Mon Profil',
       icon: User,
       items: [
-        { label: 'Informations personnelles', value: user?.fullName || 'Utilisateur', action: () => setActiveModal('profile') },
+        { label: 'Informations personnelles', value: user?.fullName || 'Utilisateur', action: () => { setFullName(user?.fullName || ''); setActiveModal('profile'); } },
         { label: 'Adresse Email', value: user?.email || 'email@example.com' },
-        { label: 'Photo de profil', value: 'Changer', action: () => setActiveModal('photo') },
+        { label: 'Photo de profil', value: 'Changer', action: () => { setAvatarUrl(user?.avatarUrl || ''); setActiveModal('photo'); } },
       ]
     },
     {
@@ -110,10 +112,10 @@ const SettingsPage: React.FC = () => {
   ];
 
   return (
-    <div className="space-y-8 animate-[fadeIn_0.5s_ease-out]">
+    <div className="max-w-6xl mx-auto space-y-8 animate-[fadeIn_0.5s_ease-out]">
       {/* Toast Message */}
       {message && (
-        <div className={`fixed top-6 right-6 px-6 py-3 rounded-2xl shadow-2xl z-50 animate-bounce-in flex items-center gap-3 ${
+        <div className={`fixed top-6 right-6 px-6 py-3 rounded-2xl shadow-2xl z-[200] animate-bounce-in flex items-center gap-3 ${
           message.type === 'success' ? 'bg-win text-white' : 'bg-loss text-white'
         }`}>
           <Shield size={18} />
@@ -124,7 +126,7 @@ const SettingsPage: React.FC = () => {
       {/* Header */}
       <div className="flex items-center gap-6">
         <div className="relative group">
-          <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-accent to-accent-2 flex items-center justify-center text-4xl font-bold text-white shadow-2xl group-hover:scale-105 transition-transform overflow-hidden">
+          <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-accent to-accent-2 flex items-center justify-center text-4xl font-bold text-white shadow-2xl group-hover:scale-105 transition-transform overflow-hidden border-4 border-surface">
             {user?.avatarUrl ? (
               <img src={user.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
             ) : (
@@ -132,7 +134,7 @@ const SettingsPage: React.FC = () => {
             )}
           </div>
           <button 
-            onClick={() => setActiveModal('photo')}
+            onClick={() => { setAvatarUrl(user?.avatarUrl || ''); setActiveModal('photo'); }}
             className="absolute -bottom-2 -right-2 p-2 bg-surface border border-border rounded-xl text-txt-2 hover:text-accent shadow-xl transition-colors"
           >
             <Camera size={16} />
@@ -270,13 +272,42 @@ const SettingsPage: React.FC = () => {
         </div>
       )}
 
-      {/* Modal Photo (Placeholder) */}
+      {/* Modal Photo */}
       {activeModal === 'photo' && (
         <div className="fixed inset-0 bg-bg/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
-          <div className="glass w-full max-w-md p-8 rounded-[2.5rem] border-accent/20 animate-scale-in text-center">
-            <h3 className="text-xl font-bold mb-4">Photo de Profil</h3>
-            <p className="text-sm text-txt-2 mb-8">Le téléchargement de photo sera disponible dans la version V2. Utilisez une URL pour l'instant via l'API.</p>
-            <button onClick={() => setActiveModal(null)} className="w-full py-4 bg-elevated border border-border rounded-2xl font-bold hover:bg-surface transition-all">Fermer</button>
+          <div className="glass w-full max-w-md p-8 rounded-[2.5rem] border-accent/20 animate-scale-in">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-xl font-bold">Photo de Profil</h3>
+              <button onClick={() => setActiveModal(null)} className="p-2 text-txt-3 hover:text-txt transition-colors"><X size={20} /></button>
+            </div>
+            <div className="space-y-4">
+              <div className="flex justify-center mb-4">
+                <div className="w-20 h-20 rounded-2xl bg-elevated flex items-center justify-center overflow-hidden border border-border">
+                  {avatarUrl ? (
+                    <img src={avatarUrl} alt="Preview" className="w-full h-full object-cover" />
+                  ) : (
+                    <Camera className="text-txt-3" size={32} />
+                  )}
+                </div>
+              </div>
+              <div>
+                <label className="text-[10px] font-bold text-txt-3 uppercase tracking-widest mb-2 block">URL de l'image</label>
+                <input 
+                  type="text" 
+                  value={avatarUrl}
+                  onChange={(e) => setAvatarUrl(e.target.value)}
+                  className="w-full bg-elevated border border-border rounded-2xl py-3 px-4 focus:outline-none focus:border-accent transition-all"
+                  placeholder="https://..."
+                />
+              </div>
+              <button 
+                onClick={() => updateProfile.mutate({ avatar_url: avatarUrl })}
+                disabled={updateProfile.isPending}
+                className="w-full py-4 bg-accent text-white rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-accent-2 transition-all"
+              >
+                {updateProfile.isPending ? <Loader2 className="animate-spin" /> : 'Mettre à jour la photo'}
+              </button>
+            </div>
           </div>
         </div>
       )}

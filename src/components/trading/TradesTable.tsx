@@ -26,10 +26,36 @@ export const TradesTable: React.FC = () => {
     );
   }
 
+  if (!activeAccount) {
+    return (
+      <div className="glass rounded-3xl p-12 text-center space-y-4">
+        <div className="w-16 h-16 bg-elevated rounded-full flex items-center justify-center mx-auto text-txt-3">
+          <Filter size={32} />
+        </div>
+        <h3 className="text-xl font-bold">Aucun compte actif</h3>
+        <p className="text-txt-3 max-w-xs mx-auto">Veuillez sélectionner ou créer un compte de trading pour voir vos opérations.</p>
+      </div>
+    );
+  }
+
   const filteredTrades = tradesList.filter(t => 
-    t.instrument.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    t.setup?.toLowerCase().includes(searchTerm.toLowerCase())
+    t && t.instrument && (
+      t.instrument.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      t.setup?.toLowerCase().includes(searchTerm.toLowerCase())
+    )
   );
+
+  if (tradesList.length === 0) {
+    return (
+      <div className="glass rounded-3xl p-12 text-center space-y-4">
+        <div className="w-16 h-16 bg-elevated rounded-full flex items-center justify-center mx-auto text-txt-3">
+          <MoreHorizontal size={32} />
+        </div>
+        <h3 className="text-xl font-bold">Aucun trade enregistré</h3>
+        <p className="text-txt-3 max-w-xs mx-auto">Commencez par ajouter votre premier trade via le bouton "Nouveau Trade".</p>
+      </div>
+    );
+  }
 
   const totalPages = Math.ceil(filteredTrades.length / itemsPerPage);
   const currentTrades = filteredTrades.slice((page - 1) * itemsPerPage, page * itemsPerPage);
