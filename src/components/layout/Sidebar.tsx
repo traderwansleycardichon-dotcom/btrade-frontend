@@ -19,7 +19,12 @@ import {
   Landmark,
   DollarSign,
   TrendingUp,
-  BrainCircuit
+  Brain,
+  Activity,
+  ArrowUpRight,
+  Target,
+  Globe,
+  FileText
 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { useAccounts } from '../../hooks/useAccounts';
@@ -45,46 +50,58 @@ interface NavGroup {
   items: NavItem[];
 }
 
+/**
+ * Sidebar Component
+ * Gère la navigation principale de l'application BTrade.
+ * Les liens sont regroupés par sections logiques pour une meilleure UX.
+ */
+
 export const Sidebar: React.FC = () => {
   const { user, logout } = useAuth();
-  const { accounts, isLoading } = useAccounts();
+  const { accounts } = useAccounts();
   const location = useLocation();
 
+  // Sécurisation des données provenant du hook
   const accountsList = Array.isArray(accounts) ? accounts : [];
   
+  /**
+   * Configuration de la navigation
+   * Chaque groupe contient un titre et une liste d'items (NavItem)
+   */
   const navGroups: NavGroup[] = [
     {
       title: 'Trading',
       items: [
         { label: 'Dashboard', icon: LayoutDashboard, href: '/app/dashboard' },
-        { label: 'Journal', icon: BookOpen, href: '/app/journal', live: true },
-        { label: 'Trades', icon: LineChart, href: '/app/trades' },
+        { label: 'Comptes', icon: Wallet, href: '/app/accounts' },
+        { label: 'Mes Trades', icon: Activity, href: '/app/trades' },
+        { label: 'Journal', icon: BookOpen, href: '/app/journal' },
         { label: 'Calendrier', icon: Calendar, href: '/app/calendar' },
-        { label: 'Playbooks', icon: Layers, href: '/app/playbooks' },
-        { label: 'Psychologie', icon: BrainCircuit, href: '/app/psychology' },
       ]
     },
     {
       title: 'Finance',
       items: [
-        { label: 'Patrimoine', icon: Wallet, href: '/app/patrimoine' },
-        { label: 'Budget', icon: CreditCard, href: '/app/finance' },
-        { label: 'Objectifs', icon: TrendingUp, href: '/app/goals' },
+        { label: 'Patrimoine', icon: Landmark, href: '/app/patrimoine' },
+        { label: 'Budget & Flux', icon: CreditCard, href: '/app/finance' },
+        { label: 'Objectifs', icon: Target, href: '/app/goals' },
+        { label: 'Retraits', icon: ArrowUpRight, href: '/app/payouts' },
       ]
     },
     {
       title: 'Analyse & École',
       items: [
-        { label: 'Academy', icon: GraduationCap, href: '/app/formation' },
-        { label: 'Économie', icon: Newspaper, href: '/app/economic' },
-        { label: 'Insights IA', icon: Sparkles, href: '/app/ai-insights' },
+        { label: 'Insights IA', icon: Sparkles, href: '/app/ai-insights', live: true },
+        { label: 'Psychologie', icon: Brain, href: '/app/psychology' },
+        { label: 'Academy', icon: GraduationCap, href: '/app/formation', badge: 'New' },
+        { label: 'Playbooks', icon: FileText, href: '/app/playbooks' },
       ]
     },
     {
       title: 'Gestion',
       items: [
-        { label: 'Mes comptes', icon: Landmark, href: '/app/accounts', badge: accountsList.length.toString() },
-        { label: 'Paiements', icon: DollarSign, href: '/app/payouts' },
+        { label: 'Calendrier Éco', icon: Globe, href: '/app/economic' },
+        { label: 'Analyses', icon: BarChart3, href: '/app/reports' },
         { label: 'Paramètres', icon: Settings, href: '/app/settings' },
       ]
     }

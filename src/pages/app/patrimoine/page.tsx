@@ -1,5 +1,5 @@
 import React from 'react';
-import { Wallet, PieChart, TrendingUp, Landmark, ShieldCheck } from 'lucide-react';
+import { Wallet, PieChart, TrendingUp, Landmark, ShieldCheck, CreditCard } from 'lucide-react';
 import { KpiCard } from '../../../components/ui/KpiCard';
 
 const PatrimoinePage: React.FC = () => {

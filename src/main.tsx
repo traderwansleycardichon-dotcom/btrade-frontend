@@ -17,6 +17,7 @@ import FinancePage from './pages/app/finance/page';
 import GoalsPage from './pages/app/goals/page';
 import FormationPage from './pages/app/formation/page';
 import AIInsightsPage from './pages/app/ai-insights/page';
+import SettingsPage from './pages/app/settings/page';
 import './styles/globals.css';
 
 const queryClient = new QueryClient();
@@ -53,7 +54,7 @@ const router = createBrowserRouter([
       { path: 'ai-insights', element: <AIInsightsPage /> },
       { path: 'playbooks', element: <div className="glass p-12 text-center rounded-3xl text-txt-2 italic">Module Playbooks en cours de déploiement...</div> },
       { path: 'reports', element: <div className="glass p-12 text-center rounded-3xl text-txt-2 italic">Module Rapports en cours de déploiement...</div> },
-      { path: 'settings', element: <div className="glass p-12 text-center rounded-3xl text-txt-2 italic">Paramètres du profil...</div> },
+      { path: 'settings', element: <SettingsPage /> },
       { path: 'economic', element: <div className="glass p-12 text-center rounded-3xl text-txt-2 italic">Module Économique en cours de déploiement...</div> },
     ],
   },

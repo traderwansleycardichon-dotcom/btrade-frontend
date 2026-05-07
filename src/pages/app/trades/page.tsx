@@ -4,10 +4,10 @@ import { KpiCard } from '../../../components/ui/KpiCard';
 import { useAccounts } from '../../../hooks/useAccounts';
 
 const TradesPage: React.FC = () => {
-  const { accounts, isLoading } = useAccounts();
+  const { accounts, useStats } = useAccounts();
   const safeAccounts = Array.isArray(accounts) ? accounts : [];
-  const activeAccount = safeAccounts.find(a => a.statut === 'actif') || safeAccounts[0];
-  const { data: stats, isLoading: statsLoading } = useAccounts().useStats(activeAccount?.id);
+  const activeAccount = safeAccounts.find((a: any) => a.statut === 'actif') || safeAccounts[0];
+  const { data: stats, isLoading: statsLoading } = useStats(activeAccount?.id);
 
   return (
     <div className="space-y-8 animate-[fadeIn_0.5s_ease-out]">

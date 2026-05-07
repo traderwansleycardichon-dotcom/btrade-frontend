@@ -7,6 +7,9 @@ interface User {
   fullName: string;
   plan: 'free' | 'pro';
   onboarded: boolean;
+  avatarUrl?: string;
+  timezone?: string;
+  currency?: string;
 }
 
 interface AuthState {

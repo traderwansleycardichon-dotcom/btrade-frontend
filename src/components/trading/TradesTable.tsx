@@ -8,8 +8,10 @@ import { Search, Filter, Download, MoreHorizontal, ChevronLeft, ChevronRight } f
 
 export const TradesTable: React.FC = () => {
   const { accounts } = useAccounts();
-  const activeAccount = accounts.find(a => a.statut === 'actif') || accounts[0];
+  const safeAccounts = Array.isArray(accounts) ? accounts : [];
+  const activeAccount = safeAccounts.find((a: any) => a.statut === 'actif') || safeAccounts[0];
   const { trades, isLoading } = useTrades(activeAccount?.id);
+  const tradesList = Array.isArray(trades) ? trades : [];
   
   const [searchTerm, setSearchTerm] = useState('');
   const [page, setPage] = useState(1);
@@ -24,7 +26,7 @@ export const TradesTable: React.FC = () => {
     );
   }
 
-  const filteredTrades = trades.filter(t => 
+  const filteredTrades = tradesList.filter(t => 
     t.instrument.toLowerCase().includes(searchTerm.toLowerCase()) ||
     t.setup?.toLowerCase().includes(searchTerm.toLowerCase())
   );
