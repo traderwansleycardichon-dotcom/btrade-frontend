@@ -6,6 +6,7 @@ import { useToast } from '../../../hooks/useToast';
 export default function AdminSystemPage() {
   const [loading, setLoading] = useState(true);
   const [health, setHealth] = useState<any>(null);
+  const [logs, setLogs] = useState<any[]>([]);
   const { addToast } = useToast();
   const [flags, setFlags] = useState({
     maintenanceMode: false,
@@ -15,25 +16,38 @@ export default function AdminSystemPage() {
   });
 
   useEffect(() => {
-    fetchHealth();
-    const interval = setInterval(fetchHealth, 10000); // Rafraîchir toutes les 10s
+    fetchData();
+    const interval = setInterval(fetchData, 10000); // Rafraîchir toutes les 10s
     return () => clearInterval(interval);
   }, []);
 
-  const fetchHealth = async () => {
+  const fetchData = async () => {
     try {
-      const res = await api.get('/api/admin/system/health');
-      setHealth(res.data.data);
+      const [healthRes, logsRes] = await Promise.all([
+        api.get('/api/admin/system/health'),
+        api.get('/api/admin/system/logs')
+      ]);
+      setHealth(healthRes.data.data);
+      setLogs(logsRes.data.data);
     } catch (err) {
-      console.error('Erreur santé:', err);
+      console.error('Erreur système:', err);
     } finally {
       setLoading(false);
     }
   };
 
-  const toggleFlag = (key: keyof typeof flags) => {
-    setFlags(prev => ({ ...prev, [key]: !prev[key] }));
-    addToast('Configuration système mise à jour', 'success');
+  const toggleFlag = async (key: keyof typeof flags) => {
+    const newValue = !flags[key];
+    setFlags(prev => ({ ...prev, [key]: newValue }));
+    
+    try {
+      await api.patch('/api/admin/system/flags', { key, value: newValue });
+      addToast(`Flag ${key} mis à jour`, 'success');
+      fetchData(); // Rafraîchir les logs pour voir l'action
+    } catch (err) {
+      addToast('Erreur lors de la mise à jour', 'error');
+      setFlags(prev => ({ ...prev, [key]: !newValue })); // Revert
+    }
   };
 
   return (
@@ -90,8 +104,8 @@ export default function AdminSystemPage() {
             <div className="grid grid-cols-2 gap-8">
               <div>
                 <div className="flex justify-between text-xs font-bold mb-2">
-                  <span className="text-txt-2">Utilisation Mémoire</span>
-                  <span>{health?.server?.memoryUsage || '0%'}</span>
+                   <span className="text-txt-2">Utilisation Mémoire</span>
+                   <span>{health?.server?.memoryUsage || '0%'}</span>
                 </div>
                 <div className="h-2 bg-elevated rounded-full overflow-hidden">
                   <div 
@@ -109,6 +123,39 @@ export default function AdminSystemPage() {
                   <div className="h-full bg-accent" style={{ width: '40%' }} />
                 </div>
               </div>
+            </div>
+          </div>
+
+          <div className="glass rounded-3xl border border-border overflow-hidden">
+            <div className="px-6 py-4 border-b border-border bg-surface/50 flex justify-between items-center">
+              <h3 className="font-bold">Journaux Système (Logs)</h3>
+              <div className="text-[10px] font-bold text-txt-3 uppercase tracking-widest">Temps Réel</div>
+            </div>
+            <div className="p-2 max-h-[300px] overflow-y-auto custom-scrollbar">
+              {logs.length === 0 ? (
+                <div className="p-8 text-center text-txt-3 text-xs italic">Aucun log récent.</div>
+              ) : (
+                <div className="divide-y divide-border/50">
+                  {logs.map((log: any) => (
+                    <div key={log.id} className="p-3 flex gap-4 items-start hover:bg-elevated/30 transition-colors">
+                      <div className={`mt-1 w-2 h-2 rounded-full shrink-0 ${
+                        log.level === 'error' ? 'bg-loss' : log.level === 'warn' ? 'bg-orange-500' : 'bg-accent'
+                      }`} />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex justify-between gap-4">
+                          <span className={`text-[10px] font-black uppercase ${
+                            log.level === 'error' ? 'text-loss' : log.level === 'warn' ? 'text-orange-500' : 'text-accent'
+                          }`}>
+                            {log.type}
+                          </span>
+                          <span className="text-[9px] font-mono text-txt-3">{new Date(log.createdAt).toLocaleTimeString()}</span>
+                        </div>
+                        <p className="text-xs text-txt-2 mt-0.5 leading-relaxed">{log.message}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>

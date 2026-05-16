@@ -30,6 +30,8 @@ import AdminCmsPage from './pages/admin/cms/page';
 import AdminSystemPage from './pages/admin/system/page';
 import AdminSettingsPage from './pages/admin/settings/page';
 
+import UpgradePage from './pages/app/upgrade/page';
+
 const queryClient = new QueryClient();
 
 const router = createBrowserRouter([
@@ -44,6 +46,10 @@ const router = createBrowserRouter([
   {
     path: '/register',
     element: <LoginPage />, // Réutilise LoginPage pour l'instant (RegisterForm à venir)
+  },
+  {
+    path: '/app/upgrade',
+    element: <UpgradePage />,
   },
   {
     path: '/admin',

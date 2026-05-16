@@ -3,15 +3,29 @@ import { AccountCard } from '../../../components/trading/AccountCard';
 import { useAccounts } from '../../../hooks/useAccounts';
 import { Plus } from 'lucide-react';
 import { AddAccountModal } from '../../../components/trading/AddAccountModal';
+import { useAuth } from '../../../hooks/useAuth';
+import { useNavigate } from 'react-router-dom';
 
 const AccountsPage: React.FC = () => {
   const { accounts, isLoading } = useAccounts();
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = React.useState(false);
 
   const safeAccounts = Array.isArray(accounts) ? accounts : [];
   const totalCapital = safeAccounts.reduce((acc, a) => acc + Number(a.tailleCompte || 0), 0);
   const totalBalance = safeAccounts.reduce((acc, a) => acc + Number(a.balanceCourante || 0), 0);
   const totalPnL = totalBalance - totalCapital;
+
+  const isPro = user?.plan === 'pro' || user?.role === 'admin';
+
+  const handleAddAccount = () => {
+    if (!isPro && safeAccounts.length >= 1) {
+      navigate('/app/upgrade');
+    } else {
+      setIsModalOpen(true);
+    }
+  };
 
   return (
     <div className="space-y-8 animate-[fadeIn_0.5s_ease-out]">
@@ -36,7 +50,7 @@ const AccountsPage: React.FC = () => {
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-bold">Mes Comptes Trading</h2>
         <button 
-          onClick={() => setIsModalOpen(true)}
+          onClick={handleAddAccount}
           className="btn-primary flex items-center gap-2"
         >
           <Plus size={18} />
@@ -57,9 +71,12 @@ const AccountsPage: React.FC = () => {
           ))}
           
           <button 
-            onClick={() => setIsModalOpen(true)}
-            className="glass rounded-3xl border-dashed border-2 border-border hover:border-accent/30 hover:bg-accent/5 transition-all flex flex-col items-center justify-center p-8 group min-h-[300px]"
+            onClick={handleAddAccount}
+            className="glass rounded-3xl border-dashed border-2 border-border hover:border-accent/30 hover:bg-accent/5 transition-all flex flex-col items-center justify-center p-8 group min-h-[300px] relative overflow-hidden"
           >
+            {!isPro && (
+              <div className="absolute top-4 right-4 bg-accent text-white text-[9px] font-black px-2 py-0.5 rounded uppercase">PRO</div>
+            )}
             <div className="w-12 h-12 rounded-full bg-elevated flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
               <Plus className="text-txt-3 group-hover:text-accent" />
             </div>

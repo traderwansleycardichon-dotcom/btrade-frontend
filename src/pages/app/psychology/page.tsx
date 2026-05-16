@@ -2,6 +2,15 @@ import React, { useState } from 'react';
 import { Brain, Heart, Zap, Shield, Target, TrendingUp } from 'lucide-react';
 import { AddPsychologyModal } from '../../../components/trading/AddPsychologyModal';
 import { usePsychology } from '../../../hooks/usePsychology';
+import { 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  ResponsiveContainer,
+  AreaChart,
+  Area
+} from 'recharts';
 
 const MOODS: Record<string, string> = {
   'confident': 'Confiant',
@@ -22,6 +31,12 @@ const PsychologyPage: React.FC = () => {
     { label: 'Total Entrées', value: trackings.length.toString(), color: 'text-win', icon: Zap },
     { label: 'Overtrading', value: 'Nul', color: 'text-win', icon: Target },
   ];
+
+  // Préparation des données pour le graphique (inverser pour ordre chronologique)
+  const chartData = [...trackings].reverse().slice(-10).map((t: any) => ({
+    date: new Date(t.date || t.createdAt).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' }),
+    discipline: t.disciplineScore
+  }));
 
   return (
     <div className="space-y-8 animate-[fadeIn_0.5s_ease-out]">
@@ -61,18 +76,48 @@ const PsychologyPage: React.FC = () => {
             <TrendingUp size={20} className="text-accent" />
             Évolution Discipline (10 derniers)
           </h3>
-          <div className="h-64 flex items-end gap-2 px-4">
-            {trackings.slice(0, 10).reverse().map((t: any, i: number) => (
-              <div key={t.id} className="flex-1 flex flex-col items-center gap-2 group">
-                <div 
-                  className={`w-full ${t.disciplineScore >= 7 ? 'bg-win/50 hover:bg-win/80' : t.disciplineScore >= 4 ? 'bg-accent/50 hover:bg-accent/80' : 'bg-loss/50 hover:bg-loss/80'} rounded-t-lg transition-all duration-300`}
-                  style={{ height: `${t.disciplineScore * 10}%` }}
-                />
-                <span className="text-[10px] font-bold text-txt-3 uppercase">{t.disciplineScore}/10</span>
-              </div>
-            ))}
-            {trackings.length === 0 && !isLoading && (
-              <div className="w-full text-center text-txt-3 text-sm italic pb-10">
+          <div className="h-64 w-full">
+            {chartData.length > 0 ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={chartData}>
+                  <defs>
+                    <linearGradient id="colorDisc" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#F36C00" stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor="#F36C00" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#333" vertical={false} />
+                  <XAxis 
+                    dataKey="date" 
+                    stroke="#666" 
+                    fontSize={10} 
+                    tickLine={false} 
+                    axisLine={false}
+                  />
+                  <YAxis 
+                    domain={[0, 10]} 
+                    stroke="#666" 
+                    fontSize={10} 
+                    tickLine={false} 
+                    axisLine={false} 
+                    ticks={[0, 5, 10]}
+                  />
+                  <Tooltip 
+                    contentStyle={{ backgroundColor: '#1A1A1A', border: '1px solid #333', borderRadius: '12px', fontSize: '12px' }}
+                    itemStyle={{ color: '#F36C00' }}
+                  />
+                  <Area 
+                    type="monotone" 
+                    dataKey="discipline" 
+                    stroke="#F36C00" 
+                    strokeWidth={3}
+                    fillOpacity={1} 
+                    fill="url(#colorDisc)" 
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            ) : !isLoading && (
+              <div className="h-full flex items-center justify-center text-txt-3 text-sm italic">
                 Aucune donnée pour afficher le graphique.
               </div>
             )}

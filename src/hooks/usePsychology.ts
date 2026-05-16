@@ -18,6 +18,7 @@ export const usePsychology = () => {
       const formattedPayload = {
         emotional_state: payload.mood,
         discipline_score: Number(payload.disciplineScore),
+        fatigue_level: Number(payload.fatigueLevel),
         tilt_detected: payload.mood === 'tilt',
         note: payload.notes
       };

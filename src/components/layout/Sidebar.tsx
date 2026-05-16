@@ -24,7 +24,8 @@ import {
   ArrowUpRight,
   Target,
   Globe,
-  FileText
+  FileText,
+  Lock
 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { useAccounts } from '../../hooks/useAccounts';
@@ -43,6 +44,7 @@ interface NavItem {
   href: string;
   live?: boolean;
   badge?: string;
+  proOnly?: boolean;
 }
 
 interface NavGroup {
@@ -60,6 +62,8 @@ export const Sidebar: React.FC = () => {
   const { user, logout } = useAuth();
   const { accounts } = useAccounts();
   const location = useLocation();
+
+  const isPro = user?.plan === 'pro' || user?.role === 'admin';
 
   // Sécurisation des données provenant du hook
   const accountsList = Array.isArray(accounts) ? accounts : [];
@@ -91,17 +95,17 @@ export const Sidebar: React.FC = () => {
     {
       title: 'Analyse & École',
       items: [
-        { label: 'Insights IA', icon: Sparkles, href: '/app/ai-insights', live: true },
+        { label: 'Insights IA', icon: Sparkles, href: '/app/ai-insights', proOnly: true },
         { label: 'Psychologie', icon: Brain, href: '/app/psychology' },
-        { label: 'Academy', icon: GraduationCap, href: '/app/formation', badge: 'New' },
-        { label: 'Playbooks', icon: FileText, href: '/app/playbooks' },
+        { label: 'Academy', icon: GraduationCap, href: '/app/formation', proOnly: true },
+        { label: 'Playbooks', icon: FileText, href: '/app/playbooks', proOnly: true },
       ]
     },
     {
       title: 'Gestion',
       items: [
         { label: 'Calendrier Éco', icon: Globe, href: '/app/economic' },
-        { label: 'Analyses', icon: BarChart3, href: '/app/reports' },
+        { label: 'Analyses', icon: BarChart3, href: '/app/reports', proOnly: true },
         { label: 'Paramètres', icon: Settings, href: '/app/settings' },
       ]
     }
@@ -147,32 +151,36 @@ export const Sidebar: React.FC = () => {
             </div>
             <div className="space-y-0.5">
               {group.items.map((item) => (
-                <NavLink
-                  key={item.href}
-                  to={item.href}
-                  className={({ isActive }) => cn(
-                    "flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all group",
-                    isActive 
-                      ? "bg-accent/10 text-accent border-l-2 border-accent rounded-l-none" 
-                      : "text-txt-2 hover:text-txt hover:bg-elevated"
-                  )}
-                >
-                  <div className="flex items-center gap-3">
-                    <item.icon size={18} />
-                    <span>{item.label}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {item.live && (
-                      <span className="text-[9px] font-black bg-accent text-white px-1.5 py-0.5 rounded leading-none animate-pulse">LIVE</span>
+                  <NavLink
+                    key={item.href}
+                    to={(!item.proOnly || isPro) ? item.href : '/app/upgrade'}
+                    className={({ isActive }) => cn(
+                      "flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all group",
+                      isActive 
+                        ? "bg-accent/10 text-accent border-l-2 border-accent rounded-l-none" 
+                        : "text-txt-2 hover:text-txt hover:bg-elevated",
+                      item.proOnly && !isPro && "opacity-60"
                     )}
-                    {item.badge && (
-                      <span className="text-[10px] font-bold bg-border text-txt-2 group-hover:bg-accent group-hover:text-white px-1.5 py-0.5 rounded transition-colors">
-                        {item.badge}
-                      </span>
-                    )}
-                    <ChevronRight size={14} className="opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all" />
-                  </div>
-                </NavLink>
+                  >
+                    <div className="flex items-center gap-3">
+                      <item.icon size={18} />
+                      <span>{item.label}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {item.proOnly && !isPro && (
+                        <Lock size={12} className="text-txt-3" />
+                      )}
+                      {item.live && (
+                        <span className="text-[9px] font-black bg-accent text-white px-1.5 py-0.5 rounded leading-none animate-pulse">LIVE</span>
+                      )}
+                      {item.badge && (
+                        <span className="text-[10px] font-bold bg-border text-txt-2 group-hover:bg-accent group-hover:text-white px-1.5 py-0.5 rounded transition-colors">
+                          {item.badge}
+                        </span>
+                      )}
+                      <ChevronRight size={14} className="opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all" />
+                    </div>
+                  </NavLink>
               ))}
             </div>
           </div>
