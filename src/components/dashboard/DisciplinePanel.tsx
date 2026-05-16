@@ -40,7 +40,7 @@ export const DisciplinePanel: React.FC = () => {
       </div>
 
       <div className="mt-6 p-4 rounded-2xl bg-accent/5 border border-accent/10">
-        <p className="text-[10px] text-txt-2 leading-relaxed italic">
+        <p className="text-[11px] md:text-[10px] text-txt-2 leading-relaxed italic">
           "Votre discipline est en hausse de <span className="text-accent font-bold">12%</span> cette semaine. 
           Concentrez-vous sur le respect du plan pour atteindre l'élite."
         </p>

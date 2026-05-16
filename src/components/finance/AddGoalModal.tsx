@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Modal } from '../ui/Modal';
 import { useObjectifs } from '../../hooks/useObjectifs';
 import { useToast } from '../../hooks/useToast';
-import { Target, DollarSign, Calendar, Palette } from 'lucide-react';
+import { Target, DollarSign, Calendar, Palette, Star } from 'lucide-react';
 
 interface AddGoalModalProps {
   isOpen: boolean;
@@ -26,6 +26,7 @@ export const AddGoalModal: React.FC<AddGoalModalProps> = ({ isOpen, onClose }) =
     montantCible: '',
     montantActuel: '0',
     dateCible: '',
+    description: '',
     couleur: '#10B981'
   });
 
@@ -44,6 +45,7 @@ export const AddGoalModal: React.FC<AddGoalModalProps> = ({ isOpen, onClose }) =
         montantCible: '',
         montantActuel: '0',
         dateCible: '',
+        description: '',
         couleur: '#10B981'
       });
     } catch (error) {
@@ -56,7 +58,7 @@ export const AddGoalModal: React.FC<AddGoalModalProps> = ({ isOpen, onClose }) =
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="grid grid-cols-2 gap-4">
           <div className="col-span-2">
-            <label className="block text-[10px] font-bold text-txt-3 uppercase tracking-widest mb-2">Nom de l'objectif</label>
+            <label className="block text-[11px] md:text-[10px] font-bold text-txt-3 uppercase tracking-widest mb-2">Nom de l'objectif</label>
             <div className="relative">
               <Target className="absolute left-4 top-1/2 -translate-y-1/2 text-txt-3" size={16} />
               <input 
@@ -71,7 +73,7 @@ export const AddGoalModal: React.FC<AddGoalModalProps> = ({ isOpen, onClose }) =
           </div>
 
           <div className="col-span-1">
-            <label className="block text-[10px] font-bold text-txt-3 uppercase tracking-widest mb-2">Cible ($)</label>
+            <label className="block text-[11px] md:text-[10px] font-bold text-txt-3 uppercase tracking-widest mb-2">Cible ($)</label>
             <div className="relative">
               <DollarSign className="absolute left-4 top-1/2 -translate-y-1/2 text-win" size={16} />
               <input 
@@ -87,7 +89,7 @@ export const AddGoalModal: React.FC<AddGoalModalProps> = ({ isOpen, onClose }) =
           </div>
 
           <div className="col-span-1">
-            <label className="block text-[10px] font-bold text-txt-3 uppercase tracking-widest mb-2">Déjà épargné ($)</label>
+            <label className="block text-[11px] md:text-[10px] font-bold text-txt-3 uppercase tracking-widest mb-2">Déjà épargné ($)</label>
             <div className="relative">
               <DollarSign className="absolute left-4 top-1/2 -translate-y-1/2 text-txt-3" size={16} />
               <input 
@@ -101,8 +103,21 @@ export const AddGoalModal: React.FC<AddGoalModalProps> = ({ isOpen, onClose }) =
             </div>
           </div>
 
+          <div className="col-span-2">
+            <label className="block text-[11px] md:text-[10px] font-bold text-txt-3 uppercase tracking-widest mb-2">Récompense (Optionnel)</label>
+            <div className="relative">
+              <Star className="absolute left-4 top-3 text-txt-3" size={16} />
+              <textarea 
+                placeholder="Ex: Un bon restaurant, un weekend..."
+                value={formData.description}
+                onChange={(e) => setFormData({...formData, description: e.target.value})}
+                className="w-full bg-bg border border-border rounded-xl py-3 pl-12 pr-4 focus:border-accent/50 outline-none transition-all min-h-[100px] resize-none" 
+              />
+            </div>
+          </div>
+
           <div className="col-span-1">
-            <label className="block text-[10px] font-bold text-txt-3 uppercase tracking-widest mb-2">Deadline (Optionnel)</label>
+            <label className="block text-[11px] md:text-[10px] font-bold text-txt-3 uppercase tracking-widest mb-2">Deadline (Optionnel)</label>
             <div className="relative">
               <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-txt-3" size={16} />
               <input 
@@ -115,7 +130,7 @@ export const AddGoalModal: React.FC<AddGoalModalProps> = ({ isOpen, onClose }) =
           </div>
 
           <div className="col-span-1">
-            <label className="block text-[10px] font-bold text-txt-3 uppercase tracking-widest mb-2">Couleur</label>
+            <label className="block text-[11px] md:text-[10px] font-bold text-txt-3 uppercase tracking-widest mb-2">Couleur</label>
             <div className="relative">
               <Palette className="absolute left-4 top-1/2 -translate-y-1/2 text-txt-3" size={16} />
               <select 

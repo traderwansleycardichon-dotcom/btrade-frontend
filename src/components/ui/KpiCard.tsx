@@ -52,8 +52,8 @@ export const KpiCard: React.FC<KpiCardProps> = ({
         )}
       </div>
       <div className="flex items-baseline">
-        {currency && <span className="text-txt-2 text-xl font-mono mr-1">{currency}</span>}
-        <span className={cn("text-3xl font-mono font-bold tracking-tight", colorClass || "text-txt")}>
+        {currency && <span className="text-txt-2 text-lg md:text-xl font-mono mr-1">{currency}</span>}
+        <span className={cn("text-2xl md:text-3xl font-mono font-bold tracking-tight", colorClass || "text-txt")}>
           {value}
         </span>
       </div>

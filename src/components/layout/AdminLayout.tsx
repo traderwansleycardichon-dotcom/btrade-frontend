@@ -3,11 +3,12 @@ import { Outlet, Navigate, useLocation } from 'react-router-dom';
 import { AdminSidebar } from './AdminSidebar';
 import { useAuth } from '../../hooks/useAuth';
 import { ToastContainer } from '../ui/Toast';
-import { ShieldAlert } from 'lucide-react';
+import { ShieldAlert, Menu } from 'lucide-react';
 
 export const AdminLayout: React.FC = () => {
   const { isAuthenticated, isLoading, user, refreshUser } = useAuth();
   const location = useLocation();
+  const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -51,9 +52,20 @@ export const AdminLayout: React.FC = () => {
 
   return (
     <div className="flex min-h-screen bg-bg text-txt">
-      <AdminSidebar />
+      <AdminSidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
       <div className="flex-1 flex flex-col min-w-0">
-        <main className="flex-1 p-8 overflow-y-auto custom-scrollbar">
+        {/* Mobile Header for Admin */}
+        <header className="h-16 border-b border-border bg-surface/50 backdrop-blur-xl lg:hidden flex items-center px-4 sticky top-0 z-50">
+          <button 
+            onClick={() => setIsSidebarOpen(true)}
+            className="p-2 text-txt-2 hover:bg-elevated rounded-lg transition-colors"
+          >
+            <Menu size={20} />
+          </button>
+          <span className="ml-4 font-bold">Admin Panel</span>
+        </header>
+
+        <main className="flex-1 p-4 lg:p-8 overflow-y-auto custom-scrollbar overflow-x-hidden">
           <Outlet />
         </main>
       </div>

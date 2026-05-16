@@ -7,6 +7,8 @@ const GoalsPage: React.FC = () => {
   const { objectifs, isLoading } = useObjectifs();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  const nextGoal = objectifs.find((o: any) => !o.completed);
+
   return (
     <div className="space-y-8 animate-[fadeIn_0.5s_ease-out]">
       <div className="flex justify-between items-center">
@@ -23,49 +25,55 @@ const GoalsPage: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {objectifs.map((goal: any) => (
-          <div key={goal.id} className="glass p-8 rounded-3xl relative overflow-hidden group">
-            <div 
-              className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity"
-              style={{ color: goal.couleur }}
-            >
-              <Target size={80} />
-            </div>
-            
-            <div className="flex items-center gap-3 mb-6">
+        {isLoading ? (
+          [1, 2, 3].map(i => (
+            <div key={i} className="glass p-8 rounded-3xl h-[280px] animate-pulse bg-elevated/50" />
+          ))
+        ) : (
+          objectifs.map((goal: any) => (
+            <div key={goal.id} className="glass p-8 rounded-3xl relative overflow-hidden group">
               <div 
-                className="w-10 h-10 rounded-xl flex items-center justify-center"
-                style={{ backgroundColor: `${goal.couleur}15`, color: goal.couleur }}
+                className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity"
+                style={{ color: goal.couleur }}
               >
-                <Target size={20} />
+                <Target size={80} />
               </div>
-              <span className="text-[10px] font-bold text-txt-3 uppercase tracking-widest">
-                {goal.completed ? 'Atteint' : 'En cours'}
-              </span>
-            </div>
-
-            <h3 className="text-xl font-bold mb-1">{goal.nom}</h3>
-            <div className="text-sm text-txt-2 mb-8 flex items-center gap-2">
-              <Target size={14} style={{ color: goal.couleur }} />
-              Cible: <span className="font-bold text-txt">{Number(goal.montantCible).toLocaleString()}$</span>
-            </div>
-
-            <div className="space-y-3">
-              <div className="flex justify-between text-xs font-bold uppercase tracking-widest">
-                <span className="text-txt-2">
-                  {Number(goal.montantActuel).toLocaleString()}$ / {Number(goal.montantCible).toLocaleString()}$
-                </span>
-                <span style={{ color: goal.couleur }}>{goal.progressionPct}%</span>
-              </div>
-              <div className="h-2 w-full bg-border rounded-full overflow-hidden">
+              
+              <div className="flex items-center gap-3 mb-6">
                 <div 
-                  className="h-full rounded-full transition-all duration-1000" 
-                  style={{ width: `${goal.progressionPct}%`, backgroundColor: goal.couleur }}
-                />
+                  className="w-10 h-10 rounded-xl flex items-center justify-center"
+                  style={{ backgroundColor: `${goal.couleur}15`, color: goal.couleur }}
+                >
+                  <Target size={20} />
+                </div>
+                <span className="text-[10px] font-bold text-txt-3 uppercase tracking-widest">
+                  {goal.completed ? 'Atteint' : 'En cours'}
+                </span>
+              </div>
+
+              <h3 className="text-xl font-bold mb-1">{goal.nom}</h3>
+              <div className="text-sm text-txt-2 mb-8 flex items-center gap-2">
+                <Target size={14} style={{ color: goal.couleur }} />
+                Cible: <span className="font-bold text-txt">{Number(goal.montantCible).toLocaleString()}$</span>
+              </div>
+
+              <div className="space-y-3">
+                <div className="flex justify-between text-xs font-bold uppercase tracking-widest">
+                  <span className="text-txt-2">
+                    {Number(goal.montantActuel).toLocaleString()}$ / {Number(goal.montantCible).toLocaleString()}$
+                  </span>
+                  <span style={{ color: goal.couleur }}>{goal.progressionPct}%</span>
+                </div>
+                <div className="h-2 w-full bg-border rounded-full overflow-hidden">
+                  <div 
+                    className="h-full rounded-full transition-all duration-1000" 
+                    style={{ width: `${goal.progressionPct}%`, backgroundColor: goal.couleur }}
+                  />
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          ))
+        )}
         {objectifs.length === 0 && !isLoading && (
           <div className="col-span-1 lg:col-span-3 py-12 text-center glass rounded-3xl border border-dashed border-border">
             <Target size={48} className="mx-auto text-txt-3 mb-4" />
@@ -108,19 +116,36 @@ const GoalsPage: React.FC = () => {
 
         <div className="glass p-8 rounded-3xl bg-gradient-to-br from-accent/5 to-transparent border-accent/20">
           <h3 className="text-lg font-bold mb-4 italic">Prochain Milestone</h3>
-          <p className="text-txt-2 mb-6 text-sm">
-            Vous êtes à seulement **$3,500** de valider votre premier objectif financier de l'année. 
-            Gardez le cap sur votre gestion des risques !
-          </p>
-          <div className="p-4 rounded-2xl bg-surface border border-accent/20 flex items-center gap-4">
-            <div className="w-12 h-12 rounded-full bg-accent flex items-center justify-center text-white">
-              <Star size={24} />
+          {isLoading ? (
+            <div className="h-24 animate-pulse bg-elevated/50 rounded-xl" />
+          ) : nextGoal ? (
+            <>
+              <p className="text-txt-2 mb-6 text-sm">
+                Vous êtes à seulement <span className="text-accent font-bold">
+                  ${(Number(nextGoal.montantCible) - Number(nextGoal.montantActuel)).toLocaleString()}
+                </span> de valider votre objectif <span className="font-bold text-txt">"{nextGoal.nom}"</span>. 
+                Gardez le cap sur votre gestion des risques !
+              </p>
+              <div className="p-4 rounded-2xl bg-surface border border-accent/20 flex items-center gap-4">
+                <div className="w-12 h-12 rounded-full bg-accent flex items-center justify-center text-white">
+                  <Star size={24} />
+                </div>
+                <div>
+                  <div className="text-xs font-bold text-txt-3 uppercase">Reward à la clé</div>
+                  <div className="font-bold">
+                    {nextGoal.description || "Dîner gastronomique & Weekend détente"}
+                  </div>
+                </div>
+              </div>
+            </>
+          ) : (
+            <div className="text-center py-6">
+              <CheckCircle2 size={32} className="mx-auto text-win mb-2" />
+              <p className="text-txt-2 text-sm italic">
+                Tous vos objectifs sont complétés ! Félicitations pour votre discipline. 🏆
+              </p>
             </div>
-            <div>
-              <div className="text-xs font-bold text-txt-3 uppercase">Reward à la clé</div>
-              <div className="font-bold">Dîner gastronomique & Weekend détente</div>
-            </div>
-          </div>
+          )}
         </div>
       </div>
 

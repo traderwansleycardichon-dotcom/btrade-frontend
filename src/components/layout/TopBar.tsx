@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Search, Plus, Upload, Bell, Command } from 'lucide-react';
+import { Search, Plus, Upload, Bell, Command, Menu } from 'lucide-react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { NotificationsDropdown } from './NotificationsDropdown';
 import { ImportTradesModal } from '../trading/ImportTradesModal';
 import { useNotifications } from '../../hooks/useNotifications';
 
-export const TopBar: React.FC = () => {
+interface TopBarProps {
+  onMenuClick: () => void;
+}
+
+export const TopBar: React.FC<TopBarProps> = ({ onMenuClick }) => {
   const location = useLocation();
   const [now, setNow] = useState(new Date());
   const [isNotifOpen, setIsNotifOpen] = useState(false);
@@ -33,9 +37,15 @@ export const TopBar: React.FC = () => {
   };
 
   return (
-    <header className="h-16 bg-surface/50 backdrop-blur-xl border-b border-border px-8 flex items-center justify-between sticky top-0 z-50">
-      <div className="flex items-center gap-6">
-        <h1 className="text-xl font-bold text-txt">{getPageTitle()}</h1>
+    <header className="h-16 bg-surface/50 backdrop-blur-xl border-b border-border px-4 lg:px-8 flex items-center justify-between sticky top-0 z-50">
+      <div className="flex items-center gap-4 lg:gap-6">
+        <button 
+          onClick={onMenuClick}
+          className="lg:hidden p-2 text-txt-2 hover:bg-elevated rounded-lg transition-colors"
+        >
+          <Menu size={20} />
+        </button>
+        <h1 className="text-base sm:text-lg lg:text-xl font-bold text-txt truncate max-w-[150px] lg:max-w-none">{getPageTitle()}</h1>
         <div className="h-4 w-px bg-border hidden sm:block" />
         <div className="text-sm text-txt-2 hidden md:block">
           {format(now, "EEEE d MMMM", { locale: fr })} <span className="mx-1">·</span> 

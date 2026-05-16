@@ -4,6 +4,7 @@ import { KpiCard } from '../../../components/ui/KpiCard';
 import api from '../../../lib/api';
 
 import { AdminActivityChart } from '../../../components/admin/AdminActivityChart';
+import { AdminBillingStats } from '../../../components/admin/AdminBillingStats';
 
 export default function AdminDashboardPage() {
   const [stats, setStats] = useState<any>(null);
@@ -56,12 +57,7 @@ export default function AdminDashboardPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <AdminActivityChart />
-        
-        <div className="glass p-8 rounded-3xl h-96 flex flex-col items-center justify-center border-loss/10 hover:border-loss/30 transition-all">
-          <TrendingUp size={48} className="text-txt-3 mb-4 opacity-50" />
-          <h3 className="font-bold text-lg mb-2">Revenus & Abonnements</h3>
-          <p className="text-txt-2 text-sm text-center max-w-sm">Intégration Stripe en cours de déploiement.</p>
-        </div>
+        <AdminBillingStats data={stats?.billing} loading={loading} />
       </div>
     </div>
   );

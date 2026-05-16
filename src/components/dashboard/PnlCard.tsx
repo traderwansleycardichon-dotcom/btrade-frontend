@@ -32,7 +32,7 @@ export const PnlCard: React.FC = () => {
           <div>
             <h3 className="text-txt-2 text-xs font-bold uppercase tracking-widest mb-1">Net P&L · 30 derniers jours</h3>
             <div className="flex items-baseline gap-2">
-              <span className={`text-4xl font-mono font-bold tracking-tight ${isPositive ? 'text-win' : 'text-loss'}`}>
+              <span className={`text-3xl md:text-4xl font-mono font-bold tracking-tight ${isPositive ? 'text-win' : 'text-loss'}`}>
                 {isPositive ? '+' : ''}${Math.abs(pnl).toLocaleString()}
               </span>
               <Chip variant={isPositive ? 'win' : 'loss'} withDot>

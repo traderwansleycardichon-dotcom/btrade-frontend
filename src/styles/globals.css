@@ -15,9 +15,31 @@
 }
 
 @layer base {
+  html {
+    font-size: 14px;
+    @screen md {
+      font-size: 15px;
+    }
+    @screen lg {
+      font-size: 16px;
+    }
+  }
+
   body {
     @apply bg-bg text-txt font-sans antialiased selection:bg-accent/30;
     letter-spacing: -0.01em;
+  }
+
+  h1 {
+    @apply text-3xl md:text-4xl lg:text-5xl font-black tracking-tighter;
+  }
+
+  h2 {
+    @apply text-2xl md:text-3xl lg:text-4xl font-bold tracking-tight;
+  }
+
+  h3 {
+    @apply text-xl md:text-2xl lg:text-3xl font-bold;
   }
 }
 

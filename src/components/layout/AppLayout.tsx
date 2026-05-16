@@ -9,11 +9,7 @@ export const AppLayout: React.FC = () => {
   const { isAuthenticated, isLoading, refreshUser } = useAuth();
   const location = useLocation();
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      refreshUser();
-    }
-  }, [isAuthenticated, location.pathname]);
+  const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
 
   if (isLoading && isAuthenticated) {
     return (
@@ -32,10 +28,10 @@ export const AppLayout: React.FC = () => {
 
   return (
     <div className="flex min-h-screen bg-bg text-txt">
-      <Sidebar />
+      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
       <div className="flex-1 flex flex-col min-w-0">
-        <TopBar />
-        <main className="flex-1 p-8 overflow-y-auto">
+        <TopBar onMenuClick={() => setIsSidebarOpen(true)} />
+        <main className="flex-1 p-4 lg:p-8 overflow-y-auto overflow-x-hidden">
           <Outlet />
         </main>
       </div>

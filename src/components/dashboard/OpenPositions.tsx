@@ -27,11 +27,11 @@ export const OpenPositions: React.FC = () => {
 
             <div className="grid grid-cols-2 gap-4 mb-4">
               <div>
-                <div className="text-[9px] font-bold text-txt-3 uppercase mb-0.5">Entrée</div>
+                <div className="text-[10px] md:text-[9px] font-bold text-txt-3 uppercase mb-0.5">Entrée</div>
                 <div className="text-xs font-mono">{pos.entryPrice}</div>
               </div>
               <div className="text-right">
-                <div className="text-[9px] font-bold text-txt-3 uppercase mb-0.5">SL / TP</div>
+                <div className="text-[10px] md:text-[9px] font-bold text-txt-3 uppercase mb-0.5">SL / TP</div>
                 <div className="text-xs font-mono text-txt-2">{pos.sl} / {pos.tp}</div>
               </div>
             </div>
