@@ -15,21 +15,28 @@ export const AddTradeModal: React.FC<AddTradeModalProps> = ({ isOpen, onClose, a
   
   const [formData, setFormData] = useState({
     instrument: 'EURUSD',
-    direction: 'buy',
+    direction: 'long',
     quantite: 1.0,
-    prix_entree: '',
-    prix_sortie: '',
-    pl_brut: '',
+    prixEntree: '',
+    prixSortie: '',
+    plBrut: '',
     commission: '',
     setup: '',
     resultat: 'win',
     note: ''
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await createTrade.mutateAsync(formData);
+      await createTrade.mutateAsync({
+        ...formData,
+        quantite: Number(formData.quantite),
+        prixEntree: Number(formData.prixEntree),
+        prixSortie: formData.prixSortie ? Number(formData.prixSortie) : null,
+        plBrut: Number(formData.plBrut),
+        commission: Number(formData.commission)
+      });
       addToast('Trade ajouté avec succès !');
       onClose();
     } catch (err) {
@@ -68,8 +75,8 @@ export const AddTradeModal: React.FC<AddTradeModalProps> = ({ isOpen, onClose, a
             onChange={(e) => setFormData({...formData, direction: e.target.value})}
             className="w-full bg-bg border border-border rounded-xl py-3 px-4 focus:border-accent/50 outline-none transition-all"
           >
-            <option value="buy">BUY / LONG</option>
-            <option value="sell">SELL / SHORT</option>
+            <option value="long">LONG</option>
+            <option value="short">SHORT</option>
           </select>
         </div>
 
@@ -99,8 +106,8 @@ export const AddTradeModal: React.FC<AddTradeModalProps> = ({ isOpen, onClose, a
           <label className="block text-[10px] font-bold text-txt-2 uppercase tracking-widest mb-2">P&L Brut ($)</label>
           <input 
             type="number" 
-            value={formData.pl_brut}
-            onChange={(e) => setFormData({...formData, pl_brut: e.target.value})}
+            value={formData.plBrut}
+            onChange={(e) => setFormData({...formData, plBrut: e.target.value})}
             className="w-full bg-bg border border-border rounded-xl py-3 px-4 focus:border-accent/50 outline-none transition-all font-mono" 
           />
         </div>
@@ -114,7 +121,7 @@ export const AddTradeModal: React.FC<AddTradeModalProps> = ({ isOpen, onClose, a
           >
             <option value="win">WIN</option>
             <option value="loss">LOSS</option>
-            <option value="be">BREAKEVEN</option>
+            <option value="breakeven">BREAKEVEN</option>
           </select>
         </div>
 

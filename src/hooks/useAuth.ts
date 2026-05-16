@@ -6,6 +6,7 @@ interface User {
   email: string;
   fullName: string;
   plan: 'free' | 'pro';
+  role?: string;
   onboarded: boolean;
   avatarUrl?: string;
   timezone?: string;

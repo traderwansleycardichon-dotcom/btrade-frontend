@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useAccounts } from '../../hooks/useAccounts';
 import { Chip } from '../ui/Chip';
-import { Wallet, TrendingUp, AlertTriangle, CheckCircle2, MoreVertical } from 'lucide-react';
+import { Wallet, TrendingUp, AlertTriangle, CheckCircle2, MoreVertical, Trash2 } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { AccountStatsModal } from './AccountStatsModal';
@@ -15,18 +15,21 @@ interface AccountCardProps {
 }
 
 export const AccountCard: React.FC<AccountCardProps> = ({ account }) => {
-  const { passFunded } = useAccounts();
+  const { passFunded, deleteAccount } = useAccounts();
   const [isStatsOpen, setIsStatsOpen] = useState(false);
   
-  const balance = Number(account.balanceCourante);
-  const initial = Number(account.tailleCompte);
+  const balance = Number(account.balanceCourante || 0);
+  const initial = Number(account.tailleCompte || 0);
   const pnl = balance - initial;
-  const pnlPct = initial > 0 ? (pnl / initial) * 100 : 0;
+  const pnlPct = Number(account.profitCourantPct || 0);
   
-  const currentDrawdown = initial > 0 ? ((initial - balance) / initial) * 100 : 0;
-  const isDrawdownAlert = currentDrawdown > 8;
+  const currentDrawdown = Number(account.drawdownCourantPct || 0);
+  const maxDrawdown = Number(account.maxDrawdownPct || 10);
+  const profitTarget = Number(account.profitTargetPct || 10);
+  
+  const isDrawdownAlert = currentDrawdown > (maxDrawdown * 0.8);
 
-  const canPassFunded = account.typeCompte === 'evaluation' && account.statut === 'actif' && pnlPct >= 10;
+  const canPassFunded = account.typeCompte === 'evaluation' && account.statut === 'actif' && pnlPct >= profitTarget;
 
   return (
     <>
@@ -76,7 +79,7 @@ export const AccountCard: React.FC<AccountCardProps> = ({ account }) => {
             <div className="flex justify-between text-[9px] font-black mb-2 uppercase tracking-widest">
               <span className="text-txt-3">Daily Drawdown</span>
               <span className={isDrawdownAlert ? "text-loss" : "text-txt-3"}>
-                {currentDrawdown > 0 ? currentDrawdown.toFixed(2) : 0}% / 10%
+                {currentDrawdown > 0 ? currentDrawdown.toFixed(2) : 0}% / {maxDrawdown}%
               </span>
             </div>
             <div className="h-1 bg-white/5 rounded-full overflow-hidden">
@@ -85,7 +88,7 @@ export const AccountCard: React.FC<AccountCardProps> = ({ account }) => {
                   "h-full rounded-full transition-all duration-1000",
                   isDrawdownAlert ? "bg-loss shadow-[0_0_10px_rgba(239,68,68,0.5)]" : "bg-accent shadow-[0_0_10px_rgba(243,108,0,0.5)]"
                 )}
-                style={{ width: `${Math.min((currentDrawdown / 10) * 100, 100)}%` }}
+                style={{ width: `${Math.min((currentDrawdown / maxDrawdown) * 100, 100)}%` }}
               />
             </div>
           </div>
@@ -94,12 +97,12 @@ export const AccountCard: React.FC<AccountCardProps> = ({ account }) => {
             <div>
               <div className="flex justify-between text-[9px] font-black mb-2 uppercase tracking-widest">
                 <span className="text-txt-3">Profit Target</span>
-                <span className="text-win">{pnlPct > 0 ? pnlPct.toFixed(2) : 0}% / 10%</span>
+                <span className="text-win">{pnlPct > 0 ? pnlPct.toFixed(2) : 0}% / {profitTarget}%</span>
               </div>
               <div className="h-1 bg-white/5 rounded-full overflow-hidden">
                 <div 
                   className="h-full rounded-full bg-win shadow-[0_0_10px_rgba(16,185,129,0.5)] transition-all duration-1000"
-                  style={{ width: `${Math.min((pnlPct / 10) * 100, 100)}%` }}
+                  style={{ width: `${Math.min((pnlPct / profitTarget) * 100, 100)}%` }}
                 />
               </div>
             </div>
@@ -124,8 +127,17 @@ export const AccountCard: React.FC<AccountCardProps> = ({ account }) => {
               Statistics
             </button>
           )}
-          <button className="px-4 py-3 bg-white/5 border border-white/5 text-txt-3 hover:text-white rounded-2xl transition-all">
-            <MoreVertical size={14} />
+          <button 
+            onClick={() => {
+              if (window.confirm('Êtes-vous sûr de vouloir supprimer ce compte et tout son historique ?')) {
+                deleteAccount.mutate(account.id);
+              }
+            }}
+            disabled={deleteAccount.isPending}
+            className="px-4 py-3 bg-loss/10 border border-loss/20 text-loss hover:bg-loss/20 rounded-2xl transition-all disabled:opacity-50"
+            title="Supprimer le compte"
+          >
+            <Trash2 size={14} />
           </button>
         </div>
       </div>

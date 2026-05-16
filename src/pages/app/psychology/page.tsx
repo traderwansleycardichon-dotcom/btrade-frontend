@@ -1,11 +1,25 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Brain, Heart, Zap, Shield, Target, TrendingUp } from 'lucide-react';
+import { AddPsychologyModal } from '../../../components/trading/AddPsychologyModal';
+import { usePsychology } from '../../../hooks/usePsychology';
+
+const MOODS: Record<string, string> = {
+  'confident': 'Confiant',
+  'calm': 'Calme',
+  'neutral': 'Neutre',
+  'anxious': 'Anxieux',
+  'frustrated': 'Frustré',
+  'tilt': 'Tilt'
+};
 
 const PsychologyPage: React.FC = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const { trackings, isLoading } = usePsychology();
+
   const emotionalStats = [
-    { label: 'Indice de Discipline', value: '85%', color: 'text-win', icon: Shield },
-    { label: 'Gestion du Stress', value: 'Bien', color: 'text-accent', icon: Heart },
-    { label: 'FOMO Alert', value: 'Faible', color: 'text-win', icon: Zap },
+    { label: 'Indice de Discipline', value: trackings.length > 0 ? `${(trackings.reduce((acc: number, t: any) => acc + t.disciplineScore, 0) / trackings.length).toFixed(1)}/10` : 'N/A', color: 'text-win', icon: Shield },
+    { label: 'Niveau Fatigue (Moy)', value: trackings.length > 0 ? `${(trackings.reduce((acc: number, t: any) => acc + t.fatigueLevel, 0) / trackings.length).toFixed(1)}/10` : 'N/A', color: 'text-accent', icon: Heart },
+    { label: 'Total Entrées', value: trackings.length.toString(), color: 'text-win', icon: Zap },
     { label: 'Overtrading', value: 'Nul', color: 'text-win', icon: Target },
   ];
 
@@ -16,7 +30,10 @@ const PsychologyPage: React.FC = () => {
           <h2 className="text-2xl font-bold">Psychologie & État d'Esprit</h2>
           <p className="text-txt-2 text-sm">Analysez vos émotions pour améliorer votre discipline de trading.</p>
         </div>
-        <button className="btn-primary flex items-center gap-2">
+        <button 
+          onClick={() => setIsModalOpen(true)}
+          className="btn-primary flex items-center gap-2"
+        >
           <Brain size={18} />
           Nouveau Journal Émotionnel
         </button>
@@ -31,7 +48,9 @@ const PsychologyPage: React.FC = () => {
               </div>
               <span className="text-[10px] font-bold text-txt-3 uppercase tracking-widest">{stat.label}</span>
             </div>
-            <div className={`text-3xl font-mono font-bold ${stat.color}`}>{stat.value}</div>
+            <div className={`text-3xl font-mono font-bold ${stat.color}`}>
+              {isLoading ? '...' : stat.value}
+            </div>
           </div>
         ))}
       </div>
@@ -40,18 +59,23 @@ const PsychologyPage: React.FC = () => {
         <div className="glass p-8 rounded-3xl">
           <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
             <TrendingUp size={20} className="text-accent" />
-            Évolution du Mental
+            Évolution Discipline (10 derniers)
           </h3>
           <div className="h-64 flex items-end gap-2 px-4">
-            {[40, 70, 45, 90, 65, 80, 85].map((h, i) => (
-              <div key={i} className="flex-1 flex flex-col items-center gap-2 group">
+            {trackings.slice(0, 10).reverse().map((t: any, i: number) => (
+              <div key={t.id} className="flex-1 flex flex-col items-center gap-2 group">
                 <div 
-                  className="w-full bg-accent/20 group-hover:bg-accent/40 rounded-t-lg transition-all duration-1000"
-                  style={{ height: `${h}%` }}
+                  className={`w-full ${t.disciplineScore >= 7 ? 'bg-win/50 hover:bg-win/80' : t.disciplineScore >= 4 ? 'bg-accent/50 hover:bg-accent/80' : 'bg-loss/50 hover:bg-loss/80'} rounded-t-lg transition-all duration-300`}
+                  style={{ height: `${t.disciplineScore * 10}%` }}
                 />
-                <span className="text-[10px] font-bold text-txt-3 uppercase">J{i+1}</span>
+                <span className="text-[10px] font-bold text-txt-3 uppercase">{t.disciplineScore}/10</span>
               </div>
             ))}
+            {trackings.length === 0 && !isLoading && (
+              <div className="w-full text-center text-txt-3 text-sm italic pb-10">
+                Aucune donnée pour afficher le graphique.
+              </div>
+            )}
           </div>
         </div>
 
@@ -61,7 +85,7 @@ const PsychologyPage: React.FC = () => {
           </div>
           <h3 className="text-xl font-bold italic">"Le trading n'est pas une question de stratégie, c'est une question de psychologie."</h3>
           <p className="text-sm text-txt-2 max-w-xs">
-            Vous avez maintenu une discipline exemplaire ces 5 derniers jours. Continuez à suivre vos règles !
+            Remplissez votre journal quotidiennement pour identifier les schémas émotionnels qui précèdent vos meilleures et pires sessions de trading.
           </p>
         </div>
       </div>
@@ -69,15 +93,31 @@ const PsychologyPage: React.FC = () => {
       <div className="glass p-8 rounded-3xl">
         <h3 className="text-lg font-bold mb-6">Notes Récentes de Psychologie</h3>
         <div className="space-y-4">
-          <div className="p-4 rounded-2xl bg-bg/50 border border-border">
-            <div className="flex justify-between mb-2">
-              <span className="font-bold text-sm">Aujourd'hui - 14:30</span>
-              <span className="text-[10px] font-bold text-win uppercase">Calme</span>
+          {trackings.map((t: any) => (
+            <div key={t.id} className="p-4 rounded-2xl bg-bg/50 border border-border">
+              <div className="flex justify-between mb-2">
+                <span className="font-bold text-sm">
+                  {new Date(t.date || t.createdAt).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}
+                </span>
+                <span className={`text-[10px] font-bold uppercase ${t.tiltDetected || t.emotionalState === 'tilt' || t.emotionalState === 'frustrated' ? 'text-loss' : 'text-win'}`}>
+                  {MOODS[t.emotionalState] || t.emotionalState} • Dis: {t.disciplineScore}/10
+                </span>
+              </div>
+              <p className="text-sm text-txt-2 italic">"{t.note || 'Aucune note.'}"</p>
             </div>
-            <p className="text-sm text-txt-2 italic">"J'ai attendu mon setup patiemment sans forcer le trade malgré la volatilité. Fier de ma patience."</p>
-          </div>
+          ))}
+          {trackings.length === 0 && !isLoading && (
+            <p className="text-center text-txt-3 text-sm italic py-4">
+              Aucun suivi psychologique récent. Prenez un moment pour noter votre état d'esprit.
+            </p>
+          )}
         </div>
       </div>
+
+      <AddPsychologyModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+      />
     </div>
   );
 };

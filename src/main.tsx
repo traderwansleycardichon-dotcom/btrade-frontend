@@ -20,6 +20,16 @@ import AIInsightsPage from './pages/app/ai-insights/page';
 import SettingsPage from './pages/app/settings/page';
 import './styles/globals.css';
 
+import { AdminLayout } from './components/layout/AdminLayout';
+import AdminDashboardPage from './pages/admin/dashboard/page';
+import AdminUsersPage from './pages/admin/users/page';
+import AdminBillingPage from './pages/admin/billing/page';
+import AdminSupportPage from './pages/admin/support/page';
+import AdminBroadcastPage from './pages/admin/broadcast/page';
+import AdminCmsPage from './pages/admin/cms/page';
+import AdminSystemPage from './pages/admin/system/page';
+import AdminSettingsPage from './pages/admin/settings/page';
+
 const queryClient = new QueryClient();
 
 const router = createBrowserRouter([
@@ -34,6 +44,21 @@ const router = createBrowserRouter([
   {
     path: '/register',
     element: <LoginPage />, // Réutilise LoginPage pour l'instant (RegisterForm à venir)
+  },
+  {
+    path: '/admin',
+    element: <AdminLayout />,
+    children: [
+      { path: '', element: <Navigate to="/admin/dashboard" replace /> },
+      { path: 'dashboard', element: <AdminDashboardPage /> },
+      { path: 'users', element: <AdminUsersPage /> },
+      { path: 'billing', element: <AdminBillingPage /> },
+      { path: 'support', element: <AdminSupportPage /> },
+      { path: 'broadcast', element: <AdminBroadcastPage /> },
+      { path: 'cms', element: <AdminCmsPage /> },
+      { path: 'system', element: <AdminSystemPage /> },
+      { path: 'settings', element: <AdminSettingsPage /> },
+    ],
   },
   {
     path: '/app',

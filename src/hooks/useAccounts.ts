@@ -52,11 +52,22 @@ export const useAccounts = () => {
     },
   });
 
+  const deleteAccount = useMutation({
+    mutationFn: async (id: string) => {
+      await api.delete(`/api/comptes/${id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['accounts'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+    },
+  });
+
   return {
     accounts: accountsQuery.data || [],
     isLoading: accountsQuery.isLoading,
     useStats: statsQuery,
     createAccount,
     passFunded,
+    deleteAccount,
   };
 };

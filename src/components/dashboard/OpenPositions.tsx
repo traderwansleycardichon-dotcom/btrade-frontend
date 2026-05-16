@@ -4,7 +4,7 @@ import { Chip } from '../ui/Chip';
 
 export const OpenPositions: React.FC = () => {
   return (
-    <div className="glass p-6 rounded-3xl h-full">
+    <div className="glass p-6 rounded-3xl h-fit">
       <div className="flex justify-between items-center mb-6">
         <h3 className="font-bold text-lg">Positions Ouvertes</h3>
         <span className="bg-accent/10 text-accent text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-widest">Live</span>

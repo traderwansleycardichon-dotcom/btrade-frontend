@@ -39,7 +39,7 @@ export const PayoutsTable: React.FC<{ accountId: string }> = ({ accountId }) => 
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
-            {payouts.map((p) => (
+            {Array.isArray(payouts) && payouts.map((p: any) => (
               <tr key={p.id} className="hover:bg-elevated/50 transition-colors">
                 <td className="px-6 py-4">
                   <div className="text-xs font-bold text-txt">
@@ -48,15 +48,15 @@ export const PayoutsTable: React.FC<{ accountId: string }> = ({ accountId }) => 
                   <div className="text-[10px] text-txt-2 uppercase">{p.id.split('-')[0]}</div>
                 </td>
                 <td className="px-6 py-4 font-mono font-bold text-sm text-win">
-                  +${Number(p.profitTotal).toLocaleString()}
+                  +${Number(p.montant).toLocaleString()}
                 </td>
                 <td className="px-6 py-4 text-center">
                   <span className="px-2 py-1 rounded-lg bg-border text-[10px] font-bold text-txt-2">
-                    {p.partTrader}% / {100 - p.partTrader}%
+                    -
                   </span>
                 </td>
                 <td className="px-6 py-4 font-mono font-bold text-base text-accent">
-                  ${Number(p.montantNet).toLocaleString()}
+                  ${Number(p.montant).toLocaleString()}
                 </td>
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-2">
@@ -67,12 +67,12 @@ export const PayoutsTable: React.FC<{ accountId: string }> = ({ accountId }) => 
                   </div>
                 </td>
                 <td className="px-6 py-4 text-right">
-                  <Chip variant={p.statut === 'payé' ? 'win' : 'orange'} withDot>
+                  <Chip variant={p.statut === 'confirmed' || p.statut === 'payé' ? 'win' : 'orange'} withDot>
                     {p.statut}
                   </Chip>
                 </td>
                 <td className="px-6 py-4 text-right">
-                  {p.statut === 'en_attente' && (
+                  {(p.statut === 'pending' || p.statut === 'en_attente') && (
                     <div className="flex justify-end gap-2">
                       <button 
                         onClick={() => confirmPayout.mutate(p.id)}

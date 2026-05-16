@@ -1,8 +1,23 @@
-import React from 'react';
-import { CreditCard, ArrowUpCircle, ArrowDownCircle, Filter, Download } from 'lucide-react';
+import React, { useState } from 'react';
+import { CreditCard, ArrowUpCircle, ArrowDownCircle, Filter, Download, Plus } from 'lucide-react';
 import { KpiCard } from '../../../components/ui/KpiCard';
+import { useFinance } from '../../../hooks/useFinance';
+import { AddRevenuModal } from '../../../components/finance/AddRevenuModal';
+import { AddDepenseModal } from '../../../components/finance/AddDepenseModal';
+import { ExportDataModal } from '../../../components/finance/ExportDataModal';
 
 const FinancePage: React.FC = () => {
+  const { revenus, depenses, totalRevenus, totalDepenses, isLoading } = useFinance();
+  const [isRevenuModalOpen, setIsRevenuModalOpen] = useState(false);
+  const [isDepenseModalOpen, setIsDepenseModalOpen] = useState(false);
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+
+  // Fusionner et trier les transactions par date
+  const transactions = [
+    ...revenus.map((r: any) => ({ ...r, type: 'revenu', label: r.source })),
+    ...depenses.map((d: any) => ({ ...d, type: 'depense' }))
+  ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
   return (
     <div className="space-y-8 animate-[fadeIn_0.5s_ease-out]">
       <div className="flex justify-between items-center">
@@ -11,20 +26,52 @@ const FinancePage: React.FC = () => {
           <p className="text-txt-2 text-sm">Gérez vos revenus et contrôlez vos dépenses.</p>
         </div>
         <div className="flex gap-3">
-          <button className="btn-secondary flex items-center gap-2">
+          <button 
+            onClick={() => setIsExportModalOpen(true)}
+            className="btn-secondary flex items-center gap-2"
+          >
             <Download size={18} />
             Export
           </button>
-          <button className="btn-primary">
-            + Nouvelle Transaction
-          </button>
+          <div className="flex gap-2">
+            <button 
+              onClick={() => setIsRevenuModalOpen(true)}
+              className="bg-win/10 text-win px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 hover:bg-win/20 transition-all"
+            >
+              <Plus size={16} /> Revenu
+            </button>
+            <button 
+              onClick={() => setIsDepenseModalOpen(true)}
+              className="bg-loss/10 text-loss px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 hover:bg-loss/20 transition-all"
+            >
+              <Plus size={16} /> Dépense
+            </button>
+          </div>
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <KpiCard label="Solde Mensuel" value="2,450" currency="$" colorClass="text-win" />
-        <KpiCard label="Revenus Totaux" value="6,800" currency="$" colorClass="text-win" icon={ArrowUpCircle} />
-        <KpiCard label="Dépenses Totales" value="4,350" currency="$" colorClass="text-loss" icon={ArrowDownCircle} />
+        <KpiCard 
+          label="Solde Mensuel" 
+          value={(totalRevenus - totalDepenses).toLocaleString()} 
+          currency="$" 
+          colorClass={(totalRevenus - totalDepenses) >= 0 ? 'text-win' : 'text-loss'} 
+          loading={isLoading}
+        />
+        <KpiCard 
+          label="Revenus Totaux" 
+          value={totalRevenus.toLocaleString()} 
+          currency="$" 
+          colorClass="text-win" 
+          loading={isLoading}
+        />
+        <KpiCard 
+          label="Dépenses Totales" 
+          value={totalDepenses.toLocaleString()} 
+          currency="$" 
+          colorClass="text-loss" 
+          loading={isLoading}
+        />
       </div>
 
       <div className="glass overflow-hidden rounded-3xl">
@@ -45,30 +92,50 @@ const FinancePage: React.FC = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-border/50">
-              {[
-                { date: '05 Mai 2026', cat: 'Salaire', desc: 'Virement Entreprise X', amount: '+4,500', color: 'text-win' },
-                { date: '04 Mai 2026', cat: 'Loyer', desc: 'Loyer Appartement', amount: '-1,200', color: 'text-loss' },
-                { date: '03 Mai 2026', cat: 'Trading', desc: 'Payout MyFundedFX', amount: '+1,800', color: 'text-win' },
-                { date: '02 Mai 2026', cat: 'Loisirs', desc: 'Restaurant', amount: '-85', color: 'text-loss' },
-                { date: '01 Mai 2026', cat: 'Abonnement', desc: 'TradingView Pro', amount: '-49', color: 'text-loss' },
-              ].map((t, i) => (
+              {transactions.map((t: any, i) => (
                 <tr key={i} className="hover:bg-elevated/30 transition-colors group">
-                  <td className="px-6 py-4 text-sm font-medium">{t.date}</td>
+                  <td className="px-6 py-4 text-sm font-medium">
+                    {new Date(t.date).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })}
+                  </td>
                   <td className="px-6 py-4">
-                    <span className="text-[10px] font-bold px-2 py-1 rounded-lg bg-border text-txt-2 group-hover:bg-accent/10 group-hover:text-accent transition-colors">
-                      {t.cat}
+                    <span className={`text-[10px] font-bold px-2 py-1 rounded-lg ${
+                      t.type === 'revenu' ? 'bg-win/10 text-win' : 'bg-loss/10 text-loss'
+                    }`}>
+                      {t.type === 'revenu' ? 'REVENU' : (t.categorie || 'AUTRE')}
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-sm text-txt-2">{t.desc}</td>
-                  <td className={`px-6 py-4 text-sm font-mono font-bold text-right ${t.color}`}>
-                    {t.amount}$
+                  <td className="px-6 py-4 text-sm text-txt-2">{t.label}</td>
+                  <td className={`px-6 py-4 text-sm font-mono font-bold text-right ${
+                    t.type === 'revenu' ? 'text-win' : 'text-loss'
+                  }`}>
+                    {t.type === 'revenu' ? '+' : '-'}{Number(t.montant).toLocaleString()}$
                   </td>
                 </tr>
               ))}
+              {transactions.length === 0 && !isLoading && (
+                <tr>
+                  <td colSpan={4} className="px-6 py-12 text-center text-txt-3 italic text-sm">
+                    Aucune transaction enregistrée ce mois-ci.
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
       </div>
+
+      <AddRevenuModal 
+        isOpen={isRevenuModalOpen} 
+        onClose={() => setIsRevenuModalOpen(false)} 
+      />
+      <AddDepenseModal 
+        isOpen={isDepenseModalOpen} 
+        onClose={() => setIsDepenseModalOpen(false)} 
+      />
+      <ExportDataModal 
+        isOpen={isExportModalOpen} 
+        onClose={() => setIsExportModalOpen(false)} 
+      />
     </div>
   );
 };

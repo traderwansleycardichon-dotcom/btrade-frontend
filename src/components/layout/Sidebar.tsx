@@ -124,15 +124,15 @@ export const Sidebar: React.FC = () => {
         <button className="w-full p-3 rounded-xl bg-elevated border border-border hover:border-accent/30 transition-all group relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-r from-accent/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
           <div className="flex justify-between items-center mb-1 relative">
-            <span className="text-txt-2 text-[10px] font-bold uppercase tracking-widest">Compte Actif</span>
+            <span className="text-txt-2 text-[10px] font-bold uppercase tracking-widest">Balance Globale</span>
             <RefreshCw size={12} className="text-txt-2 group-hover:rotate-180 transition-transform duration-500" />
           </div>
           <div className="flex items-center gap-2 mb-2 relative">
             <div className="w-2 h-2 rounded-full bg-accent animate-pulse-dot" />
-            <span className="font-bold text-sm truncate">{activeAccount?.nom || 'Chargement...'}</span>
+            <span className="font-bold text-sm truncate">{accountsList.length > 0 ? 'Tous les comptes' : 'Chargement...'}</span>
           </div>
           <div className="flex justify-between items-end relative">
-            <span className="text-xl font-mono font-bold">${Number(activeAccount?.balanceCourante || 0).toLocaleString()}</span>
+            <span className="text-xl font-mono font-bold">${accountsList.reduce((acc, a) => acc + Number(a.balanceCourante || 0), 0).toLocaleString()}</span>
             <span className="text-[10px] font-bold text-win bg-win/10 px-1.5 py-0.5 rounded">PRO</span>
           </div>
         </button>

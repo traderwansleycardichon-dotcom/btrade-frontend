@@ -15,12 +15,12 @@ export const AddAccountModal: React.FC<AddAccountModalProps> = ({ isOpen, onClos
   
   const [formData, setFormData] = useState({
     nom: '',
-    type_compte: 'evaluation',
-    taille_compte: 50000,
+    typeCompte: 'evaluation',
+    tailleCompte: 50000,
     broker: '',
     plateforme: 'MT5',
-    profit_target_pct: 10,
-    max_drawdown_pct: 10,
+    profitTargetPct: 10,
+    maxDrawdownPct: 10,
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -28,9 +28,10 @@ export const AddAccountModal: React.FC<AddAccountModalProps> = ({ isOpen, onClos
     try {
       await createAccount.mutateAsync({
         ...formData,
-        taille_compte: Number(formData.taille_compte),
-        profit_target_pct: Number(formData.profit_target_pct),
-        max_drawdown_pct: Number(formData.max_drawdown_pct),
+        propFirm: formData.broker,
+        tailleCompte: Number(formData.tailleCompte),
+        profitTargetPct: Number(formData.profitTargetPct),
+        maxDrawdownPct: Number(formData.maxDrawdownPct),
       });
       addToast('Compte de trading ajouté avec succès !');
       onClose();
@@ -75,8 +76,8 @@ export const AddAccountModal: React.FC<AddAccountModalProps> = ({ isOpen, onClos
         <div className="col-span-1">
           <label className="block text-[10px] font-bold text-txt-2 uppercase tracking-widest mb-2">Type</label>
           <select 
-            value={formData.type_compte}
-            onChange={(e) => setFormData({...formData, type_compte: e.target.value})}
+            value={formData.typeCompte}
+            onChange={(e) => setFormData({...formData, typeCompte: e.target.value})}
             className="w-full bg-bg border border-border rounded-xl py-3 px-4 focus:border-accent/50 outline-none transition-all"
           >
             <option value="evaluation">Évaluation (Prop Firm)</option>
@@ -90,8 +91,8 @@ export const AddAccountModal: React.FC<AddAccountModalProps> = ({ isOpen, onClos
           <input 
             type="number" 
             required
-            value={formData.taille_compte}
-            onChange={(e) => setFormData({...formData, taille_compte: Number(e.target.value)})}
+            value={formData.tailleCompte}
+            onChange={(e) => setFormData({...formData, tailleCompte: Number(e.target.value)})}
             className="w-full bg-bg border border-border rounded-xl py-3 px-4 focus:border-accent/50 outline-none transition-all font-mono" 
           />
         </div>
@@ -126,7 +127,7 @@ export const AddAccountModal: React.FC<AddAccountModalProps> = ({ isOpen, onClos
           </select>
         </div>
 
-        {formData.type_compte === 'evaluation' && (
+        {formData.typeCompte === 'evaluation' && (
           <div className="col-span-2 grid grid-cols-2 gap-4 pt-4 border-t border-border mt-2">
             <div className="col-span-1">
               <label className="block text-[10px] font-bold text-txt-2 uppercase tracking-widest mb-2 flex items-center gap-2">
@@ -134,8 +135,8 @@ export const AddAccountModal: React.FC<AddAccountModalProps> = ({ isOpen, onClos
               </label>
               <input 
                 type="number" 
-                value={formData.profit_target_pct}
-                onChange={(e) => setFormData({...formData, profit_target_pct: Number(e.target.value)})}
+                value={formData.profitTargetPct}
+                onChange={(e) => setFormData({...formData, profitTargetPct: Number(e.target.value)})}
                 className="w-full bg-bg border border-border rounded-xl py-3 px-4 focus:border-accent/50 outline-none transition-all font-mono" 
               />
             </div>
@@ -145,8 +146,8 @@ export const AddAccountModal: React.FC<AddAccountModalProps> = ({ isOpen, onClos
               </label>
               <input 
                 type="number" 
-                value={formData.max_drawdown_pct}
-                onChange={(e) => setFormData({...formData, max_drawdown_pct: Number(e.target.value)})}
+                value={formData.maxDrawdownPct}
+                onChange={(e) => setFormData({...formData, maxDrawdownPct: Number(e.target.value)})}
                 className="w-full bg-bg border border-border rounded-xl py-3 px-4 focus:border-accent/50 outline-none transition-all font-mono" 
               />
             </div>

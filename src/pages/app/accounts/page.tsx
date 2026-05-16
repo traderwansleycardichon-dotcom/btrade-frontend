@@ -18,7 +18,7 @@ const AccountsPage: React.FC = () => {
       {/* Header Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="glass p-6 rounded-3xl">
-          <div className="text-[10px] font-bold text-txt-2 uppercase tracking-widest mb-1">Comptes Actifs</div>
+          <div className="text-[10px] font-bold text-txt-2 uppercase tracking-widest mb-1">Total Comptes</div>
           <div className="text-3xl font-mono font-bold">{safeAccounts.length}</div>
         </div>
         <div className="glass p-6 rounded-3xl">

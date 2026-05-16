@@ -139,7 +139,7 @@ export const TradesTable: React.FC = () => {
                   <div className="text-[10px] text-txt-3 font-bold uppercase">{trade.quantite} lots</div>
                 </td>
                 <td className="px-6 py-4">
-                  <Chip variant={trade.direction === 'buy' ? 'buy' : 'sell'} withDot>
+                  <Chip variant={trade.direction === 'long' ? 'buy' : 'sell'} withDot>
                     {trade.direction}
                   </Chip>
                 </td>

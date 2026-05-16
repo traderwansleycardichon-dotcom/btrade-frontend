@@ -14,8 +14,12 @@ const LoginPage: React.FC = () => {
       refreshUser();
     }
 
-    if (isAuthenticated && !isLoading) {
-      navigate('/app/dashboard', { replace: true });
+    if (isAuthenticated && !isLoading && user) {
+      if (user.role === 'admin') {
+        navigate('/admin/dashboard', { replace: true });
+      } else {
+        navigate('/app/dashboard', { replace: true });
+      }
     }
   }, [isAuthenticated, isLoading, navigate, user, refreshUser]);
 
