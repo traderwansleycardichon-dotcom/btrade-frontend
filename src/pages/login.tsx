@@ -2,11 +2,13 @@ import React from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { LoginForm } from '../components/auth/LoginForm';
+import { RegisterForm } from '../components/auth/RegisterForm';
 import { HeroPane } from '../components/auth/HeroPane';
 
 const LoginPage: React.FC = () => {
   const { isAuthenticated, isLoading, refreshUser, user } = useAuth();
   const navigate = useNavigate();
+  const [isRegister, setIsRegister] = React.useState(false);
 
   React.useEffect(() => {
     // Si on a un token mais pas de données user, on refresh
@@ -30,6 +32,7 @@ const LoginPage: React.FC = () => {
       </div>
     );
   }
+
   return (
     <div className="min-h-screen bg-bg flex overflow-hidden">
       <HeroPane />
@@ -43,7 +46,11 @@ const LoginPage: React.FC = () => {
           <span className="font-black text-xl tracking-tighter">BTrade</span>
         </div>
 
-        <LoginForm />
+        {isRegister ? (
+          <RegisterForm onSwitchToLogin={() => setIsRegister(false)} />
+        ) : (
+          <LoginForm onSwitchToRegister={() => setIsRegister(true)} />
+        )}
 
         {/* Footer info */}
         <div className="mt-12 text-center">

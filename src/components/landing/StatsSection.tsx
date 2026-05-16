@@ -9,7 +9,7 @@ export const StatsSection: React.FC = () => {
   ];
 
   return (
-    <section className="py-20 relative overflow-hidden">
+    <section className="py-10 relative overflow-hidden">
       <div className="container mx-auto px-6">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
           {stats.map((stat, i) => (

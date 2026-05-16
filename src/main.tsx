@@ -29,6 +29,8 @@ import AdminBroadcastPage from './pages/admin/broadcast/page';
 import AdminCmsPage from './pages/admin/cms/page';
 import AdminSystemPage from './pages/admin/system/page';
 import AdminSettingsPage from './pages/admin/settings/page';
+import AdminLegalPage from './pages/admin/legal/AdminLegalPage';
+import LegalPage from './pages/legal/LegalPage';
 
 import UpgradePage from './pages/app/upgrade/page';
 
@@ -38,6 +40,10 @@ const router = createBrowserRouter([
   {
     path: '/',
     element: <LandingPage />,
+  },
+  {
+    path: '/legal/:slug',
+    element: <LegalPage />,
   },
   {
     path: '/login',
@@ -64,6 +70,7 @@ const router = createBrowserRouter([
       { path: 'cms', element: <AdminCmsPage /> },
       { path: 'system', element: <AdminSystemPage /> },
       { path: 'settings', element: <AdminSettingsPage /> },
+      { path: 'legal', element: <AdminLegalPage /> },
     ],
   },
   {

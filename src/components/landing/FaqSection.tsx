@@ -22,9 +22,9 @@ export const FaqSection: React.FC = () => {
   ];
 
   return (
-    <section id="faq" className="py-32">
+    <section id="faq" className="py-16">
       <div className="container mx-auto px-6 max-w-2xl">
-        <div className="text-center mb-24">
+        <div className="text-center mb-12">
           <h2 className="text-4xl md:text-6xl font-black mb-6 tracking-tighter uppercase">Questions.</h2>
         </div>
 

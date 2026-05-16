@@ -14,9 +14,9 @@ export const ComparisonTable: React.FC = () => {
   ];
 
   return (
-    <section className="py-32">
+    <section className="py-16">
       <div className="container mx-auto px-6 text-center">
-        <h2 className="text-4xl md:text-6xl font-black mb-24 tracking-tighter uppercase">No Match.</h2>
+        <h2 className="text-4xl md:text-6xl font-black mb-12 tracking-tighter uppercase">No Match.</h2>
 
         <div className="max-w-4xl mx-auto glass rounded-[2.5rem] overflow-hidden border-white/5">
           <table className="w-full text-left border-collapse">

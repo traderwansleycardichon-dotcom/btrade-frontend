@@ -1,10 +1,14 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Eye, EyeOff, ArrowRight, Chrome } from 'lucide-react';
+import { Eye, EyeOff, ArrowRight } from 'lucide-react';
 import api from '../../lib/api';
 import { useAuth } from '../../hooks/useAuth';
 
-export const LoginForm: React.FC = () => {
+interface LoginFormProps {
+  onSwitchToRegister: () => void;
+}
+
+export const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -26,7 +30,7 @@ export const LoginForm: React.FC = () => {
       login(accessToken, refreshToken, user);
       navigate('/app/dashboard');
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Identifiants incorrects');
+      setError(err.response?.data?.error || 'Identifiants incorrects');
     } finally {
       setLoading(false);
     }
@@ -39,23 +43,7 @@ export const LoginForm: React.FC = () => {
         <p className="text-txt-2">Connectez-vous pour suivre vos performances.</p>
       </div>
 
-      <div className="space-y-4 mb-8">
-        <button className="w-full py-3 px-4 rounded-xl border border-border bg-surface hover:bg-elevated flex items-center justify-center gap-3 font-bold transition-all group">
-          <Chrome size={20} className="text-txt-2 group-hover:text-txt transition-colors" />
-          Continuer avec Google
-        </button>
-        <button className="w-full py-3 px-4 rounded-xl border border-border bg-surface hover:bg-elevated flex items-center justify-center gap-3 font-bold transition-all group">
-          <span className="text-lg"></span>
-          Continuer avec Apple
-        </button>
-      </div>
 
-      <div className="relative mb-8 text-center">
-        <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-border"></div>
-        </div>
-        <span className="relative px-4 bg-bg text-txt-3 text-xs font-bold uppercase tracking-widest">ou</span>
-      </div>
 
       <form onSubmit={handleSubmit} className="space-y-5">
         <div>
@@ -73,7 +61,7 @@ export const LoginForm: React.FC = () => {
         <div>
           <div className="flex justify-between items-center mb-2 px-1">
             <label className="text-xs font-bold text-txt-2 uppercase tracking-widest">Mot de passe</label>
-            <Link to="/forgot-password" size="sm" className="text-xs font-bold text-accent hover:text-accent-2 transition-colors">Oublié ?</Link>
+            <Link to="/forgot-password" className="text-xs font-bold text-accent hover:text-accent-2 transition-colors">Oublié ?</Link>
           </div>
           <div className="relative">
             <input
@@ -115,7 +103,13 @@ export const LoginForm: React.FC = () => {
 
         <p className="text-center text-sm text-txt-2 pt-4">
           Pas encore de compte ?{' '}
-          <Link to="/register" className="text-accent font-bold hover:text-accent-2 transition-colors">Créer un compte</Link>
+          <button 
+            type="button"
+            onClick={onSwitchToRegister}
+            className="text-accent font-bold hover:text-accent-2 transition-colors"
+          >
+            Créer un compte
+          </button>
         </p>
       </form>
     </div>

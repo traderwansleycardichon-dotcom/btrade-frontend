@@ -39,8 +39,8 @@ const features = [
 
 export const BentoFeatures: React.FC = () => {
   return (
-    <section id="features" className="container mx-auto px-6 py-24 relative">
-      <div className="text-center mb-24">
+    <section id="features" className="container mx-auto px-6 py-16 relative">
+      <div className="text-center mb-12">
         <h2 className="text-4xl md:text-6xl font-black mb-6 tracking-tighter uppercase">Power. Precision. Control.</h2>
         <p className="text-txt-2 text-lg max-w-2xl mx-auto">
           Chaque détail a été pensé pour les traders qui visent le financement professionnel.
