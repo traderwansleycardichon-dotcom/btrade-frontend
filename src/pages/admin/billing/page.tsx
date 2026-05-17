@@ -111,21 +111,51 @@ export default function AdminBillingPage() {
           <div className="space-y-6">
             <div>
               <div className="flex justify-between text-xs font-bold mb-2">
-                <span className="text-txt-2">PRO PLAN (70%)</span>
-                <span>$8,715</span>
+                <span className="text-txt-2">
+                  PRO PLAN ({loading ? '...' : `${stats?.planDistribution?.pro?.percentage}%`})
+                </span>
+                <span>
+                  {loading 
+                    ? '...' 
+                    : `$${Math.round(stats?.planDistribution?.pro?.revenue || 0).toLocaleString()}`
+                  }
+                </span>
               </div>
               <div className="h-2 bg-elevated rounded-full overflow-hidden">
-                <div className="h-full bg-win" style={{ width: '70%' }} />
+                <div 
+                  className="h-full bg-win transition-all duration-500" 
+                  style={{ width: loading ? '0%' : `${stats?.planDistribution?.pro?.percentage || 0}%` }} 
+                />
               </div>
+              {!loading && (
+                <div className="text-[10px] text-txt-3 mt-1 text-right">
+                  {stats?.planDistribution?.pro?.count || 0} utilisateur(s)
+                </div>
+              )}
             </div>
             <div>
               <div className="flex justify-between text-xs font-bold mb-2">
-                <span className="text-txt-2">FREE PLAN (30%)</span>
-                <span>$0</span>
+                <span className="text-txt-2">
+                  FREE PLAN ({loading ? '...' : `${stats?.planDistribution?.free?.percentage}%`})
+                </span>
+                <span>
+                  {loading 
+                    ? '...' 
+                    : `$${Math.round(stats?.planDistribution?.free?.revenue || 0).toLocaleString()}`
+                  }
+                </span>
               </div>
               <div className="h-2 bg-elevated rounded-full overflow-hidden">
-                <div className="h-full bg-loss" style={{ width: '30%' }} />
+                <div 
+                  className="h-full bg-loss transition-all duration-500" 
+                  style={{ width: loading ? '0%' : `${stats?.planDistribution?.free?.percentage || 0}%` }} 
+                />
               </div>
+              {!loading && (
+                <div className="text-[10px] text-txt-3 mt-1 text-right">
+                  {stats?.planDistribution?.free?.count || 0} utilisateur(s)
+                </div>
+              )}
             </div>
           </div>
 
@@ -137,7 +167,10 @@ export default function AdminBillingPage() {
               <span className="text-sm font-bold">Alerte Stripe</span>
             </div>
             <p className="text-xs text-txt-2 leading-relaxed">
-              3 paiements ont échoué au cours des dernières 24 heures. Pensez à vérifier les litiges Stripe.
+              {loading 
+                ? 'Chargement des alertes...' 
+                : `${stats?.failedPayments24h || 0} paiement(s) ont échoué au cours des dernières 24 heures. Pensez à vérifier les litiges Stripe.`
+              }
             </p>
           </div>
         </div>
