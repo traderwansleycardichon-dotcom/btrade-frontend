@@ -11,7 +11,7 @@ export const PLAN_FEATURES = {
     hasFinance: false,
   },
   pro: {
-    maxTradingAccounts: 5,
+    maxTradingAccounts: -1,
     maxTradesPerMonth: -1,
     hasAiChat: true,
     hasAiInsights: true,

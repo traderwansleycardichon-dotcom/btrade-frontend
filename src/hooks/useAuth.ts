@@ -11,6 +11,7 @@ interface User {
   avatarUrl?: string;
   timezone?: string;
   currency?: string;
+  createdAt?: string;
 }
 
 interface AuthState {
@@ -38,7 +39,11 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
   refreshUser: async () => {
     try {
-      set({ isLoading: true });
+      // S'il y a déjà un utilisateur chargé, on rafraîchit en tâche de fond pour une UX fluide
+      const hasUser = !!useAuthStore.getState().user;
+      if (!hasUser) {
+        set({ isLoading: true });
+      }
       const { data } = await api.get('/api/me');
       set({ user: data.data.user, isAuthenticated: true, isLoading: false });
     } catch (err) {

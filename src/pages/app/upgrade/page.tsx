@@ -1,7 +1,17 @@
-import React, { useState } from 'react';
-import { Check, Sparkles, Zap, Shield, Rocket, ArrowRight, Loader2 } from 'lucide-react';
-import api from '../../../lib/api';
-import { useAuth } from '../../../hooks/useAuth';
+import React, { useState } from "react";
+import {
+  Check,
+  Sparkles,
+  Zap,
+  Shield,
+  Rocket,
+  ArrowRight,
+  Loader2,
+  ArrowLeft,
+} from "lucide-react";
+import { Link } from "react-router-dom";
+import api from "../../../lib/api";
+import { useAuth } from "../../../hooks/useAuth";
 
 export default function UpgradePage() {
   const { user } = useAuth();
@@ -12,10 +22,10 @@ export default function UpgradePage() {
   React.useEffect(() => {
     const fetchPlans = async () => {
       try {
-        const { data } = await api.get('/api/billing/plans');
+        const { data } = await api.get("/api/billing/plans");
         setPlans(data.data);
       } catch (err) {
-        console.error('Erreur plans:', err);
+        console.error("Erreur plans:", err);
       } finally {
         setIsFetching(false);
       }
@@ -23,16 +33,18 @@ export default function UpgradePage() {
     fetchPlans();
   }, []);
 
-  const handleUpgrade = async (planId: 'pro') => {
+  const handleUpgrade = async (planId: "pro") => {
     setLoading(planId);
     try {
-      const res = await api.post('/api/billing/create-checkout-session', { planId });
+      const res = await api.post("/api/billing/create-checkout-session", {
+        planId,
+      });
       if (res.data.url) {
         window.location.href = res.data.url;
       }
     } catch (err) {
-      console.error('Erreur checkout:', err);
-      alert('Erreur lors de la création de la session de paiement.');
+      console.error("Erreur checkout:", err);
+      alert("Erreur lors de la création de la session de paiement.");
     } finally {
       setLoading(null);
     }
@@ -49,10 +61,20 @@ export default function UpgradePage() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto py-12 px-4 animate-[fadeIn_0.5s_ease-out]">
+    <div className="max-w-5xl mx-auto py-12 px-4 animate-[fadeIn_0.5s_ease-out] relative">
+      <div className="flex justify-start mb-6">
+        <Link
+          to="/app/dashboard"
+          className="flex items-center gap-2 px-3 py-1.5 rounded-md text-[11px] font-semibold bg-surface hover:bg-elevated border border-border text-txt-2 hover:text-txt transition-all shadow-sm"
+        >
+          <ArrowLeft size={12} />
+          Retour au Dashboard
+        </Link>
+      </div>
+
       <div className="text-center mb-16">
-        <h1 className="text-4xl font-black mb-4">Plans Transparents</h1>
-        <p className="text-txt-2 text-lg max-w-2xl mx-auto font-bold text-accent">
+        <h1 className="text-3xl font-black mb-4">Plans Transparents</h1>
+        <p className="text-txt-2 text-[11px] max-w-2xl mx-auto font-semibold text-accent">
           Investissez dans votre discipline, pas dans des fioritures.
         </p>
       </div>
@@ -61,14 +83,20 @@ export default function UpgradePage() {
         {plans.map((plan) => {
           const Icon = icons[plan.icon] || Zap;
           const isCurrent = user?.plan === plan.id;
-          const isFree = plan.id === 'free';
-          const buttonText = isCurrent ? 'Votre Plan Actuel' : (isFree ? 'Plan Gratuit' : `Passer au Plan ${plan.name}`);
+          const isFree = plan.id === "free";
+          const buttonText = isCurrent
+            ? "Votre Plan Actuel"
+            : isFree
+              ? "Plan Gratuit"
+              : `Passer au Plan ${plan.name}`;
 
           return (
-            <div 
+            <div
               key={plan.id}
               className={`glass p-8 rounded-[2rem] border transition-all relative flex flex-col ${
-                plan.recommended ? 'border-accent shadow-[0_20px_50px_rgba(243,108,0,0.15)] scale-105 z-10' : 'border-border hover:border-accent/30'
+                plan.recommended
+                  ? "border-accent shadow-[0_20px_50px_rgba(243,108,0,0.15)] scale-105 z-10"
+                  : "border-border hover:border-accent/30"
               }`}
             >
               {plan.recommended && (
@@ -86,32 +114,40 @@ export default function UpgradePage() {
                   <span className="text-4xl font-black">${plan.price}</span>
                   <span className="text-txt-3 text-sm font-bold">/ mois</span>
                 </div>
-                <p className="text-xs text-txt-2 mt-4 leading-relaxed">{plan.description}</p>
+                <p className="text-xs text-txt-2 mt-4 leading-relaxed">
+                  {plan.description}
+                </p>
               </div>
 
               <div className="space-y-4 mb-10 flex-1">
-                {(Array.isArray(plan.features) ? plan.features : []).map((feature: string, i: number) => (
-                  <div key={i} className="flex items-start gap-3">
-                    <div className={`mt-1 shrink-0 w-4 h-4 rounded-full flex items-center justify-center ${isFree ? 'bg-border text-txt-3' : 'bg-win/10 text-win'}`}>
-                      <Check size={10} strokeWidth={4} />
+                {(Array.isArray(plan.features) ? plan.features : []).map(
+                  (feature: string, i: number) => (
+                    <div key={i} className="flex items-start gap-3">
+                      <div
+                        className={`mt-1 shrink-0 w-4 h-4 rounded-full flex items-center justify-center ${isFree ? "bg-border text-txt-3" : "bg-win/10 text-win"}`}
+                      >
+                        <Check size={10} strokeWidth={4} />
+                      </div>
+                      <span className="text-xs text-txt-2 font-medium">
+                        {feature}
+                      </span>
                     </div>
-                    <span className="text-xs text-txt-2 font-medium">{feature}</span>
-                  </div>
-                ))}
+                  ),
+                )}
               </div>
 
               <button
                 onClick={() => !isFree && handleUpgrade(plan.id as any)}
-                disabled={isFree || isCurrent || (loading !== null)}
+                disabled={isFree || isCurrent || loading !== null}
                 className={`w-full py-4 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all ${
-                  isCurrent 
-                    ? 'bg-elevated text-txt-3 cursor-default' 
-                    : plan.recommended 
-                      ? 'bg-accent text-white shadow-xl hover:scale-105 hover:shadow-accent/20' 
-                      : 'bg-surface border border-border hover:border-accent/50'
+                  isCurrent
+                    ? "bg-elevated text-txt-3 cursor-default"
+                    : plan.recommended
+                      ? "bg-accent text-white shadow-xl hover:scale-105 hover:shadow-accent/20"
+                      : "bg-surface border border-border hover:border-accent/50"
                 } disabled:opacity-50`}
               >
-                {loading === plan.id ? 'Redirection...' : buttonText}
+                {loading === plan.id ? "Redirection..." : buttonText}
                 {!isCurrent && !isFree && <ArrowRight size={18} />}
               </button>
             </div>
@@ -124,9 +160,13 @@ export default function UpgradePage() {
           <Shield size={32} />
         </div>
         <div className="flex-1 text-center md:text-left">
-          <h4 className="font-bold text-lg mb-1">Paiement 100% sécurisé via Stripe</h4>
+          <h4 className="font-bold text-lg mb-1">
+            Paiement 100% sécurisé via Stripe
+          </h4>
           <p className="text-xs text-txt-2 leading-relaxed">
-            Vos informations de paiement sont traitées par Stripe. Vous pouvez annuler votre abonnement à tout moment d'un simple clic depuis vos paramètres. Aucune donnée bancaire n'est stockée sur nos serveurs.
+            Vos informations de paiement sont traitées par Stripe. Vous pouvez
+            annuler votre abonnement à tout moment d'un simple clic depuis vos
+            paramètres. Aucune donnée bancaire n'est stockée sur nos serveurs.
           </p>
         </div>
         <div className="flex gap-4 grayscale opacity-50">

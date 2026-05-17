@@ -32,6 +32,17 @@ const SettingsPage: React.FC = () => {
   const [newPassword, setNewPassword] = useState('');
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
 
+  const formatJoinedDate = (dateStr?: string) => {
+    if (!dateStr) return 'Mai 2024';
+    try {
+      const date = new Date(dateStr);
+      const formatted = date.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
+      return formatted.charAt(0).toUpperCase() + formatted.slice(1);
+    } catch {
+      return 'Mai 2024';
+    }
+  };
+
   // Mutation pour le profil
   const updateProfile = useMutation({
     mutationFn: async (data: any) => {
@@ -84,9 +95,15 @@ const SettingsPage: React.FC = () => {
       title: 'Abonnement',
       icon: CreditCard,
       items: [
-        { label: 'Plan Actuel', value: user?.plan || 'Free Plan', badge: 'PRO' },
-        { label: 'Prochain prélèvement', value: '15 Juin 2026' },
-        { label: 'Mode de paiement', value: '•••• 4242' },
+        { 
+          label: 'Plan Actuel', 
+          value: user?.plan ? user.plan.toUpperCase() : 'FREE', 
+          badge: user?.plan === 'pro' ? 'PRO' : undefined 
+        },
+        ...(user?.plan === 'pro' ? [
+          { label: 'Prochain prélèvement', value: '15 Juin 2026' },
+          { label: 'Mode de paiement', value: '•••• 4242' },
+        ] : [])
       ]
     },
     {
@@ -142,7 +159,7 @@ const SettingsPage: React.FC = () => {
         </div>
         <div>
           <h2 className="text-3xl font-black tracking-tight">{user?.fullName || 'Utilisateur'}</h2>
-          <p className="text-txt-2">Membre BTrade depuis Mai 2024 • <span className="text-accent font-bold">Plan {user?.plan || 'Free'}</span></p>
+          <p className="text-txt-2">Membre BTrade depuis {formatJoinedDate(user?.createdAt)} • <span className="text-accent font-bold">Plan {user?.plan ? user.plan.toUpperCase() : 'FREE'}</span></p>
         </div>
       </div>
 

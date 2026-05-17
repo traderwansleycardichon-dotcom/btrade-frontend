@@ -14,7 +14,7 @@ export const AdminLayout: React.FC = () => {
     if (isAuthenticated) {
       refreshUser();
     }
-  }, [isAuthenticated, location.pathname]);
+  }, [isAuthenticated]);
 
   if (isLoading) {
     return (
@@ -51,7 +51,7 @@ export const AdminLayout: React.FC = () => {
   }
 
   return (
-    <div className="flex min-h-screen bg-bg text-txt">
+    <div className="flex min-h-screen bg-bg text-txt dashboard-view">
       <AdminSidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
       <div className="flex-1 flex flex-col min-w-0">
         {/* Mobile Header for Admin */}

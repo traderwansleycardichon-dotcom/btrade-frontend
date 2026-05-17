@@ -55,11 +55,11 @@
   }
   
   .btn-primary {
-    @apply bg-accent hover:bg-accent-2 text-white font-black py-2.5 px-6 rounded-full transition-all duration-300 shadow-[0_0_20px_rgba(243,108,0,0.15)] hover:shadow-[0_0_30px_rgba(243,108,0,0.3)] hover:-translate-y-0.5;
+    @apply bg-accent hover:bg-accent-2 text-white font-semibold py-2 px-4 rounded-md transition-all duration-300 shadow-[0_0_20px_rgba(243,108,0,0.15)] hover:shadow-[0_0_30px_rgba(243,108,0,0.3)] hover:-translate-y-0.5;
   }
 
   .btn-ghost {
-    @apply hover:bg-white/5 text-txt-2 hover:text-txt font-bold py-2.5 px-6 rounded-full transition-all duration-300 border border-transparent hover:border-white/10;
+    @apply hover:bg-white/5 text-txt-2 hover:text-txt font-semibold py-2 px-4 rounded-md transition-all duration-300 border border-transparent hover:border-white/10;
   }
 }
 
@@ -149,3 +149,29 @@
 
 .hm { aspect-ratio: 1; border-radius: 6px; transition: all .15s ease; cursor: pointer; }
 .hm:hover { transform: scale(1.08); z-index: 2; position: relative; box-shadow: 0 4px 12px rgba(0,0,0,.4); }
+
+/* Card & Button global border-radius override to rounded-md (6px / 0.375rem) */
+.glass,
+.surface,
+.elevated,
+.card,
+.btn-primary,
+.btn-secondary,
+.btn-ghost,
+.button,
+button,
+input,
+select,
+textarea,
+.rounded-3xl,
+.rounded-2xl,
+.rounded-xl,
+.rounded-lg {
+  border-radius: 0.375rem !important;
+}
+
+/* Dashboard-wide text overrides (applies within .dashboard-view / outlet main) */
+.dashboard-view :not(svg):not(svg *):not(path):not(circle):not(rect):not(line) {
+  font-size: 11px !important;
+  font-weight: 600 !important;
+}

@@ -13,7 +13,7 @@ export const AppLayout: React.FC = () => {
   useEffect(() => {
     if (isAuthenticated) refreshUser();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAuthenticated, location.pathname]);
+  }, [isAuthenticated]);
 
   // Ferme le drawer mobile à chaque changement de page
   useEffect(() => {
@@ -46,7 +46,7 @@ export const AppLayout: React.FC = () => {
   }
 
   return (
-    <div className="flex min-h-screen bg-bg text-txt relative">
+    <div className="flex min-h-screen bg-bg text-txt relative dashboard-view">
       {/* Sidebar — drawer mobile + fixe desktop */}
       <Sidebar
         mobileOpen={sidebarOpen}
