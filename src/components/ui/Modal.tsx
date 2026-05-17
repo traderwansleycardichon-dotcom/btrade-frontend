@@ -51,7 +51,7 @@ export const Modal: React.FC<ModalProps> = ({
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className={`relative w-full ${sizeClasses[size]} glass rounded-2xl overflow-hidden shadow-2xl`}
+            className={`relative w-full ${sizeClasses[size]} glass rounded-2xl overflow-hidden shadow-2xl dashboard-view`}
           >
             <div className="flex items-center justify-between p-6 border-b border-border">
               <h2 className="text-xl font-bold text-txt">{title}</h2>
