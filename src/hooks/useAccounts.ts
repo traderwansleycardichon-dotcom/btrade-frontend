@@ -52,6 +52,17 @@ export const useAccounts = () => {
     },
   });
 
+  const updateAccount = useMutation({
+    mutationFn: async ({ id, patch }: { id: string; patch: any }) => {
+      const { data } = await api.patch(`/api/comptes/${id}`, patch);
+      return data.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['accounts'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+    },
+  });
+
   const deleteAccount = useMutation({
     mutationFn: async (id: string) => {
       await api.delete(`/api/comptes/${id}`);
@@ -67,7 +78,8 @@ export const useAccounts = () => {
     isLoading: accountsQuery.isLoading,
     useStats: statsQuery,
     createAccount,
-    passFunded,
+    updateAccount,
     deleteAccount,
+    passFunded,
   };
 };

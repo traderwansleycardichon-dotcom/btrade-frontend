@@ -1,54 +1,76 @@
 import React from 'react';
-import { MOCK_OPEN_POSITIONS } from '../../lib/mocks';
 import { Chip } from '../ui/Chip';
 
-export const OpenPositions: React.FC = () => {
+interface Trade {
+  id: string;
+  instrument: string | null;
+  direction: string | null;
+  prixEntree: string | number | null;
+  prixSortie: string | number | null;
+  dateSortie: string | null;
+  plNet: string | number | null;
+  quantite: string | number | null;
+}
+
+interface OpenPositionsProps {
+  trades?: Trade[];
+}
+
+const num = (v: any) => Number(v ?? 0);
+
+export const OpenPositions: React.FC<OpenPositionsProps> = ({ trades = [] }) => {
+  // Position "ouverte" = pas de dateSortie OU pas de prixSortie
+  const open = (trades || []).filter(t => !t.dateSortie || !t.prixSortie).slice(0, 4);
+
   return (
-    <div className="glass p-6 rounded-3xl h-fit">
+    <div className="glass p-6 rounded-3xl h-full w-full flex flex-col">
       <div className="flex justify-between items-center mb-6">
         <h3 className="font-bold text-lg">Positions Ouvertes</h3>
-        <span className="bg-accent/10 text-accent text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-widest">Live</span>
+        <span className="bg-accent/10 text-accent text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-widest">
+          {open.length > 0 ? 'Live' : '—'}
+        </span>
       </div>
 
-      <div className="space-y-4">
-        {MOCK_OPEN_POSITIONS.map((pos) => (
-          <div key={pos.id} className="p-4 rounded-2xl bg-bg/50 border border-border group hover:border-accent/30 transition-all">
-            <div className="flex justify-between items-center mb-3">
-              <div className="flex items-center gap-2">
-                <span className="font-black text-sm">{pos.symbol}</span>
-                <Chip variant={pos.direction === 'BUY' ? 'buy' : 'sell'} className="scale-75 origin-left">
-                  {pos.direction}
-                </Chip>
-              </div>
-              <div className={`font-mono font-bold ${pos.pnl >= 0 ? 'text-win' : 'text-loss'}`}>
-                {pos.pnl >= 0 ? '+' : ''}{pos.pnl.toFixed(2)}$
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4 mb-4">
-              <div>
-                <div className="text-[10px] md:text-[9px] font-bold text-txt-3 uppercase mb-0.5">Entrée</div>
-                <div className="text-xs font-mono">{pos.entryPrice}</div>
-              </div>
-              <div className="text-right">
-                <div className="text-[10px] md:text-[9px] font-bold text-txt-3 uppercase mb-0.5">SL / TP</div>
-                <div className="text-xs font-mono text-txt-2">{pos.sl} / {pos.tp}</div>
-              </div>
-            </div>
-
-            <div className="relative h-1 bg-border rounded-full overflow-hidden">
-              <div 
-                className="absolute inset-y-0 left-0 bg-accent transition-all duration-1000"
-                style={{ width: `${pos.progressPct}%` }}
-              />
-            </div>
-          </div>
-        ))}
-        {MOCK_OPEN_POSITIONS.length === 0 && (
-          <div className="py-8 text-center text-txt-3 italic text-sm">
-            Aucune position ouverte actuellement.
+      <div className="space-y-4 flex-1 overflow-y-auto">
+        {open.length === 0 && (
+          <div className="flex-1 flex items-center justify-center text-center text-txt-3 italic text-sm py-8">
+            Aucune position ouverte.
           </div>
         )}
+        {open.map(pos => {
+          const dir = (pos.direction || '').toLowerCase();
+          const isBuy = dir === 'long' || dir === 'buy';
+          const pl = num(pos.plNet);
+          return (
+            <div
+              key={pos.id}
+              className="p-4 rounded-2xl bg-bg/50 border border-border group hover:border-accent/30 transition-all"
+            >
+              <div className="flex justify-between items-center mb-3">
+                <div className="flex items-center gap-2">
+                  <span className="font-black text-sm">{pos.instrument || '—'}</span>
+                  <Chip variant={isBuy ? 'buy' : 'sell'} className="scale-75 origin-left">
+                    {isBuy ? 'BUY' : 'SELL'} {num(pos.quantite).toFixed(2)}
+                  </Chip>
+                </div>
+                <div className={`font-mono font-bold text-sm ${pl >= 0 ? 'text-win' : 'text-loss'}`}>
+                  {pl >= 0 ? '+' : '-'}${Math.abs(pl).toFixed(2)}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 text-[10px] font-mono">
+                <div>
+                  <div className="text-txt-3 uppercase mb-0.5">Entrée</div>
+                  <div className="text-txt">{pos.prixEntree ?? '—'}</div>
+                </div>
+                <div className="text-right">
+                  <div className="text-txt-3 uppercase mb-0.5">Quantité</div>
+                  <div className="text-txt-2">{pos.quantite ?? '—'}</div>
+                </div>
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

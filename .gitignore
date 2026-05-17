@@ -1,1 +1,19 @@
 node_modules
+
+# Local Claude config / worktrees
+.claude/
+
+# Environment / secrets
+.env
+.env.local
+.env.development
+.env.production
+
+# Build output
+dist/
+build/
+
+# Logs / OS
+*.log
+.DS_Store
+Thumbs.db

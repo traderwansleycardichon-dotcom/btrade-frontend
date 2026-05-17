@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Outlet, Navigate, useLocation } from 'react-router-dom';
 import { Sidebar } from './Sidebar';
 import { TopBar } from './TopBar';
@@ -8,8 +8,27 @@ import { ToastContainer } from '../ui/Toast';
 export const AppLayout: React.FC = () => {
   const { isAuthenticated, isLoading, refreshUser } = useAuth();
   const location = useLocation();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
+  useEffect(() => {
+    if (isAuthenticated) refreshUser();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated, location.pathname]);
+
+  // Ferme le drawer mobile à chaque changement de page
+  useEffect(() => {
+    setSidebarOpen(false);
+  }, [location.pathname]);
+
+  // Empêche le scroll body quand le drawer est ouvert sur mobile
+  useEffect(() => {
+    if (sidebarOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => { document.body.style.overflow = ''; };
+  }, [sidebarOpen]);
 
   if (isLoading && isAuthenticated) {
     return (
@@ -27,14 +46,20 @@ export const AppLayout: React.FC = () => {
   }
 
   return (
-    <div className="flex min-h-screen bg-bg text-txt">
-      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+    <div className="flex min-h-screen bg-bg text-txt relative">
+      {/* Sidebar — drawer mobile + fixe desktop */}
+      <Sidebar
+        mobileOpen={sidebarOpen}
+        onMobileClose={() => setSidebarOpen(false)}
+      />
+
       <div className="flex-1 flex flex-col min-w-0">
-        <TopBar onMenuClick={() => setIsSidebarOpen(true)} />
-        <main className="flex-1 p-4 lg:p-8 overflow-y-auto overflow-x-hidden">
+        <TopBar onOpenMenu={() => setSidebarOpen(true)} />
+        <main className="flex-1 p-3 sm:p-5 lg:p-8 overflow-y-auto">
           <Outlet />
         </main>
       </div>
+
       <ToastContainer />
     </div>
   );

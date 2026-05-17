@@ -13,30 +13,30 @@ export const HeroSection: React.FC = () => {
           <span className="text-[10px] font-black text-white uppercase tracking-[0.3em]">New: AI Trade Insights V2</span>
         </div>
         
-        <h1 className="text-7xl md:text-[10rem] font-black mb-12 leading-[0.85] tracking-[-0.05em] animate-slide-up [animation-delay:0.2s]">
+        <h1 className="text-5xl sm:text-6xl md:text-8xl lg:text-[10rem] font-black mb-8 sm:mb-12 leading-[0.85] tracking-[-0.05em] animate-slide-up [animation-delay:0.2s]">
           TRADE. <br />
           <span className="text-transparent bg-clip-text bg-gradient-to-b from-white to-white/40">JOURNAL.</span> <br />
           <span className="text-accent">WIN.</span>
         </h1>
         
-        <p className="text-lg md:text-xl text-txt-2 max-w-2xl mx-auto mb-16 leading-relaxed animate-slide-up [animation-delay:0.4s]">
+        <p className="text-base sm:text-lg md:text-xl text-txt-2 max-w-2xl mx-auto mb-10 sm:mb-16 leading-relaxed animate-slide-up [animation-delay:0.4s]">
           L'écosystème ultime pour les traders de Prop Firms. 
           Performance brute, analyses IA et psychologie de précision.
         </p>
 
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-6 animate-slide-up [animation-delay:0.6s]">
-          <a href="/register" className="btn-primary group py-5 px-10 text-sm tracking-widest uppercase">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6 animate-slide-up [animation-delay:0.6s]">
+          <a href="/register" className="btn-primary group py-4 sm:py-5 px-8 sm:px-10 text-xs sm:text-sm tracking-widest uppercase w-full sm:w-auto text-center">
             Get Started Now
             <ArrowRight size={18} className="inline-block ml-2 group-hover:translate-x-1 transition-transform" />
           </a>
-          <button className="btn-ghost py-5 px-10 text-sm tracking-widest uppercase flex items-center gap-3">
+          <button className="btn-ghost py-4 sm:py-5 px-8 sm:px-10 text-xs sm:text-sm tracking-widest uppercase flex items-center justify-center gap-3 w-full sm:w-auto">
             <Play size={18} fill="currentColor" />
             Watch Demo
           </button>
         </div>
 
         {/* Minimalist Stats / Social Proof */}
-        <div className="mt-32 pt-12 border-t border-white/5 grid grid-cols-2 md:grid-cols-4 gap-12 max-w-4xl mx-auto opacity-50 animate-fade-in [animation-delay:1s]">
+        <div className="mt-16 sm:mt-24 lg:mt-32 pt-8 sm:pt-12 border-t border-white/5 grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-12 max-w-4xl mx-auto opacity-50 animate-fade-in [animation-delay:1s]">
           {[
             { label: 'Active Traders', value: '12K+' },
             { label: 'Total Payouts', value: '$2.4M' },

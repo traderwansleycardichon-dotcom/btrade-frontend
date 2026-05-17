@@ -17,6 +17,10 @@ import FinancePage from './pages/app/finance/page';
 import GoalsPage from './pages/app/goals/page';
 import FormationPage from './pages/app/formation/page';
 import AIInsightsPage from './pages/app/ai-insights/page';
+import PlaybooksPage from './pages/app/playbooks/page';
+import EconomicPage from './pages/app/economic/page';
+import AnalysesPage from './pages/app/analyses/page';
+import AiChatPage from './pages/app/ai-chat/page';
 import SettingsPage from './pages/app/settings/page';
 import './styles/globals.css';
 
@@ -90,10 +94,11 @@ const router = createBrowserRouter([
       { path: 'goals', element: <GoalsPage /> },
       { path: 'formation', element: <FormationPage /> },
       { path: 'ai-insights', element: <AIInsightsPage /> },
-      { path: 'playbooks', element: <div className="glass p-12 text-center rounded-3xl text-txt-2 italic">Module Playbooks en cours de déploiement...</div> },
-      { path: 'reports', element: <div className="glass p-12 text-center rounded-3xl text-txt-2 italic">Module Rapports en cours de déploiement...</div> },
+      { path: 'playbooks', element: <PlaybooksPage /> },
+      { path: 'reports', element: <AnalysesPage /> },
       { path: 'settings', element: <SettingsPage /> },
-      { path: 'economic', element: <div className="glass p-12 text-center rounded-3xl text-txt-2 italic">Module Économique en cours de déploiement...</div> },
+      { path: 'economic', element: <EconomicPage /> },
+      { path: 'ai-chat', element: <AiChatPage /> },
     ],
   },
 ]);

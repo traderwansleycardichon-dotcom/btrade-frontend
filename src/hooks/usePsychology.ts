@@ -1,10 +1,21 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../lib/api';
 
-export const usePsychology = () => {
-  const queryClient = useQueryClient();
+export interface PsychologyEntry {
+  id: string;
+  userId: string | null;
+  date: string | null;
+  emotionalState: string | null;
+  disciplineScore: number | null;
+  tiltDetected: boolean;
+  note: string | null;
+  createdAt: string;
+}
 
-  const psychologyQuery = useQuery({
+export const usePsychology = () => {
+  const qc = useQueryClient();
+
+  const listQuery = useQuery<PsychologyEntry[]>({
     queryKey: ['psychology'],
     queryFn: async () => {
       const { data } = await api.get('/api/psychology');
@@ -12,28 +23,26 @@ export const usePsychology = () => {
     },
   });
 
-  const createTracking = useMutation({
-    mutationFn: async (payload: any) => {
-      // Le backend attend du snake_case (emotional_state, discipline_score, note, tilt_detected)
-      const formattedPayload = {
-        emotional_state: payload.mood,
-        discipline_score: Number(payload.disciplineScore),
-        fatigue_level: Number(payload.fatigueLevel),
-        tilt_detected: payload.mood === 'tilt',
-        note: payload.notes
-      };
-      
-      const { data } = await api.post('/api/psychology', formattedPayload);
+  const createEntry = useMutation({
+    mutationFn: async (payload: Partial<PsychologyEntry>) => {
+      const { data } = await api.post('/api/psychology', payload);
       return data.data;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['psychology'] });
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['psychology'] }),
+  });
+
+  const deleteEntry = useMutation({
+    mutationFn: async (id: string) => {
+      await api.delete(`/api/psychology/${id}`);
     },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['psychology'] }),
   });
 
   return {
-    trackings: psychologyQuery.data || [],
-    isLoading: psychologyQuery.isLoading,
-    createTracking,
+    entries: listQuery.data || [],
+    isLoading: listQuery.isLoading,
+    error: listQuery.error,
+    createEntry,
+    deleteEntry,
   };
 };

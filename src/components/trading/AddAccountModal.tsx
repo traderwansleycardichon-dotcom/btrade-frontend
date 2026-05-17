@@ -80,9 +80,9 @@ export const AddAccountModal: React.FC<AddAccountModalProps> = ({ isOpen, onClos
             onChange={(e) => setFormData({...formData, typeCompte: e.target.value})}
             className="w-full bg-bg border border-border rounded-xl py-3 px-4 focus:border-accent/50 outline-none transition-all"
           >
-            <option value="evaluation">Évaluation (Prop Firm)</option>
-            <option value="funded">Funded (Prop Firm)</option>
-            <option value="personnel">Compte Personnel</option>
+            <option value="evaluation">Évaluation (Prop Firm) — pas de retraits</option>
+            <option value="funded">Funded (Prop Firm) — retraits possibles</option>
+            <option value="personnel">Compte Réel / Live — retraits possibles</option>
           </select>
         </div>
 

@@ -3,15 +3,21 @@
 @tailwind utilities;
 
 :root {
-  --bg: #040506;
-  --surface: #0A0B0E;
-  --elevated: #111318;
+  --bg: #0A0B0E;
+  --surface: #11141B;
+  --elevated: #181C25;
   --accent: #F36C00;
-  --accent-2: #FF8A3D;
+  --accent-2: #E65C00;
+  --text: #F5F6F8;
+  --text-2: #B4BAC6;
   --txt: #FFFFFF;
-  --txt-2: #9CA3AF;
-  --txt-3: #4B5563;
-  --border: rgba(255, 255, 255, 0.05);
+  --txt-2: #B4BAC6;
+  --txt-3: #6B7280;
+  --muted: #6B7280;
+  --border: #1F2530;
+  --border-hover: #2A3140;
+  --success: #10B981;
+  --danger: #EF4444;
 }
 
 @layer base {
@@ -105,3 +111,41 @@
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(243, 108, 0, 0.5);
 }
+
+/* ── Prototype dashboard styles ──────────────────────────────────────── */
+.mono { font-family: 'JetBrains Mono', monospace; font-feature-settings: 'tnum' 1, 'cv11' 1; }
+
+.surface { background: var(--surface); border: 1px solid var(--border); }
+.surface-hover:hover { border-color: var(--border-hover); }
+.elevated { background: var(--elevated); }
+
+.chip { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; letter-spacing: .02em; }
+.chip-buy { background: rgba(16,185,129,.12); color: #34D399; border: 1px solid rgba(16,185,129,.25); }
+.chip-sell { background: rgba(239,68,68,.12); color: #F87171; border: 1px solid rgba(239,68,68,.25); }
+.chip-win { background: rgba(16,185,129,.12); color: #34D399; }
+.chip-loss { background: rgba(239,68,68,.12); color: #F87171; }
+.chip-be { background: var(--elevated); color: var(--txt-2); }
+.chip-orange { background: rgba(243,108,0,.12); color: var(--accent); border: 1px solid rgba(243,108,0,.3); }
+.chip-dot::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: currentColor; display: inline-block; }
+
+.table-row { transition: background .15s ease; }
+.table-row:hover { background: var(--elevated); }
+
+.filter-pill { display: inline-flex; align-items: center; gap: 6px; padding: 6px 11px; border: 1px solid var(--border); background: var(--surface); color: var(--txt-2); border-radius: 999px; font-size: 12px; font-weight: 500; transition: all .2s ease; cursor: pointer; }
+.filter-pill:hover { border-color: var(--accent); color: var(--txt); }
+.filter-pill.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+.grad-text { background: linear-gradient(135deg, #FF8A3D 0%, #F36C00 50%, #E65C00 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.grad-bar { background: linear-gradient(90deg, #F36C00, #E65C00); }
+
+@keyframes pulseDot { 0%,100% { box-shadow: 0 0 0 0 rgba(243,108,0,.7); } 50% { box-shadow: 0 0 0 6px rgba(243,108,0,0); } }
+.live-dot { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; animation: pulseDot 1.8s ease-in-out infinite; display: inline-block; }
+
+@keyframes drawSpark { to { stroke-dashoffset: 0; } }
+.draw-spark { stroke-dasharray: 600; stroke-dashoffset: 600; animation: drawSpark 1.4s cubic-bezier(.4,0,.2,1) forwards; }
+
+.gauge-track { stroke: #1F2530; }
+.gauge-fill { stroke: url(#gaugeGrad); stroke-linecap: round; transition: stroke-dashoffset 1.2s cubic-bezier(.4,0,.2,1); }
+
+.hm { aspect-ratio: 1; border-radius: 6px; transition: all .15s ease; cursor: pointer; }
+.hm:hover { transform: scale(1.08); z-index: 2; position: relative; box-shadow: 0 4px 12px rgba(0,0,0,.4); }

@@ -1,92 +1,267 @@
-import React from 'react';
-import { AccountCard } from '../../../components/trading/AccountCard';
+import React, { useMemo, useState } from 'react';
+import { Plus, Pencil, Trash2, TrendingUp } from 'lucide-react';
 import { useAccounts } from '../../../hooks/useAccounts';
-import { Plus } from 'lucide-react';
 import { AddAccountModal } from '../../../components/trading/AddAccountModal';
-import { useAuth } from '../../../hooks/useAuth';
-import { useNavigate } from 'react-router-dom';
+import { EditAccountModal } from '../../../components/trading/EditAccountModal';
+import { useToast } from '../../../hooks/useToast';
+
+type Account = {
+  id: string;
+  nom: string | null;
+  typeCompte: string | null;
+  propFirm: string | null;
+  tailleCompte: number | string | null;
+  balanceCourante: number | string | null;
+  devise: string;
+  statut: string;
+  profitTargetPct: number | string | null;
+  maxDrawdownPct: number | string | null;
+  drawdownCourantPct: number | string | null;
+  profitCourantPct: number | string | null;
+};
+
+const TYPE_CHIPS: Record<string, { label: string; cls: string }> = {
+  evaluation: { label: 'Eval', cls: 'chip-orange' },
+  funded: { label: 'Funded', cls: 'chip-win' },
+  personnel: { label: 'Réel', cls: 'chip-be' },
+};
+
+const num = (v: any) => Number(v ?? 0);
+const fmt = (v: any) =>
+  num(v).toLocaleString('en-US', { maximumFractionDigits: 2 });
 
 const AccountsPage: React.FC = () => {
-  const { accounts, isLoading } = useAccounts();
-  const { user } = useAuth();
-  const navigate = useNavigate();
-  const [isModalOpen, setIsModalOpen] = React.useState(false);
+  const { accounts, isLoading, passFunded, deleteAccount } = useAccounts();
+  const { addToast } = useToast();
+  const [isAddOpen, setIsAddOpen] = useState(false);
+  const [editing, setEditing] = useState<Account | null>(null);
 
-  const safeAccounts = Array.isArray(accounts) ? accounts : [];
-  const totalCapital = safeAccounts.reduce((acc, a) => acc + Number(a.tailleCompte || 0), 0);
-  const totalBalance = safeAccounts.reduce((acc, a) => acc + Number(a.balanceCourante || 0), 0);
-  const totalPnL = totalBalance - totalCapital;
+  const safe: Account[] = Array.isArray(accounts) ? (accounts as Account[]) : [];
 
-  const isPro = user?.plan === 'pro' || user?.role === 'admin';
+  const stats = useMemo(() => {
+    const totalCapital = safe.reduce((s, a) => s + num(a.tailleCompte), 0);
+    const totalBalance = safe.reduce((s, a) => s + num(a.balanceCourante), 0);
+    const totalPL = totalBalance - totalCapital;
+    return { count: safe.length, totalCapital, totalPL };
+  }, [safe]);
 
-  const handleAddAccount = () => {
-    if (!isPro && safeAccounts.length >= 1) {
-      navigate('/app/upgrade');
-    } else {
-      setIsModalOpen(true);
+  const onDelete = async (a: Account) => {
+    if (!confirm(`Supprimer le compte "${a.nom}" ?\nCette action est irréversible.`)) return;
+    try {
+      await deleteAccount.mutateAsync(a.id);
+      addToast('Compte supprimé');
+    } catch {
+      addToast('Erreur lors de la suppression', 'error');
     }
   };
 
   return (
-    <div className="space-y-8 animate-[fadeIn_0.5s_ease-out]">
-      {/* Header Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="glass p-6 rounded-3xl">
-          <div className="text-[10px] font-bold text-txt-2 uppercase tracking-widest mb-1">Total Comptes</div>
-          <div className="text-3xl font-mono font-bold">{safeAccounts.length}</div>
+    <div className="space-y-4 animate-[fadeIn_0.5s_ease-out]">
+      {/* STATS */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div className="surface rounded-xl px-4 py-3">
+          <p className="text-[10px] uppercase tracking-widest text-txt-2">Comptes actifs</p>
+          <p className="text-xl font-black mono mt-1">{isLoading ? '—' : stats.count}</p>
         </div>
-        <div className="glass p-6 rounded-3xl">
-          <div className="text-[10px] font-bold text-txt-2 uppercase tracking-widest mb-1">Capital Sous Gestion</div>
-          <div className="text-3xl font-mono font-bold">${totalCapital.toLocaleString()}</div>
+        <div className="surface rounded-xl px-4 py-3">
+          <p className="text-[10px] uppercase tracking-widest text-txt-2">Capital total</p>
+          <p className="text-xl font-black mono mt-1">
+            ${isLoading ? '—' : fmt(stats.totalCapital)}
+          </p>
         </div>
-        <div className="glass p-6 rounded-3xl">
-          <div className="text-[10px] font-bold text-txt-2 uppercase tracking-widest mb-1">P&L Global</div>
-          <div className={`text-3xl font-mono font-bold ${totalPnL >= 0 ? 'text-win' : 'text-loss'}`}>
-            {totalPnL >= 0 ? '+' : ''}${totalPnL.toLocaleString()}
-          </div>
-        </div>
-      </div>
-
-      <div className="flex justify-between items-center">
-        <h2 className="text-xl font-bold">Mes Comptes Trading</h2>
-        <button 
-          onClick={handleAddAccount}
-          className="btn-primary flex items-center gap-2"
-        >
-          <Plus size={18} />
-          Ajouter un compte
-        </button>
-      </div>
-
-      {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {[...Array(3)].map((_, i) => (
-            <div key={i} className="glass h-64 rounded-3xl animate-pulse bg-elevated/50" />
-          ))}
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {safeAccounts.map((account) => (
-            <AccountCard key={account.id} account={account} />
-          ))}
-          
-          <button 
-            onClick={handleAddAccount}
-            className="glass rounded-3xl border-dashed border-2 border-border hover:border-accent/30 hover:bg-accent/5 transition-all flex flex-col items-center justify-center p-8 group min-h-[300px] relative overflow-hidden"
+        <div className="surface rounded-xl px-4 py-3 relative overflow-hidden">
+          <div
+            className="absolute -top-8 -right-8 w-32 h-32 rounded-full"
+            style={{ background: 'radial-gradient(circle, rgba(243,108,0,.25), transparent 70%)' }}
+          />
+          <p className="text-[10px] uppercase tracking-widest text-txt-2 relative">P&amp;L combiné</p>
+          <p
+            className={`text-xl font-black mono mt-1 relative ${
+              stats.totalPL > 0 ? 'grad-text' : stats.totalPL < 0 ? 'text-loss' : 'text-txt-2'
+            }`}
           >
-            {!isPro && (
-              <div className="absolute top-4 right-4 bg-accent text-white text-[9px] font-black px-2 py-0.5 rounded uppercase">PRO</div>
-            )}
-            <div className="w-12 h-12 rounded-full bg-elevated flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-              <Plus className="text-txt-3 group-hover:text-accent" />
-            </div>
-            <span className="font-bold text-txt-2 group-hover:text-txt">Lier un nouveau compte</span>
-            <span className="text-[10px] text-txt-3 mt-1 uppercase tracking-widest">MT4 / MT5 / CTrader</span>
+            {isLoading
+              ? '—'
+              : `${stats.totalPL >= 0 ? '+' : '-'}$${fmt(Math.abs(stats.totalPL))}`}
+          </p>
+        </div>
+      </div>
+
+      {/* TABLE */}
+      <div className="surface rounded-xl">
+        <div className="px-4 py-3 border-b border-border flex justify-between items-center">
+          <h3 className="font-bold text-xs">Mes comptes</h3>
+          <button
+            onClick={() => setIsAddOpen(true)}
+            className="btn-primary px-2.5 py-1.5 rounded-md text-[11px] font-semibold flex items-center gap-1"
+          >
+            <Plus size={12} /> Nouveau
           </button>
         </div>
-      )}
 
-      <AddAccountModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+        {isLoading ? (
+          <div className="p-8 text-center text-txt-2 text-[11px]">Chargement des comptes…</div>
+        ) : safe.length === 0 ? (
+          <div className="px-5 py-10 text-center">
+            <div className="w-10 h-10 rounded-xl bg-elevated flex items-center justify-center mx-auto mb-3 text-accent">
+              <TrendingUp size={18} />
+            </div>
+            <p className="text-xs font-bold mb-1">Aucun compte trading</p>
+            <p className="text-[10px] text-txt-2 mb-4 max-w-xs mx-auto">
+              Ajoute ton premier compte (prop firm, perso, démo) pour commencer à tracker tes trades.
+            </p>
+            <button
+              onClick={() => setIsAddOpen(true)}
+              className="btn-primary px-3 py-1.5 rounded-md text-[11px] font-semibold inline-flex items-center gap-1"
+            >
+              <Plus size={12} /> Créer un compte
+            </button>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-[11px]">
+              <thead className="text-txt-3 bg-bg">
+                <tr>
+                  {[
+                    ['Nom', 'left'],
+                    ['Firm', 'left'],
+                    ['Type', 'left'],
+                    ['Capital', 'right'],
+                    ['Solde', 'right'],
+                    ['P&L', 'right'],
+                    ['Objectif', 'right'],
+                    ['DD', 'right'],
+                    ['Statut', 'center'],
+                    ['', 'right'],
+                  ].map(([label, align]) => (
+                    <th
+                      key={label as string}
+                      className={`px-3 py-2 font-medium uppercase tracking-wider text-[9px] text-${align as string}`}
+                    >
+                      {label}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {safe.map(a => {
+                  const capital = num(a.tailleCompte);
+                  const balance = num(a.balanceCourante);
+                  const pl = balance - capital;
+                  const plPct = capital > 0 ? (pl / capital) * 100 : 0;
+                  const typeKey = (a.typeCompte || 'personnel').toLowerCase();
+                  const chip = TYPE_CHIPS[typeKey] || { label: typeKey, cls: 'chip-be' };
+                  const ddPct = num(a.drawdownCourantPct);
+                  const ddMaxPct = num(a.maxDrawdownPct);
+                  const profitTarget = num(a.profitTargetPct);
+                  const eligibleFunded =
+                    typeKey === 'evaluation' && profitTarget > 0 && plPct >= profitTarget;
+
+                  return (
+                    <tr key={a.id} className="table-row border-t border-border">
+                      <td className="px-3 py-2 font-semibold text-[11px]">{a.nom || '—'}</td>
+                      <td className="px-3 py-2 text-txt-2 text-[11px]">{a.propFirm || '—'}</td>
+                      <td className="px-3 py-2">
+                        <span className={`chip ${chip.cls}`} style={{ fontSize: 10 }}>
+                          {chip.label}
+                        </span>
+                      </td>
+                      <td className="px-3 py-2 text-right mono text-[11px]">${fmt(capital)}</td>
+                      <td className="px-3 py-2 text-right mono font-bold text-[11px]">
+                        ${fmt(balance)}
+                      </td>
+                      <td
+                        className={`px-3 py-2 text-right mono font-bold text-[11px] ${
+                          pl > 0 ? 'text-win' : pl < 0 ? 'text-loss' : 'text-txt-2'
+                        }`}
+                      >
+                        {pl > 0 ? '+' : pl < 0 ? '-' : ''}${fmt(Math.abs(pl))}
+                        <span className="block text-[9px] text-txt-3 font-normal">
+                          {plPct > 0 ? '+' : ''}
+                          {plPct.toFixed(2)}%
+                        </span>
+                      </td>
+                      <td className="px-3 py-2 text-right mono text-txt-2 text-[10px]">
+                        {profitTarget > 0 ? (
+                          <div>
+                            +{profitTarget}%
+                            <div className="h-1 w-14 rounded-full overflow-hidden bg-bg mt-1 ml-auto">
+                              <div
+                                className="h-1 rounded-full grad-bar"
+                                style={{
+                                  width: `${Math.min(
+                                    Math.max((plPct / profitTarget) * 100, 0),
+                                    100
+                                  )}%`,
+                                }}
+                              />
+                            </div>
+                          </div>
+                        ) : (
+                          '—'
+                        )}
+                      </td>
+                      <td className="px-3 py-2 text-right mono text-txt-2 text-[10px]">
+                        {ddMaxPct > 0 ? (
+                          <span className={ddPct > ddMaxPct * 0.7 ? 'text-loss' : ''}>
+                            -{ddPct.toFixed(1)}% / -{ddMaxPct}%
+                          </span>
+                        ) : (
+                          '—'
+                        )}
+                      </td>
+                      <td className="px-3 py-2 text-center">
+                        <span
+                          className={`chip ${a.statut === 'actif' ? 'chip-win' : 'chip-be'}`}
+                          style={{ fontSize: 10 }}
+                        >
+                          {a.statut === 'actif' ? 'Active' : a.statut}
+                        </span>
+                      </td>
+                      <td className="px-3 py-2 text-right whitespace-nowrap">
+                        <div className="flex items-center gap-1 justify-end">
+                          {eligibleFunded && (
+                            <button
+                              onClick={() => passFunded.mutate(a.id)}
+                              disabled={passFunded.isPending}
+                              className="text-[9px] font-bold uppercase tracking-widest text-accent hover:text-accent-2 disabled:opacity-50 px-1.5"
+                              title="Passer en Funded"
+                            >
+                              → Funded
+                            </button>
+                          )}
+                          <button
+                            onClick={() => setEditing(a)}
+                            className="p-1 text-txt-2 hover:text-accent transition-colors"
+                            title="Modifier"
+                          >
+                            <Pencil size={12} />
+                          </button>
+                          <button
+                            onClick={() => onDelete(a)}
+                            disabled={deleteAccount.isPending}
+                            className="p-1 text-txt-2 hover:text-loss transition-colors disabled:opacity-50"
+                            title="Supprimer"
+                          >
+                            <Trash2 size={12} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      <AddAccountModal isOpen={isAddOpen} onClose={() => setIsAddOpen(false)} />
+      <EditAccountModal
+        account={editing}
+        isOpen={!!editing}
+        onClose={() => setEditing(null)}
+      />
     </div>
   );
 };
