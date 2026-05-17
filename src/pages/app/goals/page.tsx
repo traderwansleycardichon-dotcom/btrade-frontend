@@ -3,6 +3,8 @@ import { Target, Plus, Trash2, Pencil, X, Check } from 'lucide-react';
 import { useObjectifs, Objectif } from '../../../hooks/useFinance';
 import { useToast } from '../../../hooks/useToast';
 
+import { FeatureGate } from '../../../components/ui/FeatureGate';
+
 const num = (v: any) => Number(v ?? 0);
 const fmt = (n: number) => n.toLocaleString('en-US', { maximumFractionDigits: 0 });
 
@@ -297,4 +299,16 @@ const Field: React.FC<{ label: string; optional?: boolean; children: React.React
   </div>
 );
 
-export default GoalsPage;
+const ProtectedGoalsPage: React.FC = () => {
+  return (
+    <FeatureGate 
+      feature="hasFinance"
+      fallbackTitle="Objectifs Financiers Réservé aux Membres Pro"
+      fallbackDesc="Fixez et gérez vos objectifs financiers avec des indicateurs et graphiques de progression interactifs."
+    >
+      <GoalsPage />
+    </FeatureGate>
+  );
+};
+
+export default ProtectedGoalsPage;

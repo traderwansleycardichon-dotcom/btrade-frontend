@@ -5,6 +5,8 @@ import { usePatrimoine } from '../../../hooks/usePatrimoine';
 import { useInvestments } from '../../../hooks/useInvestments';
 import { AddInvestmentModal } from '../../../components/finance/AddInvestmentModal';
 
+import { FeatureGate } from '../../../components/ui/FeatureGate';
+
 const PatrimoinePage: React.FC = () => {
   const { dashboard, isLoading: isLoadingPatrimoine } = usePatrimoine();
   const { kpis, allocation, isLoading: isLoadingInvestments } = useInvestments();
@@ -138,4 +140,16 @@ const PatrimoinePage: React.FC = () => {
   );
 };
 
-export default PatrimoinePage;
+const ProtectedPatrimoinePage: React.FC = () => {
+  return (
+    <FeatureGate 
+      feature="hasFinance"
+      fallbackTitle="Mon Patrimoine Réservé aux Membres Pro"
+      fallbackDesc="Obtenez une vue globale, synthétique et analytique de vos investissements, de vos actifs et de votre situation nette globale."
+    >
+      <PatrimoinePage />
+    </FeatureGate>
+  );
+};
+
+export default ProtectedPatrimoinePage;

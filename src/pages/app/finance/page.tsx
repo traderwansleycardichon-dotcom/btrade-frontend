@@ -3,6 +3,8 @@ import { Trash2, ArrowUpRight, ArrowDownRight, X } from 'lucide-react';
 import { useDepenses, useRevenus, usePatrimoineDashboard } from '../../../hooks/useFinance';
 import { useToast } from '../../../hooks/useToast';
 
+import { FeatureGate } from '../../../components/ui/FeatureGate';
+
 const num = (v: any) => Number(v ?? 0);
 const fmt = (n: number, opts: Intl.NumberFormatOptions = {}) =>
   n.toLocaleString('en-US', { maximumFractionDigits: 2, ...opts });
@@ -383,4 +385,16 @@ const Field: React.FC<{ label: string; optional?: boolean; children: React.React
   </div>
 );
 
-export default FinancePage;
+const ProtectedFinancePage: React.FC = () => {
+  return (
+    <FeatureGate 
+      feature="hasFinance"
+      fallbackTitle="Budget & Flux Financiers Réservé aux Membres Pro"
+      fallbackDesc="Suivez et planifiez de manière professionnelle vos dépenses, vos revenus et vos budgets récurrents ou ponctuels."
+    >
+      <FinancePage />
+    </FeatureGate>
+  );
+};
+
+export default ProtectedFinancePage;

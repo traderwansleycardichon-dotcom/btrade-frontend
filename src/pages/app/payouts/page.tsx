@@ -6,6 +6,8 @@ import { useAccounts } from '../../../hooks/useAccounts';
 import { usePayouts, useAllPayouts, usePayoutMutations, Payout } from '../../../hooks/usePayouts';
 import { useToast } from '../../../hooks/useToast';
 
+import { FeatureGate } from '../../../components/ui/FeatureGate';
+
 const num = (v: any) => Number(v ?? 0);
 const fmt = (n: number, opts: Intl.NumberFormatOptions = {}) =>
   n.toLocaleString('en-US', { maximumFractionDigits: 2, ...opts });
@@ -562,4 +564,16 @@ const Field: React.FC<{ label: string; optional?: boolean; children: React.React
   </div>
 );
 
-export default PayoutsPage;
+const ProtectedPayoutsPage: React.FC = () => {
+  return (
+    <FeatureGate 
+      feature="hasFinance"
+      fallbackTitle="Gestion des Retraits Réservée aux Membres Pro"
+      fallbackDesc="Gérez de manière professionnelle l'historique et le suivi de vos retraits (payouts) sur vos comptes réels et funded."
+    >
+      <PayoutsPage />
+    </FeatureGate>
+  );
+};
+
+export default ProtectedPayoutsPage;

@@ -3,6 +3,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Send, Sparkles, ArrowLeft, MessageSquare, RefreshCw } from 'lucide-react';
 import { useAiChat, explainEvent } from '../../../hooks/useAiChat';
 import api from '../../../lib/api';
+import { FeatureGate } from '../../../components/ui/FeatureGate';
 
 const COUNTRY_TO_ISO: Record<string, string> = {
   US: 'us', USD: 'us', EU: 'eu', EUR: 'eu', GB: 'gb', GBP: 'gb',
@@ -344,4 +345,16 @@ const Inline: React.FC<{ text: string }> = ({ text }) => {
   );
 };
 
-export default AiChatPage;
+const ProtectedAiChatPage: React.FC = () => {
+  return (
+    <FeatureGate 
+      feature="hasAiChat"
+      fallbackTitle="Chat IA Réservé aux Membres Pro"
+      fallbackDesc="Obtenez des analyses instantanées sur l'impact des marchés, la gestion du risque et le suivi psychologique de vos trades grâce à notre IA."
+    >
+      <AiChatPage />
+    </FeatureGate>
+  );
+};
+
+export default ProtectedAiChatPage;

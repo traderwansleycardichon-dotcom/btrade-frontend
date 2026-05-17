@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Modal } from '../ui/Modal';
-import { useFinance } from '../../hooks/useFinance';
+import { useRevenus } from '../../hooks/useFinance';
 import { useToast } from '../../hooks/useToast';
 import { DollarSign, Calendar, Tag, FileText } from 'lucide-react';
 
@@ -10,7 +10,7 @@ interface AddRevenuModalProps {
 }
 
 export const AddRevenuModal: React.FC<AddRevenuModalProps> = ({ isOpen, onClose }) => {
-  const { createRevenu } = useFinance();
+  const { create: createRevenu } = useRevenus();
   const { addToast } = useToast();
   
   const [formData, setFormData] = useState({

@@ -19,7 +19,7 @@ const MOODS = [
 ];
 
 export const AddPsychologyModal: React.FC<AddPsychologyModalProps> = ({ isOpen, onClose }) => {
-  const { createTracking } = usePsychology();
+  const { createEntry: createTracking } = usePsychology();
   const { addToast } = useToast();
   
   const [formData, setFormData] = useState({

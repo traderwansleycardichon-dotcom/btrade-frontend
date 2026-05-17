@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, 
   LineChart, 
@@ -23,11 +23,14 @@ import {
   ArrowUpRight,
   Target,
   Globe,
-  FileText
+  FileText,
+  Lock
 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { useAccounts } from '../../hooks/useAccounts';
 import { useMultiAccountTrades } from '../../hooks/useMultiAccountTrades';
+import { usePlan } from '../../hooks/usePlan';
+import { Modal } from '../ui/Modal';
 import { Flame, BarChart2 } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
@@ -43,6 +46,7 @@ interface NavItem {
   href: string;
   live?: boolean;
   badge?: string;
+  proOnly?: boolean;
 }
 
 interface NavGroup {
@@ -64,6 +68,11 @@ interface SidebarProps {
 export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen = false, onMobileClose }) => {
   const { user, logout } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
+  const { isFree } = usePlan();
+
+  const [isUpgradeModalOpen, setIsUpgradeModalOpen] = React.useState(false);
+  const [selectedFeature, setSelectedFeature] = React.useState('');
 
   /**
    * Configuration de la navigation
@@ -85,28 +94,28 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen = false, onMobileCl
       items: [
         { label: 'Journal de trading', icon: BookOpen, href: '/app/journal' },
         { label: 'Psychologie',        icon: Brain,    href: '/app/psychology' },
-        { label: 'Analyses techniques',icon: BarChart3,href: '/app/reports' },
+        { label: 'Analyses techniques',icon: BarChart3,href: '/app/reports', proOnly: true },
       ]
     },
     {
       title: 'Finance',
       items: [
-        { label: 'Patrimoine',  icon: Landmark,     href: '/app/patrimoine' },
-        { label: 'Budget',      icon: CreditCard,   href: '/app/finance' },
-        { label: 'Objectifs',   icon: Target,       href: '/app/goals' },
-        { label: 'Retraits',    icon: ArrowUpRight, href: '/app/payouts' },
+        { label: 'Patrimoine',  icon: Landmark,     href: '/app/patrimoine', proOnly: true },
+        { label: 'Budget',      icon: CreditCard,   href: '/app/finance', proOnly: true },
+        { label: 'Objectifs',   icon: Target,       href: '/app/goals', proOnly: true },
+        { label: 'Retraits',    icon: ArrowUpRight, href: '/app/payouts', proOnly: true },
       ]
     },
     {
       title: 'Formation',
       items: [
-        { label: 'Academy',           icon: GraduationCap, href: '/app/formation', badge: 'New' },
+        { label: 'Academy',           icon: GraduationCap, href: '/app/formation', badge: 'New', proOnly: true },
       ]
     },
     {
       title: 'IA',
       items: [
-        { label: 'Insights IA',       icon: Sparkles, href: '/app/ai-insights', live: true },
+        { label: 'Insights IA',       icon: Sparkles, href: '/app/ai-insights', live: true, proOnly: true },
         { label: 'Calendrier Éco',    icon: Globe,    href: '/app/economic' },
       ]
     },
@@ -163,34 +172,55 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen = false, onMobileCl
               {group.title}
             </div>
             <div className="space-y-0.5">
-              {group.items.map((item) => (
-                <NavLink
-                  key={item.href}
-                  to={item.href}
-                  className={({ isActive }) => cn(
-                    "flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all group",
-                    isActive 
-                      ? "bg-accent/10 text-accent border-l-2 border-accent rounded-l-none" 
-                      : "text-txt-2 hover:text-txt hover:bg-elevated"
-                  )}
-                >
-                  <div className="flex items-center gap-3">
-                    <item.icon size={18} />
-                    <span>{item.label}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {item.live && (
-                      <span className="text-[9px] font-black bg-accent text-white px-1.5 py-0.5 rounded leading-none animate-pulse">LIVE</span>
+              {group.items.map((item) => {
+                const isLocked = item.proOnly && isFree;
+                
+                return (
+                  <NavLink
+                    key={item.href}
+                    to={isLocked ? '#' : item.href}
+                    onClick={(e) => {
+                      if (isLocked) {
+                        e.preventDefault();
+                        setSelectedFeature(item.label);
+                        setIsUpgradeModalOpen(true);
+                      } else if (onMobileClose) {
+                        onMobileClose();
+                      }
+                    }}
+                    className={({ isActive }) => cn(
+                      "flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all group",
+                      isLocked
+                        ? "text-txt-3/60 hover:text-txt hover:bg-elevated/40 cursor-pointer"
+                        : isActive 
+                          ? "bg-accent/10 text-accent border-l-2 border-accent rounded-l-none" 
+                          : "text-txt-2 hover:text-txt hover:bg-elevated"
                     )}
-                    {item.badge && (
-                      <span className="text-[10px] font-bold bg-border text-txt-2 group-hover:bg-accent group-hover:text-white px-1.5 py-0.5 rounded transition-colors">
-                        {item.badge}
-                      </span>
-                    )}
-                    <ChevronRight size={14} className="opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all" />
-                  </div>
-                </NavLink>
-              ))}
+                  >
+                    <div className="flex items-center gap-3">
+                      <item.icon size={18} className={isLocked ? "text-txt-3/50" : ""} />
+                      <span className={isLocked ? "opacity-60" : ""}>{item.label}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {isLocked ? (
+                        <Lock size={12} className="text-accent" />
+                      ) : (
+                        <>
+                          {item.live && (
+                            <span className="text-[9px] font-black bg-accent text-white px-1.5 py-0.5 rounded leading-none animate-pulse">LIVE</span>
+                          )}
+                          {item.badge && (
+                            <span className="text-[10px] font-bold bg-border text-txt-2 group-hover:bg-accent group-hover:text-white px-1.5 py-0.5 rounded transition-colors">
+                              {item.badge}
+                            </span>
+                          )}
+                          <ChevronRight size={14} className="opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all" />
+                        </>
+                      )}
+                    </div>
+                  </NavLink>
+                );
+              })}
             </div>
           </div>
         ))}
@@ -218,6 +248,65 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen = false, onMobileCl
         </div>
       </div>
       </aside>
+
+      {/* Upgrade Gating Modal */}
+      <Modal
+        isOpen={isUpgradeModalOpen}
+        onClose={() => setIsUpgradeModalOpen(false)}
+        title="💎 Fonctionnalité Premium BTrade"
+        size="md"
+      >
+        <div className="flex flex-col items-center text-center p-2">
+          <div className="w-16 h-16 rounded-3xl bg-accent/10 border border-accent/20 flex items-center justify-center text-accent mb-4 animate-bounce">
+            <Sparkles size={28} />
+          </div>
+          
+          <h3 className="text-lg font-black mb-2">
+            Débloquez l'accès à : {selectedFeature}
+          </h3>
+          
+          <p className="text-sm text-txt-2 max-w-sm mb-6 leading-relaxed">
+            Cette fonctionnalité exclusive fait partie du plan <b>BTrade Pro</b>. Améliorez votre expérience de trading avec nos outils professionnels avancés.
+          </p>
+
+          <div className="w-full bg-bg/50 border border-border rounded-2xl p-4 mb-6 text-left space-y-3">
+            <div className="flex items-center gap-3">
+              <span className="text-win font-bold">✓</span>
+              <span className="text-xs text-txt-2 font-medium">🎓 <b>Academy</b> — Cours, formations et tutoriels exclusifs</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="text-win font-bold">✓</span>
+              <span className="text-xs text-txt-2 font-medium">🧠 <b>Insights IA</b> — Analyses de performances par IA</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="text-win font-bold">✓</span>
+              <span className="text-xs text-txt-2 font-medium">💬 <b>Chat IA</b> — Session de chat intelligente avec Claude/GPT</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="text-win font-bold">✓</span>
+              <span className="text-xs text-txt-2 font-medium">📈 <b>Analyses avancées</b> — Outils d'analyses de vos setups</span>
+            </div>
+          </div>
+
+          <div className="flex gap-4 w-full">
+            <button
+              onClick={() => setIsUpgradeModalOpen(false)}
+              className="flex-1 py-3 rounded-xl border border-border font-bold hover:bg-white/5 transition-all text-xs"
+            >
+              Plus tard
+            </button>
+            <button
+              onClick={() => {
+                setIsUpgradeModalOpen(false);
+                navigate('/app/upgrade');
+              }}
+              className="flex-1 bg-accent hover:bg-accent/90 text-white py-3 rounded-xl font-bold transition-all text-xs shadow-md hover:scale-105"
+            >
+              Découvrir les plans Pro
+            </button>
+          </div>
+        </div>
+      </Modal>
     </>
   );
 };

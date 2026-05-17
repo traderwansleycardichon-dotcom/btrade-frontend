@@ -57,7 +57,7 @@ const PsychologyPage: React.FC = () => {
     },
     {
       label: 'Dernière Humeur',
-      value: entries[0]?.mood || entries[0]?.emotionalState || '—',
+      value: (entries[0] as any)?.mood || entries[0]?.emotionalState || '—',
       color: 'text-win',
       icon: Target,
     },

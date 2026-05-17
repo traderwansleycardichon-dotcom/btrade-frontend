@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Modal } from '../ui/Modal';
-import { useFinance } from '../../hooks/useFinance';
+import { useDepenses } from '../../hooks/useFinance';
 import { useToast } from '../../hooks/useToast';
 import { CreditCard, Calendar, Tag, FileText, AlertCircle } from 'lucide-react';
 
@@ -16,7 +16,7 @@ const CATEGORIES = [
 ];
 
 export const AddDepenseModal: React.FC<AddDepenseModalProps> = ({ isOpen, onClose }) => {
-  const { createDepense } = useFinance();
+  const { create: createDepense } = useDepenses();
   const { addToast } = useToast();
   
   const [formData, setFormData] = useState({

@@ -11,7 +11,7 @@ interface AddPayoutModalProps {
 }
 
 export const AddPayoutModal: React.FC<AddPayoutModalProps> = ({ isOpen, onClose, accountId }) => {
-  const { requestPayout } = usePayouts(accountId);
+  const { createPayout: requestPayout } = usePayouts(accountId);
   const { addToast } = useToast();
   
   const [formData, setFormData] = useState({

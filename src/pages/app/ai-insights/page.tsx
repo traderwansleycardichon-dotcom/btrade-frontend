@@ -1,6 +1,7 @@
 import React from 'react';
 import { Sparkles, MessageSquare, Lightbulb, AlertCircle, Trash2, Zap } from 'lucide-react';
 import { useAiInsights, AiInsight } from '../../../hooks/useAiInsights';
+import { FeatureGate } from '../../../components/ui/FeatureGate';
 
 const AIInsightsPage: React.FC = () => {
   const { insights, isLoading, error, deleteInsight } = useAiInsights();
@@ -130,4 +131,16 @@ const AIInsightsPage: React.FC = () => {
   );
 };
 
-export default AIInsightsPage;
+const ProtectedAIInsightsPage: React.FC = () => {
+  return (
+    <FeatureGate 
+      feature="hasAiInsights"
+      fallbackTitle="Insights IA Réservé aux Membres Pro"
+      fallbackDesc="L'IA analyse vos setups et vos trades pour identifier automatiquement vos forces, faiblesses et vos patterns de trading personnalisés."
+    >
+      <AIInsightsPage />
+    </FeatureGate>
+  );
+};
+
+export default ProtectedAIInsightsPage;

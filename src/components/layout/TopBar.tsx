@@ -3,6 +3,9 @@ import { useLocation } from 'react-router-dom';
 import { Search, Upload, Bell, Command, Menu } from 'lucide-react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { NotificationsDropdown } from './NotificationsDropdown';
+import { useNotifications } from '../../hooks/useNotifications';
+import { ImportTradesModal } from '../trading/ImportTradesModal';
 
 interface TopBarProps {
   onOpenMenu?: () => void;
@@ -11,6 +14,9 @@ interface TopBarProps {
 export const TopBar: React.FC<TopBarProps> = ({ onOpenMenu }) => {
   const location = useLocation();
   const [now, setNow] = useState(new Date());
+  const [isNotifOpen, setIsNotifOpen] = useState(false);
+  const [isImportOpen, setIsImportOpen] = useState(false);
+  const { unreadCount } = useNotifications();
 
   useEffect(() => {
     const timer = setInterval(() => setNow(new Date()), 60000);
@@ -87,15 +93,30 @@ export const TopBar: React.FC<TopBarProps> = ({ onOpenMenu }) => {
           <Search size={18} />
         </button>
 
-        <button className="p-2 text-txt-2 hover:text-txt hover:bg-elevated rounded-xl transition-colors relative">
-          <Bell size={18} />
-          <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-accent rounded-full" />
-        </button>
+        <div className="relative">
+          <button 
+            onClick={() => setIsNotifOpen(!isNotifOpen)}
+            className={`p-2 hover:text-txt hover:bg-elevated rounded-xl transition-colors relative ${isNotifOpen ? 'text-txt bg-elevated' : 'text-txt-2'}`}
+            title="Notifications"
+          >
+            <Bell size={18} />
+            {unreadCount > 0 && (
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-accent rounded-full animate-pulse" />
+            )}
+          </button>
+          
+          <NotificationsDropdown isOpen={isNotifOpen} onClose={() => setIsNotifOpen(false)} />
+        </div>
 
-        <button className="hidden md:flex items-center gap-2 px-3 py-2 text-xs font-bold text-txt-2 hover:text-txt hover:bg-elevated rounded-xl transition-colors">
+        <button 
+          onClick={() => setIsImportOpen(true)}
+          className="hidden md:flex items-center gap-2 px-3 py-2 text-xs font-bold text-txt-2 hover:text-txt hover:bg-elevated rounded-xl transition-colors"
+        >
           <Upload size={16} />
           <span>Importer</span>
         </button>
+
+        <ImportTradesModal isOpen={isImportOpen} onClose={() => setIsImportOpen(false)} />
       </div>
     </header>
   );
