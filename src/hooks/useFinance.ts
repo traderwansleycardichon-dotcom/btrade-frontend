@@ -42,12 +42,12 @@ const baseInvalidate = (qc: any) => () => {
 export const useDepenses = (mois?: string) => {
   const qc = useQueryClient();
 
-  const list = useQuery<FinanceItem[]>({
+  const list = useQuery<any>({
     queryKey: ['depenses', mois || 'all'],
     queryFn: async () => {
       const params = mois ? `?mois=${mois}` : '';
       const { data } = await api.get(`/api/depenses${params}`);
-      return data.data || [];
+      return data.data || {};
     },
   });
 
@@ -73,7 +73,7 @@ export const useDepenses = (mois?: string) => {
   });
 
   return {
-    depenses: list.data || [],
+    depenses: list.data?.depenses || [],
     isLoading: list.isLoading,
     create,
     update,
@@ -85,12 +85,12 @@ export const useDepenses = (mois?: string) => {
 export const useRevenus = (mois?: string) => {
   const qc = useQueryClient();
 
-  const list = useQuery<FinanceItem[]>({
+  const list = useQuery<any>({
     queryKey: ['revenus', mois || 'all'],
     queryFn: async () => {
       const params = mois ? `?mois=${mois}` : '';
       const { data } = await api.get(`/api/revenus${params}`);
-      return data.data || [];
+      return data.data || {};
     },
   });
 
@@ -116,7 +116,7 @@ export const useRevenus = (mois?: string) => {
   });
 
   return {
-    revenus: list.data || [],
+    revenus: list.data?.revenus || [],
     isLoading: list.isLoading,
     create,
     update,

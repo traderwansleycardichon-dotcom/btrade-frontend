@@ -7,6 +7,7 @@ import { usePayouts, useAllPayouts, usePayoutMutations, Payout } from '../../../
 import { useToast } from '../../../hooks/useToast';
 
 import { FeatureGate } from '../../../components/ui/FeatureGate';
+import { Modal } from '../../../components/ui/Modal';
 
 const num = (v: any) => Number(v ?? 0);
 const fmt = (n: number, opts: Intl.NumberFormatOptions = {}) =>
@@ -42,7 +43,7 @@ const PayoutsPage: React.FC = () => {
   const [scope, setScope] = useState<'all' | string>('all');
   const [scopeOpen, setScopeOpen] = useState(false);
   const [filter, setFilter] = useState<'tous' | 'pending' | 'confirmed' | 'rejected'>('tous');
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalOpenType, setModalOpenType] = useState<'create' | 'info_no_accounts' | 'info_no_eligible' | null>(null);
 
   const isAll = scope === 'all';
   const singleAccount = !isAll ? safeAccounts.find((a: any) => a.id === scope) : null;
@@ -119,14 +120,16 @@ const PayoutsPage: React.FC = () => {
           setOpen={setScopeOpen}
         />
         <button
-          onClick={() => setIsModalOpen(true)}
-          disabled={eligibleAccounts.length === 0}
-          className="text-xs font-bold uppercase tracking-widest bg-accent hover:bg-accent-2 text-white px-4 py-2 rounded-xl flex items-center gap-2 disabled:opacity-50"
-          title={
-            eligibleAccounts.length === 0
-              ? 'Aucun compte funded ou réel actif'
-              : ''
-          }
+          onClick={() => {
+            if (safeAccounts.length === 0) {
+              setModalOpenType('info_no_accounts');
+            } else if (eligibleAccounts.length === 0) {
+              setModalOpenType('info_no_eligible');
+            } else {
+              setModalOpenType('create');
+            }
+          }}
+          className="text-xs font-bold uppercase tracking-widest bg-accent hover:bg-accent-2 text-white px-4 py-2 rounded-xl flex items-center gap-2 transition-all hover:scale-[1.02] active:scale-[0.98]"
         >
           <Plus size={14} /> Enregistrer un retrait
         </button>
@@ -176,10 +179,18 @@ const PayoutsPage: React.FC = () => {
             <p className="text-[11px] text-txt-3 mb-4 max-w-sm mx-auto">
               Garde la trace des retraits reçus de tes comptes funded et réels.
             </p>
-            {payouts.length === 0 && eligibleAccounts.length > 0 && (
+            {payouts.length === 0 && (
               <button
-                onClick={() => setIsModalOpen(true)}
-                className="text-[11px] font-bold uppercase tracking-widest bg-accent text-white px-3 py-1.5 rounded inline-flex items-center gap-1.5"
+                onClick={() => {
+                  if (safeAccounts.length === 0) {
+                    setModalOpenType('info_no_accounts');
+                  } else if (eligibleAccounts.length === 0) {
+                    setModalOpenType('info_no_eligible');
+                  } else {
+                    setModalOpenType('create');
+                  }
+                }}
+                className="text-[11px] font-bold uppercase tracking-widest bg-accent text-white px-3 py-1.5 rounded-xl inline-flex items-center gap-1.5 transition-all hover:scale-[1.02] active:scale-[0.98]"
               >
                 <Plus size={12} /> Enregistrer un retrait
               </button>
@@ -273,21 +284,84 @@ const PayoutsPage: React.FC = () => {
       </div>
 
       {/* MODAL DEMANDE */}
-      {isModalOpen && (
+      {modalOpenType === 'create' && (
         <NewPayoutModal
           accounts={eligibleAccounts}
           defaultAccountId={!isAll ? scope : eligibleAccounts[0]?.id || ''}
-          onClose={() => setIsModalOpen(false)}
+          onClose={() => setModalOpenType(null)}
           onSubmit={async (accountId, data) => {
             try {
               await createPayout.mutateAsync({ accountId, data });
               addToast('Demande de retrait envoyée');
-              setIsModalOpen(false);
+              setModalOpenType(null);
             } catch (e: any) {
               addToast('Erreur : ' + (e?.response?.data?.errors?.join(' · ') || 'requête échouée'), 'error');
             }
           }}
         />
+      )}
+
+      {modalOpenType === 'info_no_accounts' && (
+        <Modal
+          isOpen={true}
+          onClose={() => setModalOpenType(null)}
+          title="Aucun compte de trading"
+          size="sm"
+        >
+          <div className="space-y-4 text-center py-4">
+            <div className="w-12 h-12 rounded-full bg-loss/10 flex items-center justify-center mx-auto text-loss mb-2">
+              <Building2 size={24} />
+            </div>
+            <p className="text-xs text-txt-2 leading-relaxed">
+              Vous n'avez pas encore de compte de trading enregistré.
+              Pour pouvoir enregistrer un retrait (payout), vous devez d'abord ajouter un compte de type <strong className="text-txt font-bold">Funded</strong> ou <strong className="text-txt font-bold">Personnel (Réel)</strong>.
+            </p>
+            <div className="pt-2">
+              <a
+                href="/app/trading"
+                className="inline-flex items-center justify-center text-[11px] font-bold uppercase tracking-widest bg-accent hover:bg-accent-2 text-white px-4 py-2 rounded-xl transition-all"
+              >
+                Créer un compte de trading
+              </a>
+            </div>
+          </div>
+        </Modal>
+      )}
+
+      {modalOpenType === 'info_no_eligible' && (
+        <Modal
+          isOpen={true}
+          onClose={() => setModalOpenType(null)}
+          title="Aucun compte éligible aux retraits"
+          size="sm"
+        >
+          <div className="space-y-4 text-center py-4">
+            <div className="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center mx-auto text-accent mb-2">
+              <Building2 size={24} />
+            </div>
+            <p className="text-xs text-txt-2 leading-relaxed">
+              Vos comptes de trading actuels ne sont pas éligibles aux retraits.
+              Seuls les comptes de type <strong className="text-txt font-bold">Funded</strong> (Prop Firm réussie) ou <strong className="text-txt font-bold">Personnel (Réel)</strong> peuvent faire l'objet de retraits.
+            </p>
+            <p className="text-[10px] text-txt-3 italic">
+              Les comptes d'évaluation ne permettent pas de simuler des retraits réels.
+            </p>
+            <div className="pt-2 flex justify-center gap-2">
+              <button
+                onClick={() => setModalOpenType(null)}
+                className="text-[11px] font-bold uppercase tracking-widest bg-bg border border-border text-txt-2 hover:text-txt px-4 py-2 rounded-xl transition-all"
+              >
+                Compris
+              </button>
+              <a
+                href="/app/trading"
+                className="inline-flex items-center justify-center text-[11px] font-bold uppercase tracking-widest bg-accent hover:bg-accent-2 text-white px-4 py-2 rounded-xl transition-all"
+              >
+                Gérer mes comptes
+              </a>
+            </div>
+          </div>
+        </Modal>
       )}
     </div>
   );

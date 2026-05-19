@@ -3,6 +3,7 @@ import api from '../lib/api';
 
 export const useNotifications = () => {
   const queryClient = useQueryClient();
+  const hasToken = typeof window !== 'undefined' && !!localStorage.getItem('btt_access_token');
 
   const notificationsQuery = useQuery({
     queryKey: ['notifications'],
@@ -14,6 +15,7 @@ export const useNotifications = () => {
       };
     },
     refetchInterval: 60000, // Refresh every minute
+    enabled: hasToken,
   });
 
   const markAsRead = useMutation({
