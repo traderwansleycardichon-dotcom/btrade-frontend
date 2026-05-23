@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import api from '../../../lib/api';
 import { FeatureGate } from '../../../components/ui/FeatureGate';
+import { SecureVideoPlayer } from './SecureVideoPlayer';
 
 interface ModuleInfo {
   id: string;
@@ -253,6 +254,27 @@ const LessonPlayer: React.FC = () => {
   const { module, lessons } = moduleData;
   const currentProgress = lessons.find(l => l.id === lessonId);
 
+  const lessonContenu = lesson?.contenu || '';
+
+  // Extract YouTube ID if any exists
+  const ytRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/i;
+  const match = lessonContenu.match(ytRegex);
+  const videoId = match ? match[1] : null;
+
+  // Clean the text from markdown or raw links containing the YouTube video
+  let cleanContenu = lessonContenu;
+  if (videoId) {
+    // Replace markdown [video](url)
+    const markdownRegex = new RegExp(`\\[.*?\\]\\(.*?${videoId}.*?\\)`, 'i');
+    cleanContenu = lessonContenu.replace(markdownRegex, '');
+    if (cleanContenu === lessonContenu) {
+      // Replace raw URLs if not wrapped in markdown link
+      const rawUrlRegex = new RegExp(`https?:\\/\\/(?:www\\.)?(?:youtube\\.com|youtu\\.be)\\S*?${videoId}\\S*`, 'i');
+      cleanContenu = lessonContenu.replace(rawUrlRegex, '');
+    }
+    cleanContenu = cleanContenu.trim();
+  }
+
   // Navigation indexes
   const currentIdx = lessons.findIndex(l => l.id === lessonId);
   const nextLesson = currentIdx !== -1 && currentIdx < lessons.length - 1 ? lessons[currentIdx + 1] : null;
@@ -396,8 +418,13 @@ const LessonPlayer: React.FC = () => {
               {/* Tab 1: Lecture */}
               {activeTab === 'lecture' && (
                 <div className="space-y-6">
+                  {videoId && (
+                    <div className="mb-6 rounded-lg overflow-hidden border border-border">
+                      <SecureVideoPlayer videoId={videoId} />
+                    </div>
+                  )}
                   <div 
-                    dangerouslySetInnerHTML={{ __html: parseMarkdown(lesson.contenu) }} 
+                    dangerouslySetInnerHTML={{ __html: parseMarkdown(cleanContenu) }} 
                     className="prose prose-invert max-w-none text-txt-2"
                   />
                   
