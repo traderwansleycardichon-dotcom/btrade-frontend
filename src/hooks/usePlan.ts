@@ -9,6 +9,7 @@ export const PLAN_FEATURES = {
     hasAdvancedExports: false,
     hasAnalytics: false,
     hasFinance: false,
+    hasAcademy: false,
   },
   pro: {
     maxTradingAccounts: -1,
@@ -18,6 +19,7 @@ export const PLAN_FEATURES = {
     hasAdvancedExports: true,
     hasAnalytics: true,
     hasFinance: true,
+    hasAcademy: true,
   }
 } as const;
 

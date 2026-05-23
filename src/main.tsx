@@ -16,6 +16,8 @@ import PatrimoinePage from './pages/app/patrimoine/page';
 import FinancePage from './pages/app/finance/page';
 import GoalsPage from './pages/app/goals/page';
 import FormationPage from './pages/app/formation/page';
+import ModuleLessonsPage from './pages/app/formation/ModuleLessonsPage';
+import LessonDetailPage from './pages/app/formation/LessonDetailPage';
 import AIInsightsPage from './pages/app/ai-insights/page';
 import PlaybooksPage from './pages/app/playbooks/page';
 import EconomicPage from './pages/app/economic/page';
@@ -93,6 +95,8 @@ const router = createBrowserRouter([
       { path: 'finance', element: <FinancePage /> },
       { path: 'goals', element: <GoalsPage /> },
       { path: 'formation', element: <FormationPage /> },
+      { path: 'formation/:slug', element: <ModuleLessonsPage /> },
+      { path: 'formation/:slug/:lessonId', element: <LessonDetailPage /> },
       { path: 'ai-insights', element: <AIInsightsPage /> },
       { path: 'playbooks', element: <PlaybooksPage /> },
       { path: 'reports', element: <AnalysesPage /> },
