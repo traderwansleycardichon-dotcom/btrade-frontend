@@ -105,6 +105,11 @@ const router = createBrowserRouter([
       { path: 'ai-chat', element: <AiChatPage /> },
     ],
   },
+  // Catch-all fallback to redirect any unknown routes to the landing page
+  {
+    path: '*',
+    element: <Navigate to="/" replace />
+  }
 ], {
   future: {
     v7_startTransition: true,
@@ -114,7 +119,7 @@ const router = createBrowserRouter([
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} />
+      <RouterProvider router={router} future={{ v7_startTransition: true }} />
     </QueryClientProvider>
   </React.StrictMode>
 );
