@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Outlet, Navigate, useLocation } from 'react-router-dom';
+import { Outlet, Navigate, useLocation, Link } from 'react-router-dom';
 import { AdminSidebar } from './AdminSidebar';
 import { useAuth } from '../../hooks/useAuth';
 import { ToastContainer } from '../ui/Toast';
@@ -42,9 +42,9 @@ export const AdminLayout: React.FC = () => {
           <p className="text-txt-2 mb-8">
             Vous ne disposez pas des privilèges nécessaires pour accéder au tableau de bord administrateur.
           </p>
-          <a href="/app/dashboard" className="btn-primary inline-flex">
+          <Link to="/app/dashboard" className="btn-primary inline-flex">
             Retour à l'application
-          </a>
+          </Link>
         </div>
       </div>
     );

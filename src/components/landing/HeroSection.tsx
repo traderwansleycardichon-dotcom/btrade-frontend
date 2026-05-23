@@ -1,58 +1,68 @@
 import React from 'react';
-import { ArrowRight, Play } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export const HeroSection: React.FC = () => {
   return (
-    <section className="relative min-h-screen flex flex-col items-center justify-center pt-20 overflow-hidden">
-      {/* Dynamic Glow Background */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-accent/20 rounded-full blur-[120px] animate-glow-pulse pointer-events-none opacity-50" />
-      
-      <div className="container mx-auto px-6 relative z-10 text-center">
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass border-white/5 mb-12 animate-slide-up">
-          <div className="w-2 h-2 rounded-full bg-accent animate-pulse" />
-          <span className="text-[10px] font-black text-white uppercase tracking-[0.3em]">New: AI Trade Insights V2</span>
-        </div>
-        
-        <h1 className="text-5xl sm:text-6xl md:text-8xl lg:text-[10rem] font-black mb-8 sm:mb-12 leading-[0.85] tracking-[-0.05em] animate-slide-up [animation-delay:0.2s]">
-          TRADE. <br />
-          <span className="text-transparent bg-clip-text bg-gradient-to-b from-white to-white/40">JOURNAL.</span> <br />
-          <span className="text-accent">WIN.</span>
-        </h1>
-        
-        <p className="text-base sm:text-lg md:text-xl text-txt-2 max-w-2xl mx-auto mb-10 sm:mb-16 leading-relaxed animate-slide-up [animation-delay:0.4s]">
-          L'écosystème ultime pour les traders de Prop Firms. 
-          Performance brute, analyses IA et psychologie de précision.
-        </p>
-
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6 animate-slide-up [animation-delay:0.6s]">
-          <a href="/register" className="btn-primary group py-4 sm:py-5 px-8 sm:px-10 text-xs sm:text-sm tracking-widest uppercase w-full sm:w-auto text-center">
-            Get Started Now
-            <ArrowRight size={18} className="inline-block ml-2 group-hover:translate-x-1 transition-transform" />
-          </a>
-          <button className="btn-ghost py-4 sm:py-5 px-8 sm:px-10 text-xs sm:text-sm tracking-widest uppercase flex items-center justify-center gap-3 w-full sm:w-auto">
-            <Play size={18} fill="currentColor" />
-            Watch Demo
-          </button>
+    <section className="relative pt-24 pb-16 overflow-hidden border-b border-border">
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="flex flex-col items-center text-center">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-accent/20 bg-accent/5 text-accent text-[11px] font-mono mb-8">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-accent" />
+            </span>
+            DÉPLOYÉ POUR LES TRADERS PRO
+          </div>
+          <h1 className="text-7xl md:text-[120px] font-black tracking-tighter leading-[0.85] mb-8">
+            TRADE.<br />JOURNAL.<br /><span className="text-accent">WIN.</span>
+          </h1>
+          <p className="max-w-xl text-lg text-txt-2 text-pretty">
+            L'écosystème ultime pour les traders de Prop Firms.
+            Performance brute, analyses IA et psychologie de précision.
+          </p>
+          <div className="mt-10 flex flex-col sm:flex-row gap-4">
+            <Link to="/register" className="flex items-center justify-center h-14 px-10 bg-accent text-white font-bold text-sm tracking-widest uppercase hover:brightness-110 transition-all">
+              Commencer Maintenant
+            </Link>
+            <button className="h-14 px-10 border border-border font-bold text-sm tracking-widest uppercase hover:bg-white/5 transition-all text-txt">
+              Voir Démo
+            </button>
+          </div>
         </div>
 
-        {/* Minimalist Stats / Social Proof */}
-        <div className="mt-16 sm:mt-24 lg:mt-32 pt-8 sm:pt-12 border-t border-white/5 grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-12 max-w-4xl mx-auto opacity-50 animate-fade-in [animation-delay:1s]">
-          {[
-            { label: 'Active Traders', value: '12K+' },
-            { label: 'Total Payouts', value: '$2.4M' },
-            { label: 'Avg RR Ratio', value: '1:3.2' },
-            { label: 'Accuracy', value: '68%' }
-          ].map((stat, i) => (
-            <div key={i} className="text-center">
-              <div className="text-xl font-black mb-1">{stat.value}</div>
-              <div className="text-[10px] font-bold text-txt-3 uppercase tracking-widest">{stat.label}</div>
+        <div className="mt-20 relative">
+          <div className="absolute inset-0 bg-gradient-to-t from-bg via-transparent to-transparent z-10 pointer-events-none" />
+          <div className="rounded-t-xl border-t border-x border-border bg-surface/50 p-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+              <div className="bg-black/40 border border-border p-6">
+                <div className="text-[10px] font-mono text-txt-2 uppercase mb-1">Profit Total</div>
+                <div className="text-2xl font-mono text-accent">+14,209.42€</div>
+              </div>
+              <div className="bg-black/40 border border-border p-6">
+                <div className="text-[10px] font-mono text-txt-2 uppercase mb-1">Win Rate</div>
+                <div className="text-2xl font-mono text-txt">64.2%</div>
+              </div>
+              <div className="bg-black/40 border border-border p-6">
+                <div className="text-[10px] font-mono text-txt-2 uppercase mb-1">Drawdown Max</div>
+                <div className="text-2xl font-mono text-loss">-2.14%</div>
+              </div>
             </div>
-          ))}
+            {/* Minimalist Dashboard Grid Mockup (in place of an image) */}
+            <div className="w-full aspect-[21/9] rounded border border-border bg-surface relative overflow-hidden flex flex-col p-4 gap-4">
+              <div className="flex-1 flex gap-4">
+                <div className="flex-1 border border-border bg-bg p-4 flex items-end">
+                  <div className="w-full h-1/2 border-t border-accent/50 relative">
+                     <div className="absolute top-0 right-0 w-full h-full bg-gradient-to-b from-accent/10 to-transparent" />
+                     <svg className="absolute bottom-0 w-full h-[150%] -translate-y-4" preserveAspectRatio="none" viewBox="0 0 100 100">
+                        <path d="M0,80 L20,60 L40,70 L60,30 L80,40 L100,10" fill="none" stroke="#F36C00" strokeWidth="2" />
+                     </svg>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-
-      {/* Decorative noise/grain */}
-      <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.03] pointer-events-none" />
     </section>
   );
 };

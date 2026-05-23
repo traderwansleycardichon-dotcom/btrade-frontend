@@ -1,81 +1,115 @@
 import React from 'react';
-import { 
-  BarChart3, 
-  Brain, 
-  Zap, 
-  ShieldCheck 
-} from 'lucide-react';
-
-const features = [
-  {
-    title: "Journalisation de Précision",
-    description: "Capturez chaque trade avec une précision chirurgicale. Automatisez vos calculs de R:R et de drawdown.",
-    icon: BarChart3,
-    size: "col-span-12 md:col-span-8",
-    color: "accent"
-  },
-  {
-    title: "Analyse Psychologique",
-    description: "Identifiez vos biais cognitifs et gérez vos émotions avec notre assistant IA.",
-    icon: Brain,
-    size: "col-span-12 md:col-span-4",
-    color: "accent"
-  },
-  {
-    title: "AI Trade Insights",
-    description: "Laissez l'IA analyser vos setups et vous donner des probabilités de succès avant d'entrer.",
-    icon: Zap,
-    size: "col-span-12 md:col-span-4",
-    color: "accent"
-  },
-  {
-    title: "Prop Firm Guard",
-    description: "Alertes en temps réel avant de violer vos règles de drawdown quotidien ou total.",
-    icon: ShieldCheck,
-    size: "col-span-12 md:col-span-8",
-    color: "accent"
-  }
-];
 
 export const BentoFeatures: React.FC = () => {
   return (
-    <section id="features" className="container mx-auto px-6 py-16 relative">
-      <div className="text-center mb-12">
-        <h2 className="text-4xl md:text-6xl font-black mb-6 tracking-tighter uppercase">Power. Precision. Control.</h2>
-        <p className="text-txt-2 text-lg max-w-2xl mx-auto">
-          Chaque détail a été pensé pour les traders qui visent le financement professionnel.
-        </p>
-      </div>
-
-      <div className="grid grid-cols-12 gap-4 max-w-6xl mx-auto">
-        {features.map((feature, i) => (
-          <div 
-            key={i} 
-            className={`${feature.size} glass rounded-[2.5rem] p-10 hover:border-white/10 transition-all group overflow-hidden relative`}
-          >
-            {/* Subtle Gradient Glow */}
-            <div className="absolute -top-24 -right-24 w-64 h-64 bg-accent/5 rounded-full blur-[80px] group-hover:bg-accent/10 transition-all" />
+    <>
+      <section id="performance" className="py-24 border-b border-border bg-white/[0.02]">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
             
-            <div className="relative z-10 h-full flex flex-col">
-              <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center mb-8 group-hover:scale-110 transition-transform">
-                <feature.icon size={24} strokeWidth={1.5} className="text-accent" />
-              </div>
-              
-              <h3 className="text-2xl font-black mb-4 tracking-tight">{feature.title}</h3>
-              <p className="text-txt-2 text-sm leading-relaxed max-w-md">
-                {feature.description}
+            <div className="space-y-4">
+              <div className="text-accent font-mono text-xs">[01]</div>
+              <h3 className="text-xl font-bold uppercase tracking-tight">Analyse par IA</h3>
+              <p className="text-txt-2 text-sm leading-relaxed">
+                Notre algorithme identifie vos biais cognitifs et vos erreurs récurrentes. Ne tradez plus à l'aveugle.
               </p>
-              
-              <div className="mt-auto pt-12">
-                <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-txt-3 group-hover:text-accent transition-colors">
-                  <span>Explore Module</span>
-                  <div className="h-[1px] w-8 bg-current opacity-20" />
+              <div className="pt-4 border-t border-border flex flex-col gap-2">
+                <div className="h-1 bg-accent/20 w-full">
+                  <div className="h-1 bg-accent w-2/3" />
+                </div>
+                <span className="text-[10px] font-mono text-txt-2">DISCIPLINE SCORE: 67%</span>
+              </div>
+            </div>
+
+            <div id="psychologie" className="space-y-4">
+              <div className="text-accent font-mono text-xs">[02]</div>
+              <h3 className="text-xl font-bold uppercase tracking-tight">Psychologie de précision</h3>
+              <p className="text-txt-2 text-sm leading-relaxed">
+                Documentez votre état émotionnel avant chaque trade pour optimiser votre gestion du risque et du stress.
+              </p>
+              <div className="pt-4 border-t border-border">
+                <div className="flex gap-1">
+                  <div className="h-8 w-1/5 bg-accent/40" />
+                  <div className="h-8 w-1/5 bg-accent/10" />
+                  <div className="h-8 w-1/5 bg-accent/60" />
+                  <div className="h-8 w-1/5 bg-accent/20" />
+                  <div className="h-8 w-1/5 bg-accent/50" />
                 </div>
               </div>
             </div>
+
+            <div className="space-y-4">
+              <div className="text-accent font-mono text-xs">[03]</div>
+              <h3 className="text-xl font-bold uppercase tracking-tight">Audit Prop Firm</h3>
+              <p className="text-txt-2 text-sm leading-relaxed">
+                Validation automatique de vos règles de trading pour garantir votre conformité avec les critères FTMO, MyFundedFX et autres.
+              </p>
+              <div className="pt-4 border-t border-border flex justify-between text-[10px] font-mono">
+                <span className="text-accent">COMPLIANT</span>
+                <span className="text-txt-2">RULE_SET: AGGRESSIVE_100K</span>
+              </div>
+            </div>
+
           </div>
-        ))}
-      </div>
-    </section>
+        </div>
+      </section>
+
+      <section className="py-24">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="flex items-end justify-between mb-12">
+            <div>
+              <h2 className="text-3xl font-bold uppercase tracking-tighter">Journal de Bord</h2>
+              <p className="text-txt-2 mt-2 font-mono text-xs">DERNIÈRES EXÉCUTIONS SIGNALÉES PAR LE TERMINAL</p>
+            </div>
+            <a href="#" className="text-xs font-mono text-accent hover:underline">VOIR TOUT →</a>
+          </div>
+
+          <div className="border border-border divide-y divide-border font-mono text-[11px] overflow-x-auto">
+            <div className="min-w-[600px]">
+              <div className="grid grid-cols-6 bg-white/5 p-4 text-txt-2 uppercase tracking-wider">
+                <span>Symbole</span>
+                <span>Type</span>
+                <span>Entrée</span>
+                <span>Sortie</span>
+                <span>P&L</span>
+                <span className="text-right">Statut</span>
+              </div>
+              <div className="grid grid-cols-6 p-4 hover:bg-white/[0.03] transition-colors text-txt">
+                <span className="font-bold">NAS100</span>
+                <span className="text-accent">LONG</span>
+                <span>15,242.1</span>
+                <span>15,294.5</span>
+                <span className="text-accent">+4,200€</span>
+                <span className="text-right">WIN</span>
+              </div>
+              <div className="grid grid-cols-6 p-4 hover:bg-white/[0.03] transition-colors text-txt">
+                <span className="font-bold">XAUUSD</span>
+                <span className="text-loss">SHORT</span>
+                <span>1,942.2</span>
+                <span>1,945.8</span>
+                <span className="text-loss">-1,250€</span>
+                <span className="text-right">LOSS</span>
+              </div>
+              <div className="grid grid-cols-6 p-4 hover:bg-white/[0.03] transition-colors text-txt">
+                <span className="font-bold">EURUSD</span>
+                <span className="text-accent">LONG</span>
+                <span>1.0842</span>
+                <span>1.0890</span>
+                <span className="text-accent">+840€</span>
+                <span className="text-right">WIN</span>
+              </div>
+              <div className="grid grid-cols-6 p-4 hover:bg-white/[0.03] transition-colors text-txt">
+                <span className="font-bold">GBPJPY</span>
+                <span className="text-accent">SHORT</span>
+                <span>189.42</span>
+                <span>188.91</span>
+                <span className="text-accent">+1,510€</span>
+                <span className="text-right">WIN</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </>
   );
 };

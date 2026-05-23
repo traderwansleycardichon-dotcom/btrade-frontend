@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import {
   Plus, Check, X, ChevronDown, Building2, Bitcoin, Wallet, CreditCard, MoreHorizontal,
 } from 'lucide-react';
@@ -317,12 +318,12 @@ const PayoutsPage: React.FC = () => {
               Pour pouvoir enregistrer un retrait (payout), vous devez d'abord ajouter un compte de type <strong className="text-txt font-bold">Funded</strong> ou <strong className="text-txt font-bold">Personnel (Réel)</strong>.
             </p>
             <div className="pt-2">
-              <a
-                href="/app/trading"
+              <Link
+                to="/app/trades"
                 className="inline-flex items-center justify-center text-[11px] font-bold uppercase tracking-widest bg-accent hover:bg-accent-2 text-white px-4 py-2 rounded-xl transition-all"
               >
                 Créer un compte de trading
-              </a>
+              </Link>
             </div>
           </div>
         </Modal>
@@ -353,12 +354,12 @@ const PayoutsPage: React.FC = () => {
               >
                 Compris
               </button>
-              <a
-                href="/app/trading"
+              <Link
+                to="/app/trades"
                 className="inline-flex items-center justify-center text-[11px] font-bold uppercase tracking-widest bg-accent hover:bg-accent-2 text-white px-4 py-2 rounded-xl transition-all"
               >
                 Gérer mes comptes
-              </a>
+              </Link>
             </div>
           </div>
         </Modal>

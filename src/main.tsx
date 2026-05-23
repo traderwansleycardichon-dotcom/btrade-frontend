@@ -105,7 +105,11 @@ const router = createBrowserRouter([
       { path: 'ai-chat', element: <AiChatPage /> },
     ],
   },
-]);
+], {
+  future: {
+    v7_startTransition: true,
+  } as any
+});
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

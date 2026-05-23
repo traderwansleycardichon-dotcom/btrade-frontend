@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { useTrades } from '../../hooks/useTrades';
 import { useAccounts } from '../../hooks/useAccounts';
 import { Chip } from '../ui/Chip';
@@ -80,10 +81,10 @@ export const RecentTrades: React.FC = () => {
       </div>
 
       <div className="p-4 bg-surface/30 border-t border-border">
-        <a href="/app/trades" className="flex items-center justify-center gap-2 text-xs font-bold text-accent hover:text-accent-2 transition-all">
+        <Link to="/app/trades" className="flex items-center justify-center gap-2 text-xs font-bold text-accent hover:text-accent-2 transition-all">
           Voir tout l'historique ({tradesList.length} trades)
           <span className="group-hover:translate-x-1 transition-transform">→</span>
-        </a>
+        </Link>
       </div>
     </div>
   );

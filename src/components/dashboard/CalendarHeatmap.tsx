@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -48,9 +49,9 @@ export const CalendarHeatmap: React.FC<CalendarHeatmapProps> = ({
       <div className="flex justify-between items-center mb-6">
         <h3 className="font-bold text-lg">{month}</h3>
         {size === 'sm' && (
-          <a href="/app/calendar" className="text-xs font-bold text-accent hover:text-accent-2 transition-colors">
+          <Link to="/app/calendar" className="text-xs font-bold text-accent hover:text-accent-2 transition-colors">
             Voir plein écran →
-          </a>
+          </Link>
         )}
       </div>
 

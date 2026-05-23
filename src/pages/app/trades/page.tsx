@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, Link } from 'react-router-dom';
 import { Plus, Trash2, TrendingUp } from 'lucide-react';
 import { useAccounts } from '../../../hooks/useAccounts';
 import { useTrades } from '../../../hooks/useTrades';
@@ -84,9 +84,9 @@ const TradesPage: React.FC = () => {
         <p className="text-[11px] text-txt-2 mb-4 max-w-xs mx-auto">
           Crée d'abord un compte trading pour pouvoir y enregistrer des trades.
         </p>
-        <a href="#/app/accounts" className="btn-primary px-3 py-1.5 rounded-md text-[11px] font-semibold inline-block">
+        <Link to="/app/accounts" className="btn-primary px-3 py-1.5 rounded-md text-[11px] font-semibold inline-block">
           Aller dans Comptes →
-        </a>
+        </Link>
       </div>
     );
   }

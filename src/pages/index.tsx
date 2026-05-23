@@ -12,7 +12,7 @@ import { Link } from 'react-router-dom';
 
 const LandingPage: React.FC = () => {
   return (
-    <div className="min-h-screen bg-bg selection:bg-accent/30 overflow-x-hidden selection:text-white">
+    <div className="min-h-screen bg-bg selection:bg-accent/30 overflow-x-hidden selection:text-white font-sans text-txt">
       <Navbar />
       <HeroSection />
       <LiveTicker />
@@ -24,23 +24,36 @@ const LandingPage: React.FC = () => {
         <FaqSection />
       </div>
       
-      {/* Footer */}
-      <footer className="py-10 border-t border-border">
-        <div className="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-8">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-accent rounded-lg flex items-center justify-center">
-              <span className="font-black text-white">B</span>
+      {/* Footer (From Lovable Design) */}
+      <footer className="py-12 border-t border-border font-mono text-[10px] text-txt-2 bg-bg">
+        <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between gap-8">
+          <div>
+            <div className="text-txt font-bold mb-4 uppercase tracking-widest">
+              BTRADE ANALYTICS © {new Date().getFullYear()}
             </div>
-            <span className="font-black text-xl">BTrade</span>
+            <p className="max-w-xs leading-relaxed italic">
+              Le trading comporte des risques importants. Assurez-vous de comprendre les enjeux avant de vous engager.
+            </p>
           </div>
-          <div className="flex gap-8 text-sm text-txt-3">
-            <Link to="/legal/terms" className="hover:text-txt transition-colors">Termes</Link>
-            <Link to="/legal/privacy" className="hover:text-txt transition-colors">Confidentialité</Link>
-            <a href="#" className="hover:text-txt transition-colors">Discord</a>
-            <a href="#" className="hover:text-txt transition-colors">Twitter</a>
-          </div>
-          <div className="text-xs text-txt-3 font-bold uppercase tracking-widest">
-            © {new Date().getFullYear()} BTrade Inc.
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-12">
+            <div className="space-y-3">
+              <div className="text-txt font-bold uppercase tracking-widest">PRODUIT</div>
+              <div><Link to="/app/trades" className="hover:text-txt">Journaling</Link></div>
+              <div><a href="#performance" className="hover:text-txt">IA Analysis</a></div>
+              <div><Link to="/app/dashboard" className="hover:text-txt">Benchmarks</Link></div>
+            </div>
+            <div className="space-y-3">
+              <div className="text-txt font-bold uppercase tracking-widest">ENTREPRISE</div>
+              <div><a href="#" className="hover:text-txt">Manifesto</a></div>
+              <div><Link to="/legal/privacy" className="hover:text-txt">Security</Link></div>
+              <div><Link to="/legal/terms" className="hover:text-txt">Legal</Link></div>
+            </div>
+            <div className="space-y-3">
+              <div className="text-txt font-bold uppercase tracking-widest">SOCIAL</div>
+              <div><a href="#" className="hover:text-txt">Twitter / X</a></div>
+              <div><a href="#" className="hover:text-txt">Discord</a></div>
+              <div><a href="#" className="hover:text-txt">YouTube</a></div>
+            </div>
           </div>
         </div>
       </footer>
