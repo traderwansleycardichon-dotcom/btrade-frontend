@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Send, Sparkles, ArrowLeft, MessageSquare, RefreshCw } from 'lucide-react';
-import { useAiChat, explainEvent } from '../../../hooks/useAiChat';
+import { useAiChat, explainEvent, type AiSource } from '../../../hooks/useAiChat';
 import api from '../../../lib/api';
 import { FeatureGate } from '../../../components/ui/FeatureGate';
 
@@ -16,13 +16,23 @@ const IMP_LABEL: Record<number, { label: string; color: string }> = {
   1: { label: 'Low',    color: 'text-txt-3' },
 };
 
-// Suggestion de questions selon contexte
-const SUGGEST_QUESTIONS = [
+// Suggestions pour un event macro (contexte spécifique)
+const SUGGEST_EVENT = [
   "Quel impact sur les marchés ?",
   "Quelles paires sont les plus sensibles ?",
-  "Quelles stratégies de trading typiques ?",
-  "Comment gérer le risque avant la news ?",
-  "À quelle heure exactement ?",
+  "Quelle stratégie avant/après la news ?",
+  "Comment gérer le risque sur cet event ?",
+  "Quelle surprise haussière vs baissière ?",
+];
+
+// Suggestions génériques pour le chat sans contexte
+const SUGGEST_GENERIC = [
+  "Comment calculer mon sizing de position ?",
+  "Explique le concept de Risk/Reward",
+  "Comment éviter le revenge trading ?",
+  "Qu'est-ce qu'une prop firm et comment passer un challenge ?",
+  "Comment analyser mes stats de trading ?",
+  "Explique la structure de marché SMC",
 ];
 
 const AiChatPage: React.FC = () => {
@@ -159,8 +169,12 @@ const AiChatPage: React.FC = () => {
         {!eventId && messages.length === 0 && (
           <div className="text-center py-12">
             <MessageSquare size={28} className="mx-auto text-txt-3 mb-3" />
-            <p className="text-xs font-bold mb-1">Pose une question à l'IA</p>
-            <p className="text-[10px] text-txt-3">Indicateurs macro, setups, gestion du risque, psychologie…</p>
+            <p className="text-xs font-bold mb-1">BTrade Coach — Ton mentor trading IA</p>
+            <p className="text-[10px] text-txt-3 max-w-xs mx-auto leading-relaxed">
+              Setups, analyse technique, macro, risk management, prop firms, psychologie…
+              <br />
+              <span className="text-accent/70">Spécialisé trading uniquement.</span>
+            </p>
           </div>
         )}
 
@@ -189,9 +203,9 @@ const AiChatPage: React.FC = () => {
       </div>
 
       {/* SUGGESTIONS */}
-      {event && messages.length <= 1 && (
+      {messages.length <= 1 && (
         <div className="flex gap-1.5 flex-wrap">
-          {SUGGEST_QUESTIONS.map(q => (
+          {(event ? SUGGEST_EVENT : SUGGEST_GENERIC).map(q => (
             <button
               key={q}
               onClick={() => send(q)}
@@ -231,7 +245,7 @@ const AiChatPage: React.FC = () => {
 const MessageBubble: React.FC<{
   role: 'user' | 'assistant' | 'system';
   content: string;
-  source?: 'claude' | 'stub';
+  source?: AiSource;
 }> = ({ role, content, source }) => {
   if (role === 'user') {
     return (
@@ -250,7 +264,9 @@ const MessageBubble: React.FC<{
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-1">
-          <span className="text-[10px] font-bold uppercase tracking-widest text-txt-2">Claude</span>
+          <span className="text-[10px] font-bold uppercase tracking-widest text-txt-2">
+            {source === 'openrouter' ? 'OpenRouter' : source === 'anthropic' ? 'Claude' : 'Coach'}
+          </span>
           {source === 'stub' && (
             <span className="text-[9px] text-txt-3 italic">(réponse pré-construite)</span>
           )}

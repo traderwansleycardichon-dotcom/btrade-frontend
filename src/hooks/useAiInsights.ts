@@ -26,6 +26,16 @@ export const useAiInsights = () => {
       // L'endpoint renvoie directement un tableau (pas {success, data})
       return Array.isArray(data) ? data : (data.data || []);
     },
+    staleTime: 0,
+    refetchOnMount: 'always',
+  });
+
+  const generateTradingInsight = useMutation<AiInsight>({
+    mutationFn: async () => {
+      const { data } = await api.post('/api/ai/insights/generate-trading');
+      return data as AiInsight;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['ai-insights'] }),
   });
 
   const deleteInsight = useMutation({
@@ -39,6 +49,7 @@ export const useAiInsights = () => {
     insights: listQuery.data || [],
     isLoading: listQuery.isLoading,
     error: listQuery.error,
+    generateTradingInsight,
     deleteInsight,
   };
 };

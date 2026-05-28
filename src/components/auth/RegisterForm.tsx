@@ -25,7 +25,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchToLogin }) =
     setLoading(true);
 
     try {
-      const { data } = await api.post('/api/register', formData);
+      const { data } = await api.post('/api/auth/register', formData);
       addToast('Inscription réussie !');
       login(data.data.accessToken, data.data.refreshToken, data.data.user);
     } catch (err: any) {

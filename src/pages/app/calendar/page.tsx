@@ -1,7 +1,8 @@
 import React, { useMemo, useState } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, NotebookPen } from 'lucide-react';
 import { useAccounts } from '../../../hooks/useAccounts';
 import { useTrades } from '../../../hooks/useTrades';
+import { useTradesJournalingStatus } from '../../../hooks/useTradesJournalingStatus';
 
 const MONTHS = [
   'janvier', 'février', 'mars', 'avril', 'mai', 'juin',
@@ -33,6 +34,7 @@ const CalendarPage: React.FC = () => {
   const activeId = selectedAccountId || safeAccounts[0]?.id;
   const { trades } = useTrades(activeId);
   const tradesList = Array.isArray(trades) ? trades : [];
+  const { journaledSet, analyzedSet } = useTradesJournalingStatus(activeId);
 
   const [cursor, setCursor] = useState(() => {
     const n = new Date();
@@ -40,17 +42,29 @@ const CalendarPage: React.FC = () => {
   });
 
   const dailyPnL = useMemo(() => {
-    const map = new Map<string, { pl: number; count: number }>();
+    const map = new Map<string, {
+      pl: number;
+      count: number;
+      journaled: number;
+      analyzed: number;
+    }>();
     tradesList.forEach((t: any) => {
       const d = t.dateEntree ? new Date(t.dateEntree) : null;
       if (!d) return;
       if (d.getFullYear() !== cursor.y || d.getMonth() !== cursor.m) return;
       const key = d.toISOString().slice(0, 10);
-      const prev = map.get(key) || { pl: 0, count: 0 };
-      map.set(key, { pl: prev.pl + num(t.plNet), count: prev.count + 1 });
+      const prev = map.get(key) || { pl: 0, count: 0, journaled: 0, analyzed: 0 };
+      const isJournaled = journaledSet.has(t.id);
+      const isAnalyzed = analyzedSet.has(t.id);
+      map.set(key, {
+        pl: prev.pl + num(t.plNet),
+        count: prev.count + 1,
+        journaled: prev.journaled + (isJournaled ? 1 : 0),
+        analyzed: prev.analyzed + (isAnalyzed ? 1 : 0),
+      });
     });
     return map;
-  }, [tradesList, cursor]);
+  }, [tradesList, cursor, journaledSet, analyzedSet]);
 
   const grid = useMemo<DayCell[]>(() => {
     const first = new Date(cursor.y, cursor.m, 1);
@@ -216,9 +230,20 @@ const CalendarPage: React.FC = () => {
               const day = dailyPnL.get(cell.key);
               const pl = day?.pl ?? 0;
               const count = day?.count ?? 0;
+              const journaled = day?.journaled ?? 0;
+              const analyzed = day?.analyzed ?? 0;
+              const isJournaledDay = count > 0 && journaled > 0;
               const dayNum = cell.date.getDate();
               const isToday = cell.date.toDateString() === new Date().toDateString();
               const isWeekend = cell.date.getDay() === 0 || cell.date.getDay() === 6;
+
+              const titleParts = [cell.date.toLocaleDateString('fr-FR')];
+              if (count > 0) {
+                titleParts.push(`${count} trade${count > 1 ? 's' : ''}`);
+                titleParts.push(`${pl >= 0 ? '+' : ''}$${fmt(pl)}`);
+                if (journaled > 0) titleParts.push(`${journaled} journalisé${journaled > 1 ? 's' : ''}`);
+                if (analyzed > 0) titleParts.push(`${analyzed} analysé${analyzed > 1 ? 's' : ''}`);
+              }
 
               return (
                 <div
@@ -227,19 +252,24 @@ const CalendarPage: React.FC = () => {
                     isToday ? 'ring-1 ring-accent ring-inset' : ''
                   } ${isWeekend && count === 0 ? 'opacity-50' : ''}`}
                   style={{ background: cellBg(pl) }}
-                  title={
-                    count > 0
-                      ? `${cell.date.toLocaleDateString('fr-FR')} · ${count} trade${count > 1 ? 's' : ''} · ${pl >= 0 ? '+' : ''}$${fmt(pl)}`
-                      : cell.date.toLocaleDateString('fr-FR')
-                  }
+                  title={titleParts.join(' · ')}
                 >
-                  <span
-                    className={`text-[11px] mono ${
-                      isToday ? 'text-accent font-bold' : count > 0 ? 'text-txt font-bold' : 'text-txt-3'
-                    }`}
-                  >
-                    {dayNum}
-                  </span>
+                  <div className="flex items-center justify-between gap-1">
+                    <span
+                      className={`text-[11px] mono ${
+                        isToday ? 'text-accent font-bold' : count > 0 ? 'text-txt font-bold' : 'text-txt-3'
+                      }`}
+                    >
+                      {dayNum}
+                    </span>
+                    {isJournaledDay && (
+                      <NotebookPen
+                        size={10}
+                        className={analyzed > 0 ? 'text-accent' : 'text-txt-2'}
+                        aria-label={`Trade${journaled > 1 ? 's' : ''} journalisé${journaled > 1 ? 's' : ''}${analyzed > 0 ? ' + analysé' : ''}`}
+                      />
+                    )}
+                  </div>
                   {count > 0 && (
                     <div className="mt-auto">
                       <p
@@ -268,6 +298,10 @@ const CalendarPage: React.FC = () => {
             </span>
             <span className="flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-sm" style={{ background: 'rgba(24,28,37,0.5)' }} /> Off
+            </span>
+            <span>·</span>
+            <span className="flex items-center gap-1">
+              <NotebookPen size={10} className="text-accent" /> Journalisé
             </span>
             <span>·</span>
             <span>Intensité ∝ taille du P&amp;L</span>

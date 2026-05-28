@@ -1,30 +1,51 @@
 import { useState } from 'react';
 import api from '../lib/api';
 
+export type AiSource = 'openrouter' | 'anthropic' | 'stub';
+
 export interface ChatMessage {
   role: 'user' | 'assistant' | 'system';
   content: string;
-  source?: 'claude' | 'stub';
+  source?: AiSource;
 }
 
+/**
+ * Hook chat IA.
+ *
+ * Contrat backend (POST /api/ai/chat) :
+ *   request : { question: string, context?: object, history?: ChatMessage[] }
+ *   reply   : { success: boolean, source: AiSource, content: string }
+ *
+ * Le state local `messages` agrège les bulles affichées (user + assistant).
+ * On envoie au backend la question courante + l'historique précédent.
+ */
 export const useAiChat = (context: any = {}) => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const send = async (text: string) => {
-    if (!text.trim()) return;
-    const userMsg: ChatMessage = { role: 'user', content: text.trim() };
-    const nextHistory = [...messages, userMsg];
-    setMessages(nextHistory);
+    const question = text.trim();
+    if (!question) return;
+
+    const userMsg: ChatMessage = { role: 'user', content: question };
+    const historyBefore = messages;
+    setMessages(m => [...m, userMsg]);
     setIsLoading(true);
     setError(null);
+
     try {
       const { data } = await api.post('/api/ai/chat', {
-        messages: nextHistory,
+        question,
         context,
+        history: historyBefore.map(m => ({ role: m.role, content: m.content })),
       });
-      setMessages(m => [...m, data.message]);
+      const assistantMsg: ChatMessage = {
+        role: 'assistant',
+        content: data?.content || '',
+        source: data?.source as AiSource | undefined,
+      };
+      setMessages(m => [...m, assistantMsg]);
     } catch (e: any) {
       setError(e?.response?.data?.error || 'Erreur de communication avec l\'IA');
     } finally {
@@ -32,7 +53,7 @@ export const useAiChat = (context: any = {}) => {
     }
   };
 
-  const pushAssistant = (content: string, source?: 'claude' | 'stub') => {
+  const pushAssistant = (content: string, source?: AiSource) => {
     setMessages(m => [...m, { role: 'assistant', content, source }]);
   };
 
@@ -46,5 +67,12 @@ export const useAiChat = (context: any = {}) => {
 
 export const explainEvent = async (eventId: string) => {
   const { data } = await api.get(`/api/ai/chat/explain-event/${eventId}`);
-  return data; // { event, explanation: { content, source } }
+  // data = { success, event, source, content }
+  return {
+    event: data?.event,
+    explanation: {
+      content: data?.content || '',
+      source: data?.source as AiSource | undefined,
+    },
+  };
 };

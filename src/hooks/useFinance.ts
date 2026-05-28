@@ -49,6 +49,8 @@ export const useDepenses = (mois?: string) => {
       const { data } = await api.get(`/api/depenses${params}`);
       return data.data || {};
     },
+    staleTime: 0,
+    refetchOnMount: 'always',
   });
 
   const create = useMutation({
@@ -92,6 +94,8 @@ export const useRevenus = (mois?: string) => {
       const { data } = await api.get(`/api/revenus${params}`);
       return data.data || {};
     },
+    staleTime: 0,
+    refetchOnMount: 'always',
   });
 
   const create = useMutation({

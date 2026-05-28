@@ -1,6 +1,22 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../lib/api';
 
+/**
+ * Le backend (validateCompte / accounts.repo.create) attend du snake_case.
+ * Les composants UI préfèrent le camelCase. On traduit ici à la frontière.
+ */
+const camelToSnakeKey = (k: string) =>
+  k.replace(/[A-Z]/g, (m) => '_' + m.toLowerCase());
+
+const toSnakePayload = (obj: Record<string, any>): Record<string, any> => {
+  const out: Record<string, any> = {};
+  for (const [k, v] of Object.entries(obj)) {
+    if (v === undefined) continue;
+    out[camelToSnakeKey(k)] = v;
+  }
+  return out;
+};
+
 export const useAccounts = () => {
   const queryClient = useQueryClient();
 
@@ -32,7 +48,7 @@ export const useAccounts = () => {
 
   const createAccount = useMutation({
     mutationFn: async (accountData: any) => {
-      const { data } = await api.post('/api/comptes', accountData);
+      const { data } = await api.post('/api/comptes', toSnakePayload(accountData));
       return data.data;
     },
     onSuccess: () => {
@@ -54,7 +70,7 @@ export const useAccounts = () => {
 
   const updateAccount = useMutation({
     mutationFn: async ({ id, patch }: { id: string; patch: any }) => {
-      const { data } = await api.patch(`/api/comptes/${id}`, patch);
+      const { data } = await api.patch(`/api/comptes/${id}`, toSnakePayload(patch));
       return data.data;
     },
     onSuccess: () => {

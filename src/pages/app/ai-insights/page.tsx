@@ -1,10 +1,27 @@
 import React from 'react';
-import { Sparkles, MessageSquare, Lightbulb, AlertCircle, Trash2, Zap } from 'lucide-react';
+import { Sparkles, MessageSquare, Lightbulb, AlertCircle, Trash2, Zap, Loader2 } from 'lucide-react';
 import { useAiInsights, AiInsight } from '../../../hooks/useAiInsights';
 import { FeatureGate } from '../../../components/ui/FeatureGate';
+import { useToast } from '../../../hooks/useToast';
+
+const SOURCE_LABEL: Record<string, string> = {
+  openrouter: 'OpenRouter',
+  anthropic: 'Claude',
+  stub: 'Coach IA (offline)',
+};
 
 const AIInsightsPage: React.FC = () => {
-  const { insights, isLoading, error, deleteInsight } = useAiInsights();
+  const { insights, isLoading, error, generateTradingInsight, deleteInsight } = useAiInsights();
+  const { addToast } = useToast();
+
+  const handleGenerate = async () => {
+    try {
+      await generateTradingInsight.mutateAsync();
+      addToast('Insight généré ✓');
+    } catch (e: any) {
+      addToast(e?.response?.data?.error || 'Erreur lors de la génération', 'error');
+    }
+  };
 
   return (
     <div className="space-y-8 animate-[fadeIn_0.5s_ease-out]">
@@ -19,12 +36,14 @@ const AIInsightsPage: React.FC = () => {
           </p>
         </div>
         <button
-          disabled
-          className="btn-primary bg-gradient-to-r from-accent to-accent-2 flex items-center gap-2 border-none opacity-60 cursor-not-allowed"
-          title="Disponible après quelques trades enregistrés"
+          onClick={handleGenerate}
+          disabled={generateTradingInsight.isPending}
+          className="btn-primary bg-gradient-to-r from-accent to-accent-2 flex items-center gap-2 border-none disabled:opacity-60 disabled:cursor-not-allowed"
         >
-          <Zap size={18} />
-          Générer Analyse
+          {generateTradingInsight.isPending
+            ? <><Loader2 size={16} className="animate-spin" /> Analyse en cours…</>
+            : <><Zap size={18} /> Générer Analyse</>
+          }
         </button>
       </div>
 
@@ -64,14 +83,18 @@ const AIInsightsPage: React.FC = () => {
                 >
                   <div className="flex justify-between items-start mb-2">
                     <div className="flex items-center gap-2 flex-wrap">
-                      {i.module && (
-                        <span className="text-[10px] font-bold uppercase text-accent bg-accent/10 px-2 py-0.5 rounded-full">
-                          {i.module}
+                      {i.source && (
+                        <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${
+                          i.source === 'openrouter' ? 'text-accent bg-accent/10' :
+                          i.source === 'anthropic'  ? 'text-purple-400 bg-purple-400/10' :
+                          'text-txt-3 bg-elevated'
+                        }`}>
+                          {SOURCE_LABEL[i.source] || i.source}
                         </span>
                       )}
                       {i.typeInsight && (
                         <span className="text-[10px] font-bold uppercase text-txt-2 bg-elevated px-2 py-0.5 rounded-full">
-                          {i.typeInsight}
+                          {i.typeInsight.replace(/_/g, ' ')}
                         </span>
                       )}
                       <span className="text-[10px] font-mono text-txt-3">
@@ -86,9 +109,9 @@ const AIInsightsPage: React.FC = () => {
                       <Trash2 size={14} />
                     </button>
                   </div>
-                  {i.titre && <p className="font-bold text-sm mb-1">{i.titre}</p>}
+                  {i.titre && <p className="font-bold text-sm mb-2">{i.titre}</p>}
                   {i.contenu && (
-                    <p className="text-sm text-txt-2 leading-relaxed">{i.contenu}</p>
+                    <p className="text-sm text-txt-2 leading-relaxed whitespace-pre-wrap">{i.contenu}</p>
                   )}
                 </div>
               ))}

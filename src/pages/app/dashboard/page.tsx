@@ -27,14 +27,21 @@ const DashboardPage: React.FC = () => {
   const { playbooks } = usePlaybooks();
   const { data: macroList } = useMacroEvents({ hours: 24, minImportance: 2 });
 
-  const { data: dashboard } = useQuery({
+  const { data: dashboard, error: dashboardError } = useQuery({
     queryKey: ['dashboard'],
     queryFn: async () => {
       const { data } = await api.get('/api/dashboard');
-      return data.data;
+      return data?.data ?? null;
     },
-    staleTime: 60 * 1000,
+    staleTime: 30 * 1000,
+    retry: 1,
+    // Toujours refetch au montage pour ne pas montrer un cache stale après reload.
+    refetchOnMount: 'always',
   });
+  if (dashboardError) {
+    // eslint-disable-next-line no-console
+    console.warn('[dashboard] /api/dashboard failed:', (dashboardError as any)?.message);
+  }
 
   // ── Scope (cumul ou compte unique) ────────────────────────────────────
   const [scope, setScope] = useState<'all' | string>('all');
@@ -149,6 +156,17 @@ const DashboardPage: React.FC = () => {
     ? safeAccounts.reduce((s: number, a: any) => s + num(a.balanceCourante), 0)
     : num(activeAccount?.balanceCourante);
 
+  // ── Fallbacks robustes ─────────────────────────────────────────────────
+  // Si /api/dashboard n'a pas (encore) répondu, on reste fonctionnel grâce
+  // aux comptes + trades déjà chargés. Les vraies valeurs viendront écraser
+  // au prochain render quand la réponse arrive.
+  const apiPatrimoine = num(dashboard?.patrimoine?.valeurNette);
+  const patrimoineNet = apiPatrimoine !== 0 ? apiPatrimoine : (totalBalance - refCapital);
+  const apiProfitMois = dashboard?.moisCourant?.balance;
+  const profitMois = apiProfitMois !== undefined && apiProfitMois !== null
+    ? num(apiProfitMois)
+    : plTotal; // approx : à défaut, le P&L total des trades chargés
+
   return (
     <div className="space-y-6 animate-[fadeIn_0.5s_ease-out]">
       {/* ACCOUNT SWITCHER */}
@@ -177,7 +195,7 @@ const DashboardPage: React.FC = () => {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
         <KpiCard
           label="Patrimoine Net"
-          value={fmt(num(dashboard?.patrimoine?.valeurNette), { maximumFractionDigits: 0 })}
+          value={fmt(patrimoineNet, { maximumFractionDigits: 0 })}
           currency="$"
           variation={undefined}
           loading={isLoading}
@@ -191,7 +209,7 @@ const DashboardPage: React.FC = () => {
         />
         <KpiCard
           label="Profit ce mois"
-          value={fmt(num(dashboard?.moisCourant?.balance), { maximumFractionDigits: 0 })}
+          value={fmt(profitMois, { maximumFractionDigits: 0 })}
           currency="$"
           variation={undefined}
           loading={isLoading}

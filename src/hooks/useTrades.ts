@@ -8,9 +8,12 @@ export const useTrades = (accountId?: string) => {
     queryKey: ['trades', accountId],
     queryFn: async () => {
       const { data } = await api.get(`/api/comptes/${accountId}/trades`);
-      return data.data;
+      // Backend retourne { success, data: [...], pagination: {...} }
+      return Array.isArray(data?.data) ? data.data : [];
     },
     enabled: !!accountId,
+    staleTime: 0,            // jamais en cache — refetch à chaque invalidation
+    refetchOnMount: 'always', // recharge au montage même si cache frais
   });
 
   const createTrade = useMutation({
