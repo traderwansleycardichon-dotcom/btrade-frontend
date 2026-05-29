@@ -27,15 +27,13 @@ export const Navbar: React.FC = () => {
         }`}
       >
         <div className="h-14 px-4 sm:px-6 flex items-center justify-between">
-          {/* Wordmark */}
-          <Link to="/" className="flex items-center gap-2 group">
-            <span className="relative inline-flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-accent to-accent-2 shadow-[0_0_24px_rgba(243,108,0,0.45)]">
-              <span className="text-white text-[13px] font-black leading-none">B</span>
-            </span>
-            <span className="hidden sm:flex items-baseline gap-1.5">
-              <span className="text-[15px] font-semibold text-white tracking-tight">BTrade</span>
-              <span className="text-[10px] uppercase tracking-[0.25em] text-white/40 font-medium">Analytics</span>
-            </span>
+          {/* Logo */}
+          <Link to="/" className="flex items-center group" aria-label="Behind the Trades — Journal">
+            <img
+              src="/logo.svg"
+              alt="Behind the Trades — Journal"
+              className="h-10 w-10 rounded-full shadow-[0_0_24px_rgba(243,108,0,0.35)] transition-transform group-hover:scale-105"
+            />
           </Link>
 
           {/* Desktop nav */}

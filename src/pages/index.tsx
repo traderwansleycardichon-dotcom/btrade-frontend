@@ -25,12 +25,12 @@ const LandingPage: React.FC = () => {
       <footer className="relative border-t border-white/[0.06] bg-bg/60 backdrop-blur-xl">
         <div className="mx-auto max-w-6xl px-6 py-14 grid grid-cols-2 md:grid-cols-4 gap-10">
           <div className="col-span-2">
-            <div className="flex items-center gap-2 mb-4">
-              <span className="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-accent to-accent-2 shadow-[0_0_24px_rgba(243,108,0,0.35)]">
-                <span className="text-white text-[13px] font-black leading-none">B</span>
-              </span>
-              <span className="text-[15px] font-semibold tracking-tight">BTrade</span>
-              <span className="text-[10px] uppercase tracking-[0.25em] text-white/40">Analytics</span>
+            <div className="mb-5">
+              <img
+                src="/logo.svg"
+                alt="Behind the Trades — Journal"
+                className="h-16 w-16 rounded-full shadow-[0_0_24px_rgba(243,108,0,0.25)]"
+              />
             </div>
             <p className="text-[13px] text-white/45 max-w-sm leading-relaxed">
               Le journal de trading qui pense comme un pro. Le trading comporte
