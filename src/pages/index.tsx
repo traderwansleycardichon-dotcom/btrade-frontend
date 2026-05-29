@@ -6,6 +6,7 @@ import { LiveTicker } from '../components/landing/LiveTicker';
 import { StatsSection } from '../components/landing/StatsSection';
 import { BentoFeatures } from '../components/landing/BentoFeatures';
 import { ComparisonTable } from '../components/landing/ComparisonTable';
+import { YoutubeSection } from '../components/landing/YoutubeSection';
 import { PricingSection } from '../components/landing/PricingSection';
 import { FaqSection } from '../components/landing/FaqSection';
 
@@ -18,6 +19,7 @@ const LandingPage: React.FC = () => {
       <StatsSection />
       <BentoFeatures />
       <ComparisonTable />
+      <YoutubeSection />
       <PricingSection />
       <FaqSection />
 
