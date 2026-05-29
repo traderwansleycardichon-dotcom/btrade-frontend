@@ -16,26 +16,67 @@ interface Plan {
   recommended?: boolean;
 }
 
+// Plans affichés tant que le backend ne répond pas (ou si /api/billing/plans renvoie vide).
+// Si le backend retourne des plans, ils remplacent ce fallback automatiquement.
+const FALLBACK_PLANS: Plan[] = [
+  {
+    id: 'free',
+    name: 'Découverte',
+    price: 0,
+    description:
+      "Pour tester le journal et comprendre vos premiers patterns avant d'investir.",
+    features: [
+      'Jusqu’à 50 trades / mois',
+      '1 compte Prop Firm',
+      'Statistiques de base (P&L, win rate, drawdown)',
+      'Journal psychologique simple',
+      'Export CSV',
+    ],
+  },
+  {
+    id: 'pro',
+    name: 'Pro',
+    price: 29,
+    recommended: true,
+    description:
+      'L’arsenal complet pour protéger un compte financé et passer vos évaluations.',
+    features: [
+      'Trades illimités',
+      'Comptes Prop Firm illimités (FTMO, MyFundedFX, FundedNext…)',
+      'Score de discipline algorithmique en temps réel',
+      'Détection IA des biais (revenge trading, FOMO, sur-exposition)',
+      'Alertes drawdown & breach Prop Firm',
+      'Playbooks statistiques + export PDF pour audit',
+      'Support prioritaire',
+    ],
+  },
+];
+
 export const PricingSection: React.FC = () => {
-  const [plans, setPlans] = useState<Plan[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [plans, setPlans] = useState<Plan[]>(FALLBACK_PLANS);
+  const [loading, setLoading] = useState(false);
   const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
   const { user, isAuthenticated } = useAuth();
   const { addToast } = useToast();
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchPlans = async () => {
+    let cancelled = false;
+    (async () => {
       try {
         const { data } = await api.get('/api/billing/plans');
-        setPlans(data.data || []);
-      } catch (err) {
-        console.error('Erreur plans landing:', err);
+        if (!cancelled && Array.isArray(data?.data) && data.data.length > 0) {
+          setPlans(data.data);
+        }
+      } catch {
+        // silencieux — on garde FALLBACK_PLANS déjà en state
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
+    })();
+    return () => {
+      cancelled = true;
     };
-    fetchPlans();
   }, []);
 
   const handleSubscribe = async (plan: Plan) => {
@@ -99,16 +140,12 @@ export const PricingSection: React.FC = () => {
             </p>
           </div>
 
-          {loading ? (
-            <div className="py-20 flex justify-center">
-              <Loader2 className="animate-spin text-accent" size={28} />
+          {loading && (
+            <div className="absolute right-6 top-6 text-white/30">
+              <Loader2 className="animate-spin" size={14} />
             </div>
-          ) : plans.length === 0 ? (
-            <div className="py-12 text-center text-white/50 text-sm">
-              Les tarifs sont en cours de chargement — réessayez dans un instant.
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+          )}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
               {plans.map((plan) => {
                 const featured = plan.recommended;
                 const isFree = plan.id === 'free' || plan.price === 0;
@@ -197,8 +234,7 @@ export const PricingSection: React.FC = () => {
                   </article>
                 );
               })}
-            </div>
-          )}
+          </div>
         </div>
       </section>
 
