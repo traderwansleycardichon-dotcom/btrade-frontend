@@ -1,14 +1,17 @@
 import React from 'react';
 import { useAuth } from '../hooks/useAuth';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { LoginForm } from '../components/auth/LoginForm';
 import { RegisterForm } from '../components/auth/RegisterForm';
 import { HeroPane } from '../components/auth/HeroPane';
+import api from '../lib/api';
 
 const LoginPage: React.FC = () => {
   const { isAuthenticated, isLoading, refreshUser, user } = useAuth();
   const navigate = useNavigate();
-  const [isRegister, setIsRegister] = React.useState(false);
+  const [params] = useSearchParams();
+  const queryPlan = params.get('plan');
+  const [isRegister, setIsRegister] = React.useState(queryPlan !== null);
 
   React.useEffect(() => {
     // Si on a un token mais pas de données user, on refresh
@@ -19,11 +22,33 @@ const LoginPage: React.FC = () => {
     if (isAuthenticated && !isLoading && user) {
       if (user.role === 'admin') {
         navigate('/admin/dashboard', { replace: true });
-      } else {
-        navigate('/app/dashboard', { replace: true });
+        return;
       }
+
+      // Reprise du checkout si un plan payant attendait
+      const pending =
+        queryPlan ||
+        (typeof window !== 'undefined' ? sessionStorage.getItem('btt_pending_plan') : null);
+      if (pending && pending !== 'free' && user.plan !== pending) {
+        try { sessionStorage.removeItem('btt_pending_plan'); } catch {}
+        (async () => {
+          try {
+            const res = await api.post('/api/billing/create-checkout-session', { planId: pending });
+            if (res.data?.url) {
+              window.location.href = res.data.url;
+              return;
+            }
+          } catch (err) {
+            console.error('Reprise checkout impossible:', err);
+          }
+          navigate('/app/dashboard', { replace: true });
+        })();
+        return;
+      }
+
+      navigate('/app/dashboard', { replace: true });
     }
-  }, [isAuthenticated, isLoading, navigate, user, refreshUser]);
+  }, [isAuthenticated, isLoading, navigate, user, refreshUser, queryPlan]);
 
   if (isLoading && isAuthenticated) {
     return (

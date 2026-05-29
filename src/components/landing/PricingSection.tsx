@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Loader2, Check, ArrowRight, Sparkles } from 'lucide-react';
 import api from '../../lib/api';
+import { useAuth } from '../../hooks/useAuth';
+import { useToast } from '../../hooks/useToast';
 
 const BG_CTA = 'https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?auto=format&fit=crop&w=2400&q=80';
 
@@ -17,6 +19,10 @@ interface Plan {
 export const PricingSection: React.FC = () => {
   const [plans, setPlans] = useState<Plan[]>([]);
   const [loading, setLoading] = useState(true);
+  const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
+  const { user, isAuthenticated } = useAuth();
+  const { addToast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchPlans = async () => {
@@ -31,6 +37,49 @@ export const PricingSection: React.FC = () => {
     };
     fetchPlans();
   }, []);
+
+  const handleSubscribe = async (plan: Plan) => {
+    // Plan gratuit → inscription simple
+    if (plan.id === 'free' || plan.price === 0) {
+      navigate('/register');
+      return;
+    }
+
+    // Pas connecté → on garde le plan choisi et on redirige vers register
+    if (!isAuthenticated) {
+      try {
+        sessionStorage.setItem('btt_pending_plan', plan.id);
+      } catch {}
+      navigate(`/register?plan=${encodeURIComponent(plan.id)}`);
+      return;
+    }
+
+    // Déjà sur ce plan
+    if (user?.plan === plan.id) {
+      addToast('Vous êtes déjà sur ce plan.');
+      return;
+    }
+
+    // Lance le checkout Stripe
+    setCheckoutLoading(plan.id);
+    try {
+      const res = await api.post('/api/billing/create-checkout-session', {
+        planId: plan.id,
+      });
+      if (res.data?.url) {
+        window.location.href = res.data.url;
+      } else {
+        addToast('Réponse de paiement invalide.', 'error');
+      }
+    } catch (err: any) {
+      addToast(
+        err?.response?.data?.error || 'Impossible de lancer le paiement.',
+        'error',
+      );
+    } finally {
+      setCheckoutLoading(null);
+    }
+  };
 
   return (
     <>
@@ -54,10 +103,26 @@ export const PricingSection: React.FC = () => {
             <div className="py-20 flex justify-center">
               <Loader2 className="animate-spin text-accent" size={28} />
             </div>
+          ) : plans.length === 0 ? (
+            <div className="py-12 text-center text-white/50 text-sm">
+              Les tarifs sont en cours de chargement — réessayez dans un instant.
+            </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
               {plans.map((plan) => {
                 const featured = plan.recommended;
+                const isFree = plan.id === 'free' || plan.price === 0;
+                const isCurrent = isAuthenticated && user?.plan === plan.id;
+                const isBusy = checkoutLoading === plan.id;
+
+                const cta = isCurrent
+                  ? 'Votre plan actuel'
+                  : isFree
+                    ? 'Commencer gratuitement'
+                    : isAuthenticated
+                      ? "S'abonner"
+                      : 'Créer un compte';
+
                 return (
                   <article
                     key={plan.id}
@@ -105,17 +170,30 @@ export const PricingSection: React.FC = () => {
                       ))}
                     </ul>
 
-                    <Link
-                      to="/register"
-                      className={`inline-flex items-center justify-center gap-2 h-12 w-full rounded-xl text-[14px] font-semibold transition-all ${
-                        featured
-                          ? 'bg-accent hover:bg-accent-2 text-white shadow-[0_10px_30px_-10px_rgba(243,108,0,0.6)]'
-                          : 'glass-subtle text-white hover:bg-white/[0.08]'
+                    <button
+                      type="button"
+                      onClick={() => handleSubscribe(plan)}
+                      disabled={isCurrent || isBusy}
+                      className={`inline-flex items-center justify-center gap-2 h-12 w-full rounded-xl text-[14px] font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
+                        isCurrent
+                          ? 'bg-white/[0.04] text-white/60'
+                          : featured
+                            ? 'bg-accent hover:bg-accent-2 text-white shadow-[0_10px_30px_-10px_rgba(243,108,0,0.6)]'
+                            : 'glass-subtle text-white hover:bg-white/[0.08]'
                       }`}
                     >
-                      {plan.id === 'free' ? 'Commencer gratuitement' : "S'abonner"}
-                      <ArrowRight size={14} />
-                    </Link>
+                      {isBusy ? (
+                        <>
+                          <Loader2 size={14} className="animate-spin" />
+                          Redirection…
+                        </>
+                      ) : (
+                        <>
+                          {cta}
+                          {!isCurrent && <ArrowRight size={14} />}
+                        </>
+                      )}
+                    </button>
                   </article>
                 );
               })}

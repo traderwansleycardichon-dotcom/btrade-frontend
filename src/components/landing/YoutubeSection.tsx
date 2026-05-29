@@ -1,49 +1,19 @@
 import React, { useState } from 'react';
 import { Youtube, Play, Radio, ArrowUpRight } from 'lucide-react';
+import { useYoutubeRecent } from '../../hooks/useYoutubeRecent';
 
-// ─── Chaîne YouTube ──────────────────────────────────────────────────────
-const CHANNEL_ID = 'UCZhjqMdTyq5ssfr9sIxf3mw';
-const CHANNEL_HANDLE = '@behindthetrades0';
-const CHANNEL_URL = `https://www.youtube.com/${CHANNEL_HANDLE}`;
-const STREAMS_URL = `${CHANNEL_URL}/streams`;
-const LIVE_FALLBACK_URL = `${CHANNEL_URL}/live`;
-
-// Embed URLs
+// ─── Embeds ──────────────────────────────────────────────────────────────
 const liveEmbed = (channelId: string) =>
   `https://www.youtube.com/embed/live_stream?channel=${channelId}&autoplay=1&rel=0`;
 const videoEmbed = (id: string) =>
   `https://www.youtube.com/embed/${id}?autoplay=1&rel=0`;
 
-// Thumbnails (real YouTube covers, fallback to hqdefault if maxres missing)
 const thumbMax = (id: string) => `https://i.ytimg.com/vi/${id}/maxresdefault.jpg`;
 const thumbHq = (id: string) => `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
 
-// ─── Vidéos récentes (sync RSS feed) ─────────────────────────────────────
-const RECENT_VIDEOS: { id: string; title: string; publishedAt: string }[] = [
-  {
-    id: '8d59IFSiemg',
-    title: 'Session institutionnelle — live',
-    publishedAt: '2026-05-29T14:07:25Z',
-  },
-  {
-    id: '4-Q-jCbn-c4',
-    title: 'Session institutionnelle — live',
-    publishedAt: '2026-05-29T03:33:09Z',
-  },
-  {
-    id: 'RQ4dUOkY5GI',
-    title: 'Session institutionnelle — live',
-    publishedAt: '2026-05-28T12:45:50Z',
-  },
-  {
-    id: 'elMQu7A02mk',
-    title: 'Session institutionnelle — live',
-    publishedAt: '2026-05-27T14:42:28Z',
-  },
-];
-
 // Date relative simple
-const relativeDate = (iso: string): string => {
+const relativeDate = (iso: string | null): string => {
+  if (!iso) return '';
   const then = new Date(iso).getTime();
   const now = Date.now();
   const diffH = Math.round((now - then) / 36e5);
@@ -54,6 +24,13 @@ const relativeDate = (iso: string): string => {
   if (d < 7) return `il y a ${d} j`;
   const w = Math.round(d / 7);
   return w === 1 ? 'il y a 1 sem' : `il y a ${w} sem`;
+};
+
+// Coupe les titres très longs et nettoie les suffixes type ",This is not financial advice. ⚠️"
+const cleanTitle = (raw: string): string => {
+  if (!raw) return '';
+  const cut = raw.split(/,\s*This is not financial advice|,\s*This is not/i)[0];
+  return cut.replace(/Behind The Trades\s*\|\s*/i, '').trim() || raw.trim();
 };
 
 // ─── Thumbnail avec fallback maxres → hq ─────────────────────────────────
@@ -80,16 +57,17 @@ const Thumb: React.FC<{ id: string; alt: string; className?: string }> = ({
 const VideoCard: React.FC<{
   id: string;
   title: string;
-  publishedAt: string;
+  publishedAt: string | null;
 }> = ({ id, title, publishedAt }) => {
   const [playing, setPlaying] = useState(false);
+  const cleaned = cleanTitle(title);
   return (
     <div className="group glass-frost glass-rim rounded-xl overflow-hidden flex flex-col transition-transform hover:-translate-y-0.5">
       <div className="relative aspect-video overflow-hidden bg-black">
         {playing ? (
           <iframe
             src={videoEmbed(id)}
-            title={title}
+            title={cleaned}
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
             className="absolute inset-0 w-full h-full"
@@ -99,11 +77,11 @@ const VideoCard: React.FC<{
             type="button"
             onClick={() => setPlaying(true)}
             className="absolute inset-0 w-full h-full"
-            aria-label={`Lire : ${title}`}
+            aria-label={`Lire : ${cleaned}`}
           >
             <Thumb
               id={id}
-              alt={title}
+              alt={cleaned}
               className="absolute inset-0 h-full w-full object-cover group-hover:scale-105 transition-transform duration-700"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
@@ -117,7 +95,7 @@ const VideoCard: React.FC<{
       </div>
       <div className="p-4 flex-1 flex flex-col">
         <h4 className="text-[14px] font-semibold text-white leading-snug line-clamp-2 group-hover:text-rose-300 transition-colors">
-          {title}
+          {cleaned}
         </h4>
         <p className="text-[11px] text-white/45 mt-2">{relativeDate(publishedAt)}</p>
       </div>
@@ -128,6 +106,7 @@ const VideoCard: React.FC<{
 // ─── Section principale ──────────────────────────────────────────────────
 export const YoutubeSection: React.FC = () => {
   const [liveOn, setLiveOn] = useState(false);
+  const { feed } = useYoutubeRecent(4);
 
   return (
     <section id="youtube" className="py-24">
@@ -146,11 +125,11 @@ export const YoutubeSection: React.FC = () => {
             </h2>
             <p className="text-white/55 mt-3 max-w-xl">
               Analyses marché en direct, debriefs institutionnels et lecture des
-              flux temps réel — sur la chaîne Behind The Trades.
+              flux temps réel — sur la chaîne {feed.channelTitle || 'Behind The Trades'}.
             </p>
           </div>
           <a
-            href={CHANNEL_URL}
+            href={feed.channelUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-1.5 text-[13px] font-medium text-white/70 hover:text-white transition-colors whitespace-nowrap"
@@ -165,20 +144,21 @@ export const YoutubeSection: React.FC = () => {
           <div className="relative aspect-[21/9] md:aspect-[21/8] bg-black">
             {liveOn ? (
               <iframe
-                src={liveEmbed(CHANNEL_ID)}
-                title="Live Behind The Trades"
+                src={liveEmbed(feed.channelId)}
+                title={`Live ${feed.channelTitle || 'YouTube'}`}
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
                 className="absolute inset-0 w-full h-full"
               />
             ) : (
               <>
-                {/* Cover = thumbnail de la dernière vidéo (la plus représentative du live actuel/dernier) */}
-                <Thumb
-                  id={RECENT_VIDEOS[0].id}
-                  alt="Cover du live Behind The Trades"
-                  className="absolute inset-0 h-full w-full object-cover opacity-65"
-                />
+                {feed.videos[0] && (
+                  <Thumb
+                    id={feed.videos[0].id}
+                    alt="Cover du live"
+                    className="absolute inset-0 h-full w-full object-cover opacity-65"
+                  />
+                )}
                 <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/55 to-transparent" />
                 <div className="absolute inset-0 bg-[radial-gradient(40%_50%_at_30%_60%,rgba(243,108,0,0.18),transparent_70%)]" />
 
@@ -211,7 +191,7 @@ export const YoutubeSection: React.FC = () => {
                       Lancer le live ici
                     </button>
                     <a
-                      href={LIVE_FALLBACK_URL}
+                      href={feed.liveUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-1.5 h-11 px-4 rounded-xl glass-subtle text-white/85 hover:text-white text-[13px] font-medium transition-colors"
@@ -220,7 +200,7 @@ export const YoutubeSection: React.FC = () => {
                       <ArrowUpRight size={13} />
                     </a>
                     <a
-                      href={STREAMS_URL}
+                      href={feed.streamsUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-1.5 h-11 px-4 rounded-xl text-white/65 hover:text-white text-[13px] font-medium transition-colors"
@@ -230,7 +210,6 @@ export const YoutubeSection: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Play decorative button */}
                 <button
                   type="button"
                   onClick={() => setLiveOn(true)}
@@ -246,8 +225,13 @@ export const YoutubeSection: React.FC = () => {
 
         {/* Recent videos grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {RECENT_VIDEOS.map((v) => (
-            <VideoCard key={v.id} id={v.id} title={v.title} publishedAt={v.publishedAt} />
+          {feed.videos.slice(0, 4).map((v) => (
+            <VideoCard
+              key={v.id}
+              id={v.id}
+              title={v.title}
+              publishedAt={v.publishedAt}
+            />
           ))}
         </div>
       </div>
