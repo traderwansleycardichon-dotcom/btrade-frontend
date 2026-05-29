@@ -1,12 +1,24 @@
 import { useState } from 'react';
 import api from '../lib/api';
 
-export type AiSource = 'openrouter' | 'anthropic' | 'stub';
+export type AiSource = 'openrouter' | 'anthropic' | 'stub' | 'guard';
+
+/** Raisons de refus côté serveur (chat.guard.js) */
+export type BlockedReason =
+  | 'empty'
+  | 'too_short'
+  | 'too_long'
+  | 'code'
+  | 'injection'
+  | 'off_topic'
+  | 'rate_hour'
+  | 'rate_day';
 
 export interface ChatMessage {
   role: 'user' | 'assistant' | 'system';
   content: string;
   source?: AiSource;
+  blocked?: BlockedReason;
 }
 
 /**
@@ -44,6 +56,7 @@ export const useAiChat = (context: any = {}) => {
         role: 'assistant',
         content: data?.content || '',
         source: data?.source as AiSource | undefined,
+        blocked: data?.blocked as BlockedReason | undefined,
       };
       setMessages(m => [...m, assistantMsg]);
     } catch (e: any) {
