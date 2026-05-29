@@ -2,47 +2,133 @@ import React, { useState } from 'react';
 import { Youtube, Play, Radio, ArrowUpRight } from 'lucide-react';
 
 // ─── Chaîne YouTube ──────────────────────────────────────────────────────
+const CHANNEL_ID = 'UCZhjqMdTyq5ssfr9sIxf3mw';
 const CHANNEL_HANDLE = '@behindthetrades0';
 const CHANNEL_URL = `https://www.youtube.com/${CHANNEL_HANDLE}`;
-// /live redirige automatiquement vers le direct en cours OU vers la chaîne s'il n'y en a pas
-const LIVE_URL = `${CHANNEL_URL}/live`;
 const STREAMS_URL = `${CHANNEL_URL}/streams`;
+const LIVE_FALLBACK_URL = `${CHANNEL_URL}/live`;
 
-// ─── Vidéos récentes ─────────────────────────────────────────────────────
-// Pour mettre à jour : colle l'ID YouTube (la partie après "?v=" dans l'URL)
-// Ex: https://www.youtube.com/watch?v=dQw4w9WgXcQ  →  id: 'dQw4w9WgXcQ'
-// Le thumbnail est automatique : https://i.ytimg.com/vi/{id}/hqdefault.jpg
-const RECENT_VIDEOS: { id: string; title: string; date: string }[] = [
-  { id: '', title: 'Setup londonien : EUR/USD breakout du matin', date: 'Récent' },
-  { id: '', title: 'Gestion du risque sur un compte FTMO 100k', date: 'Récent' },
-  { id: '', title: 'Backtester ses setups en 2026', date: 'Récent' },
-  { id: '', title: "Pourquoi je n'ai pas pris ce trade", date: 'Récent' },
+// Embed URLs
+const liveEmbed = (channelId: string) =>
+  `https://www.youtube.com/embed/live_stream?channel=${channelId}&autoplay=1&rel=0`;
+const videoEmbed = (id: string) =>
+  `https://www.youtube.com/embed/${id}?autoplay=1&rel=0`;
+
+// Thumbnails (real YouTube covers, fallback to hqdefault if maxres missing)
+const thumbMax = (id: string) => `https://i.ytimg.com/vi/${id}/maxresdefault.jpg`;
+const thumbHq = (id: string) => `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
+
+// ─── Vidéos récentes (sync RSS feed) ─────────────────────────────────────
+const RECENT_VIDEOS: { id: string; title: string; publishedAt: string }[] = [
+  {
+    id: '8d59IFSiemg',
+    title: 'Session institutionnelle — live',
+    publishedAt: '2026-05-29T14:07:25Z',
+  },
+  {
+    id: '4-Q-jCbn-c4',
+    title: 'Session institutionnelle — live',
+    publishedAt: '2026-05-29T03:33:09Z',
+  },
+  {
+    id: 'RQ4dUOkY5GI',
+    title: 'Session institutionnelle — live',
+    publishedAt: '2026-05-28T12:45:50Z',
+  },
+  {
+    id: 'elMQu7A02mk',
+    title: 'Session institutionnelle — live',
+    publishedAt: '2026-05-27T14:42:28Z',
+  },
 ];
 
-// Backdrop pour la carte Live (image trading Unsplash)
-const LIVE_BG = 'https://images.unsplash.com/photo-1518186285589-2f7649de83e0?auto=format&fit=crop&w=2400&q=80';
-// Fallback pour les vignettes vides
-const VIDEO_FALLBACK = 'https://images.unsplash.com/photo-1642790106117-e829e14a795f?auto=format&fit=crop&w=1200&q=80';
+// Date relative simple
+const relativeDate = (iso: string): string => {
+  const then = new Date(iso).getTime();
+  const now = Date.now();
+  const diffH = Math.round((now - then) / 36e5);
+  if (diffH < 1) return "à l'instant";
+  if (diffH < 24) return `il y a ${diffH} h`;
+  const d = Math.round(diffH / 24);
+  if (d === 1) return 'hier';
+  if (d < 7) return `il y a ${d} j`;
+  const w = Math.round(d / 7);
+  return w === 1 ? 'il y a 1 sem' : `il y a ${w} sem`;
+};
 
-const thumbUrl = (id: string) =>
-  id ? `https://i.ytimg.com/vi/${id}/hqdefault.jpg` : VIDEO_FALLBACK;
-const watchUrl = (id: string) =>
-  id ? `https://www.youtube.com/watch?v=${id}` : CHANNEL_URL;
-
-const VideoThumb: React.FC<{ src: string; alt: string }> = ({ src, alt }) => {
-  const [errored, setErrored] = useState(false);
+// ─── Thumbnail avec fallback maxres → hq ─────────────────────────────────
+const Thumb: React.FC<{ id: string; alt: string; className?: string }> = ({
+  id,
+  alt,
+  className = '',
+}) => {
+  const [src, setSrc] = useState(thumbMax(id));
   return (
     <img
-      src={errored ? VIDEO_FALLBACK : src}
+      src={src}
       alt={alt}
       loading="lazy"
-      onError={() => setErrored(true)}
-      className="absolute inset-0 h-full w-full object-cover group-hover:scale-105 transition-transform duration-700"
+      onError={() => {
+        if (src.includes('maxres')) setSrc(thumbHq(id));
+      }}
+      className={className}
     />
   );
 };
 
+// ─── Carte vidéo avec embed click-to-play ────────────────────────────────
+const VideoCard: React.FC<{
+  id: string;
+  title: string;
+  publishedAt: string;
+}> = ({ id, title, publishedAt }) => {
+  const [playing, setPlaying] = useState(false);
+  return (
+    <div className="group glass-frost glass-rim rounded-xl overflow-hidden flex flex-col transition-transform hover:-translate-y-0.5">
+      <div className="relative aspect-video overflow-hidden bg-black">
+        {playing ? (
+          <iframe
+            src={videoEmbed(id)}
+            title={title}
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+            className="absolute inset-0 w-full h-full"
+          />
+        ) : (
+          <button
+            type="button"
+            onClick={() => setPlaying(true)}
+            className="absolute inset-0 w-full h-full"
+            aria-label={`Lire : ${title}`}
+          >
+            <Thumb
+              id={id}
+              alt={title}
+              className="absolute inset-0 h-full w-full object-cover group-hover:scale-105 transition-transform duration-700"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+            <div className="absolute inset-0 flex items-center justify-center bg-black/10 group-hover:bg-black/30 transition-colors">
+              <span className="inline-flex items-center justify-center h-12 w-12 rounded-full bg-rose-500 shadow-[0_8px_24px_rgba(244,63,94,0.55)] group-hover:scale-110 transition-transform">
+                <Play size={18} className="text-white fill-white translate-x-0.5" />
+              </span>
+            </div>
+          </button>
+        )}
+      </div>
+      <div className="p-4 flex-1 flex flex-col">
+        <h4 className="text-[14px] font-semibold text-white leading-snug line-clamp-2 group-hover:text-rose-300 transition-colors">
+          {title}
+        </h4>
+        <p className="text-[11px] text-white/45 mt-2">{relativeDate(publishedAt)}</p>
+      </div>
+    </div>
+  );
+};
+
+// ─── Section principale ──────────────────────────────────────────────────
 export const YoutubeSection: React.FC = () => {
+  const [liveOn, setLiveOn] = useState(false);
+
   return (
     <section id="youtube" className="py-24">
       <div className="mx-auto max-w-6xl px-6">
@@ -56,11 +142,11 @@ export const YoutubeSection: React.FC = () => {
               </span>
             </div>
             <h2 className="text-4xl md:text-5xl font-semibold tracking-[-0.025em] text-white leading-[1.05]">
-              Sessions live &amp; replay.
+              Sessions live &amp; replays.
             </h2>
             <p className="text-white/55 mt-3 max-w-xl">
-              Analyses marché en direct, debriefs de setup et leçons des trades
-              récents — chaque semaine sur la chaîne Behind the Trades.
+              Analyses marché en direct, debriefs institutionnels et lecture des
+              flux temps réel — sur la chaîne Behind The Trades.
             </p>
           </div>
           <a
@@ -74,96 +160,94 @@ export const YoutubeSection: React.FC = () => {
           </a>
         </div>
 
-        {/* Live card */}
-        <a
-          href={LIVE_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="relative block rounded-2xl overflow-hidden glass-frost glass-rim mb-6 group"
-          aria-label="Regarder le direct ou le dernier replay sur YouTube"
-        >
-          <div className="relative aspect-[21/9] md:aspect-[21/8]">
-            <img
-              src={LIVE_BG}
-              alt=""
-              aria-hidden
-              className="absolute inset-0 h-full w-full object-cover opacity-40 group-hover:opacity-50 group-hover:scale-[1.02] transition-all duration-700"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/60 to-transparent" />
-            <div className="absolute inset-0 bg-[radial-gradient(40%_50%_at_30%_60%,rgba(243,108,0,0.18),transparent_70%)]" />
+        {/* Live card — click to embed */}
+        <div className="relative rounded-2xl overflow-hidden glass-frost glass-rim mb-6">
+          <div className="relative aspect-[21/9] md:aspect-[21/8] bg-black">
+            {liveOn ? (
+              <iframe
+                src={liveEmbed(CHANNEL_ID)}
+                title="Live Behind The Trades"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                className="absolute inset-0 w-full h-full"
+              />
+            ) : (
+              <>
+                {/* Cover = thumbnail de la dernière vidéo (la plus représentative du live actuel/dernier) */}
+                <Thumb
+                  id={RECENT_VIDEOS[0].id}
+                  alt="Cover du live Behind The Trades"
+                  className="absolute inset-0 h-full w-full object-cover opacity-65"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/55 to-transparent" />
+                <div className="absolute inset-0 bg-[radial-gradient(40%_50%_at_30%_60%,rgba(243,108,0,0.18),transparent_70%)]" />
 
-            <div className="relative h-full flex flex-col justify-end p-6 sm:p-10">
-              {/* Live badge */}
-              <div className="inline-flex items-center gap-2 self-start mb-4 rounded-full bg-rose-500/15 backdrop-blur-md border border-rose-500/30 px-3 py-1.5">
-                <span className="relative flex h-1.5 w-1.5">
-                  <span className="absolute inline-flex h-full w-full rounded-full bg-rose-500 animate-ping opacity-75" />
-                  <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-rose-500" />
-                </span>
-                <span className="text-[10px] font-semibold uppercase tracking-[0.22em] text-rose-300">
-                  Live / Dernier replay
-                </span>
-              </div>
+                <div className="relative h-full flex flex-col justify-end p-6 sm:p-10">
+                  <div className="inline-flex items-center gap-2 self-start mb-4 rounded-full bg-rose-500/20 backdrop-blur-md border border-rose-500/35 px-3 py-1.5">
+                    <span className="relative flex h-1.5 w-1.5">
+                      <span className="absolute inline-flex h-full w-full rounded-full bg-rose-500 animate-ping opacity-75" />
+                      <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-rose-500" />
+                    </span>
+                    <span className="text-[10px] font-semibold uppercase tracking-[0.22em] text-rose-200">
+                      Live / Dernier replay
+                    </span>
+                  </div>
 
-              <h3 className="text-2xl sm:text-3xl md:text-4xl font-semibold tracking-tight text-white mb-2 leading-tight">
-                Rejoignez la session en cours
-              </h3>
-              <p className="text-white/65 max-w-xl mb-6 text-[15px] leading-relaxed">
-                Direct ou dernière diffusion — vous arrivez toujours sur la
-                vidéo la plus récente de la chaîne.
-              </p>
+                  <h3 className="text-2xl sm:text-3xl md:text-4xl font-semibold tracking-tight text-white mb-2 leading-tight">
+                    Session institutionnelle en direct
+                  </h3>
+                  <p className="text-white/65 max-w-xl mb-6 text-[15px] leading-relaxed">
+                    Cliquez pour lancer le live en cours — ou la dernière
+                    diffusion si la chaîne est hors-ligne.
+                  </p>
 
-              <div className="flex flex-wrap items-center gap-3">
-                <span className="inline-flex items-center gap-2 h-11 px-5 rounded-xl bg-rose-500 hover:bg-rose-400 text-white font-semibold text-[13px] shadow-[0_10px_30px_-10px_rgba(244,63,94,0.6)] transition-all">
-                  <Radio size={15} />
-                  Regarder maintenant
-                </span>
-                <a
-                  href={STREAMS_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={(e) => e.stopPropagation()}
-                  className="inline-flex items-center gap-1.5 h-11 px-4 rounded-xl glass-subtle text-white/85 hover:text-white text-[13px] font-medium transition-colors"
+                  <div className="flex flex-wrap items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setLiveOn(true)}
+                      className="inline-flex items-center gap-2 h-11 px-5 rounded-xl bg-rose-500 hover:bg-rose-400 text-white font-semibold text-[13px] shadow-[0_10px_30px_-10px_rgba(244,63,94,0.6)] transition-all"
+                    >
+                      <Radio size={15} />
+                      Lancer le live ici
+                    </button>
+                    <a
+                      href={LIVE_FALLBACK_URL}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 h-11 px-4 rounded-xl glass-subtle text-white/85 hover:text-white text-[13px] font-medium transition-colors"
+                    >
+                      Ouvrir sur YouTube
+                      <ArrowUpRight size={13} />
+                    </a>
+                    <a
+                      href={STREAMS_URL}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 h-11 px-4 rounded-xl text-white/65 hover:text-white text-[13px] font-medium transition-colors"
+                    >
+                      Tous les replays
+                    </a>
+                  </div>
+                </div>
+
+                {/* Play decorative button */}
+                <button
+                  type="button"
+                  onClick={() => setLiveOn(true)}
+                  aria-label="Lancer le live"
+                  className="hidden md:flex absolute top-1/2 right-12 -translate-y-1/2 h-20 w-20 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 items-center justify-center hover:bg-white/15 hover:scale-110 transition-all"
                 >
-                  Tous les replays
-                  <ArrowUpRight size={13} />
-                </a>
-              </div>
-            </div>
-
-            {/* Decorative play */}
-            <div className="hidden md:flex absolute top-1/2 right-12 -translate-y-1/2 h-20 w-20 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 items-center justify-center group-hover:bg-white/15 group-hover:scale-110 transition-all">
-              <Play size={28} className="text-white fill-white translate-x-0.5" />
-            </div>
+                  <Play size={28} className="text-white fill-white translate-x-0.5" />
+                </button>
+              </>
+            )}
           </div>
-        </a>
+        </div>
 
         {/* Recent videos grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {RECENT_VIDEOS.map((v, i) => (
-            <a
-              key={i}
-              href={watchUrl(v.id)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group glass-frost glass-rim rounded-xl overflow-hidden flex flex-col transition-transform hover:-translate-y-0.5"
-            >
-              <div className="relative aspect-video overflow-hidden">
-                <VideoThumb src={thumbUrl(v.id)} alt={v.title} />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-                {/* Hover play overlay */}
-                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/30">
-                  <span className="inline-flex items-center justify-center h-12 w-12 rounded-full bg-rose-500 shadow-lg">
-                    <Play size={18} className="text-white fill-white translate-x-0.5" />
-                  </span>
-                </div>
-              </div>
-              <div className="p-4 flex-1 flex flex-col">
-                <h4 className="text-[14px] font-semibold text-white leading-snug line-clamp-2 group-hover:text-rose-300 transition-colors">
-                  {v.title}
-                </h4>
-                <p className="text-[11px] text-white/45 mt-2">{v.date}</p>
-              </div>
-            </a>
+          {RECENT_VIDEOS.map((v) => (
+            <VideoCard key={v.id} id={v.id} title={v.title} publishedAt={v.publishedAt} />
           ))}
         </div>
       </div>
