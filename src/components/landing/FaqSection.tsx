@@ -1,44 +1,58 @@
 import React from 'react';
 import { ChevronDown } from 'lucide-react';
 
-export const FaqSection: React.FC = () => {
-  const faqs = [
-    {
-      q: "Compatible with MT4 & MT5?",
-      a: "Yes! Import CSV files or use our auto-sync extension for real-time trade tracking."
-    },
-    {
-      q: "Is it Prop Firm friendly?",
-      a: "Absolutely. BTrade is an analysis tool. It doesn't interfere with trading and is used by traders worldwide."
-    },
-    {
-      q: "Is there a free trial?",
-      a: "We offer a 14-day trial on the Pro plan, no card required, no commitments."
-    },
-    {
-      q: "How does AI Insights work?",
-      a: "Our AI analyzes your trade history and setups to calculate win probabilities and detect cognitive biases."
-    }
-  ];
+const faqs = [
+  {
+    q: 'Compatible avec MT4 et MT5 ?',
+    a: 'Oui. Importez vos historiques en CSV ou utilisez notre auto-sync pour le suivi temps réel de vos trades.',
+  },
+  {
+    q: 'Les Prop Firms acceptent BTrade ?',
+    a: "BTrade est un outil d'analyse externe. Il ne touche pas à vos exécutions et est utilisé sans souci par les traders FTMO, MyFundedFX, FundedNext et autres.",
+  },
+  {
+    q: 'Y a-t-il un essai gratuit ?',
+    a: "14 jours sur le plan Pro, sans carte bancaire, sans engagement. Vous pouvez exporter vos données à tout moment.",
+  },
+  {
+    q: 'Comment fonctionne l\'IA ?',
+    a: "Notre moteur analyse votre historique d'exécutions, détecte les biais récurrents (revenge trading, FOMO, sur-exposition) et chiffre votre score de discipline.",
+  },
+  {
+    q: 'Mes données sont-elles privées ?',
+    a: "Vos trades sont chiffrés au repos et en transit. Aucun partage avec des tiers, et vous gardez la propriété entière de vos données.",
+  },
+];
 
+export const FaqSection: React.FC = () => {
   return (
-    <section id="faq" className="py-16">
-      <div className="container mx-auto px-6 max-w-2xl">
-        <div className="text-center mb-12">
-          <h2 className="text-4xl md:text-6xl font-black mb-6 tracking-tighter uppercase">Questions.</h2>
+    <section id="faq" className="py-24">
+      <div className="mx-auto max-w-3xl px-6">
+        <div className="text-center mb-12 max-w-xl mx-auto">
+          <div className="text-[11px] font-medium uppercase tracking-[0.25em] text-accent mb-3">
+            Questions fréquentes
+          </div>
+          <h2 className="text-4xl md:text-5xl font-semibold tracking-[-0.025em] text-white">
+            Tout est clair.
+          </h2>
         </div>
 
         <div className="space-y-3">
           {faqs.map((faq, i) => (
-            <details 
-              key={i} 
-              className="group glass rounded-3xl border-white/5 transition-all duration-500 overflow-hidden"
+            <details
+              key={i}
+              className="group glass-frost glass-rim rounded-2xl overflow-hidden transition-all"
             >
-              <summary className="flex items-center justify-between p-8 cursor-pointer list-none">
-                <span className="text-sm font-bold text-txt-2 group-hover:text-white transition-colors">{faq.q}</span>
-                <ChevronDown size={18} className="text-txt-3 group-open:rotate-180 transition-transform duration-500" />
+              <summary className="flex items-center justify-between gap-4 px-6 py-5 cursor-pointer list-none">
+                <span className="text-[15px] font-medium text-white/85 group-hover:text-white transition-colors">
+                  {faq.q}
+                </span>
+                <ChevronDown
+                  size={18}
+                  className="text-white/40 group-open:rotate-180 transition-transform duration-300 shrink-0"
+                />
               </summary>
-              <div className="px-8 pb-8 text-xs font-medium text-txt-3 leading-loose animate-scale-in">
+              <div className="px-6 pb-6 text-[14px] text-white/60 leading-relaxed">
                 {faq.a}
               </div>
             </details>

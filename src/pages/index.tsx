@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Navbar } from '../components/landing/Navbar';
 import { HeroSection } from '../components/landing/HeroSection';
 import { LiveTicker } from '../components/landing/LiveTicker';
@@ -8,52 +9,63 @@ import { ComparisonTable } from '../components/landing/ComparisonTable';
 import { PricingSection } from '../components/landing/PricingSection';
 import { FaqSection } from '../components/landing/FaqSection';
 
-import { Link } from 'react-router-dom';
-
 const LandingPage: React.FC = () => {
   return (
-    <div className="min-h-screen bg-bg selection:bg-accent/30 overflow-x-hidden selection:text-white font-sans text-txt">
+    <div className="landing-shell min-h-screen bg-bg text-white font-sans selection:bg-accent/30 selection:text-white overflow-x-hidden">
       <Navbar />
       <HeroSection />
       <LiveTicker />
-      <div className="space-y-4 pb-8">
-        <StatsSection />
-        <BentoFeatures />
-        <ComparisonTable />
-        <PricingSection />
-        <FaqSection />
-      </div>
-      
-      {/* Footer (From Lovable Design) */}
-      <footer className="py-12 border-t border-border font-mono text-[10px] text-txt-2 bg-bg">
-        <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between gap-8">
-          <div>
-            <div className="text-txt font-bold mb-4 uppercase tracking-widest">
-              BTRADE ANALYTICS © {new Date().getFullYear()}
+      <StatsSection />
+      <BentoFeatures />
+      <ComparisonTable />
+      <PricingSection />
+      <FaqSection />
+
+      {/* Footer */}
+      <footer className="relative border-t border-white/[0.06] bg-bg/60 backdrop-blur-xl">
+        <div className="mx-auto max-w-6xl px-6 py-14 grid grid-cols-2 md:grid-cols-4 gap-10">
+          <div className="col-span-2">
+            <div className="flex items-center gap-2 mb-4">
+              <span className="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-accent to-accent-2 shadow-[0_0_24px_rgba(243,108,0,0.35)]">
+                <span className="text-white text-[13px] font-black leading-none">B</span>
+              </span>
+              <span className="text-[15px] font-semibold tracking-tight">BTrade</span>
+              <span className="text-[10px] uppercase tracking-[0.25em] text-white/40">Analytics</span>
             </div>
-            <p className="max-w-xs leading-relaxed italic">
-              Le trading comporte des risques importants. Assurez-vous de comprendre les enjeux avant de vous engager.
+            <p className="text-[13px] text-white/45 max-w-sm leading-relaxed">
+              Le journal de trading qui pense comme un pro. Le trading comporte
+              des risques importants — assurez-vous de les comprendre avant de
+              vous engager.
             </p>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-12">
-            <div className="space-y-3">
-              <div className="text-txt font-bold uppercase tracking-widest">PRODUIT</div>
-              <div><Link to="/app/trades" className="hover:text-txt">Journaling</Link></div>
-              <div><a href="#performance" className="hover:text-txt">IA Analysis</a></div>
-              <div><Link to="/app/dashboard" className="hover:text-txt">Benchmarks</Link></div>
+
+          <div>
+            <div className="text-[10px] uppercase tracking-[0.22em] text-white/35 font-semibold mb-4">
+              Produit
             </div>
-            <div className="space-y-3">
-              <div className="text-txt font-bold uppercase tracking-widest">ENTREPRISE</div>
-              <div><a href="#" className="hover:text-txt">Manifesto</a></div>
-              <div><Link to="/legal/privacy" className="hover:text-txt">Security</Link></div>
-              <div><Link to="/legal/terms" className="hover:text-txt">Legal</Link></div>
+            <ul className="space-y-2.5 text-[13px] text-white/70">
+              <li><Link to="/app/trades" className="hover:text-white transition-colors">Journal</Link></li>
+              <li><a href="#performance" className="hover:text-white transition-colors">Analyse IA</a></li>
+              <li><a href="#tarification" className="hover:text-white transition-colors">Tarifs</a></li>
+            </ul>
+          </div>
+
+          <div>
+            <div className="text-[10px] uppercase tracking-[0.22em] text-white/35 font-semibold mb-4">
+              Légal
             </div>
-            <div className="space-y-3">
-              <div className="text-txt font-bold uppercase tracking-widest">SOCIAL</div>
-              <div><a href="#" className="hover:text-txt">Twitter / X</a></div>
-              <div><a href="#" className="hover:text-txt">Discord</a></div>
-              <div><a href="#" className="hover:text-txt">YouTube</a></div>
-            </div>
+            <ul className="space-y-2.5 text-[13px] text-white/70">
+              <li><Link to="/legal/privacy" className="hover:text-white transition-colors">Confidentialité</Link></li>
+              <li><Link to="/legal/terms" className="hover:text-white transition-colors">Conditions</Link></li>
+              <li><a href="#faq" className="hover:text-white transition-colors">FAQ</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <div className="border-t border-white/[0.04]">
+          <div className="mx-auto max-w-6xl px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px] text-white/35">
+            <span>© {new Date().getFullYear()} BTrade Analytics. Tous droits réservés.</span>
+            <span>Fait avec rigueur pour les traders sérieux.</span>
           </div>
         </div>
       </footer>

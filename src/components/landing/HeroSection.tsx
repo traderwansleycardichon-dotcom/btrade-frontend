@@ -1,64 +1,126 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { ArrowRight, PlayCircle, ShieldCheck, TrendingUp } from 'lucide-react';
+
+// Vraies images Unsplash (trading desks / écrans Bloomberg)
+const BG_TRADING = 'https://images.unsplash.com/photo-1640340434855-6084b1f4901c?auto=format&fit=crop&w=2400&q=80';
+const DASH_SHOT = 'https://images.unsplash.com/photo-1642790106117-e829e14a795f?auto=format&fit=crop&w=2400&q=80';
 
 export const HeroSection: React.FC = () => {
   return (
-    <section className="relative pt-24 pb-16 overflow-hidden border-b border-border">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="flex flex-col items-center text-center">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-accent/20 bg-accent/5 text-accent text-[11px] font-mono mb-8">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75" />
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-accent" />
+    <section className="relative pt-20 pb-32 overflow-hidden">
+      {/* Backdrop image */}
+      <div className="absolute inset-0 -z-10">
+        <img
+          src={BG_TRADING}
+          alt=""
+          aria-hidden
+          className="absolute inset-0 h-full w-full object-cover opacity-[0.22]"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-bg/40 via-bg/70 to-bg" />
+        <div className="absolute inset-0 bg-gradient-to-r from-bg via-transparent to-bg" />
+      </div>
+
+      <div className="relative mx-auto max-w-6xl px-6">
+        {/* Pill */}
+        <div className="flex justify-center mb-8">
+          <div className="inline-flex items-center gap-2 rounded-full glass-frost px-4 py-1.5 text-[12px] text-white/80">
+            <span className="relative flex h-1.5 w-1.5">
+              <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-400 animate-ping opacity-75" />
+              <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-400" />
             </span>
-            DÉPLOYÉ POUR LES TRADERS PRO
-          </div>
-          <h1 className="text-7xl md:text-[120px] font-black tracking-tighter leading-[0.85] mb-8">
-            TRADE.<br />JOURNAL.<br /><span className="text-accent">WIN.</span>
-          </h1>
-          <p className="max-w-xl text-lg text-txt-2 text-pretty">
-            L'écosystème ultime pour les traders de Prop Firms.
-            Performance brute, analyses IA et psychologie de précision.
-          </p>
-          <div className="mt-10 flex flex-col sm:flex-row gap-4">
-            <Link to="/register" className="flex items-center justify-center h-14 px-10 bg-accent text-white font-bold text-sm tracking-widest uppercase hover:brightness-110 transition-all">
-              Commencer Maintenant
-            </Link>
-            <button className="h-14 px-10 border border-border font-bold text-sm tracking-widest uppercase hover:bg-white/5 transition-all text-txt">
-              Voir Démo
-            </button>
+            <span className="font-medium">Pensé pour les traders Prop Firm</span>
           </div>
         </div>
 
-        <div className="mt-20 relative">
-          <div className="absolute inset-0 bg-gradient-to-t from-bg via-transparent to-transparent z-10 pointer-events-none" />
-          <div className="rounded-t-xl border-t border-x border-border bg-surface/50 p-4">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-              <div className="bg-black/40 border border-border p-6">
-                <div className="text-[10px] font-mono text-txt-2 uppercase mb-1">Profit Total</div>
-                <div className="text-2xl font-mono text-accent">+14,209.42€</div>
-              </div>
-              <div className="bg-black/40 border border-border p-6">
-                <div className="text-[10px] font-mono text-txt-2 uppercase mb-1">Win Rate</div>
-                <div className="text-2xl font-mono text-txt">64.2%</div>
-              </div>
-              <div className="bg-black/40 border border-border p-6">
-                <div className="text-[10px] font-mono text-txt-2 uppercase mb-1">Drawdown Max</div>
-                <div className="text-2xl font-mono text-loss">-2.14%</div>
-              </div>
-            </div>
-            {/* Minimalist Dashboard Grid Mockup (in place of an image) */}
-            <div className="w-full aspect-[21/9] rounded border border-border bg-surface relative overflow-hidden flex flex-col p-4 gap-4">
-              <div className="flex-1 flex gap-4">
-                <div className="flex-1 border border-border bg-bg p-4 flex items-end">
-                  <div className="w-full h-1/2 border-t border-accent/50 relative">
-                     <div className="absolute top-0 right-0 w-full h-full bg-gradient-to-b from-accent/10 to-transparent" />
-                     <svg className="absolute bottom-0 w-full h-[150%] -translate-y-4" preserveAspectRatio="none" viewBox="0 0 100 100">
-                        <path d="M0,80 L20,60 L40,70 L60,30 L80,40 L100,10" fill="none" stroke="#F36C00" strokeWidth="2" />
-                     </svg>
+        {/* Headline */}
+        <h1 className="text-center text-balance font-semibold tracking-[-0.03em] text-white text-[44px] sm:text-6xl md:text-7xl leading-[1.02] mb-6">
+          Le journal de trading
+          <br />
+          <span className="bg-gradient-to-br from-white via-white/90 to-white/60 bg-clip-text text-transparent">
+            qui pense comme un{' '}
+          </span>
+          <span className="bg-gradient-to-br from-accent-2 via-accent to-accent bg-clip-text text-transparent">
+            pro
+          </span>
+          <span className="text-accent">.</span>
+        </h1>
+
+        {/* Subtitle */}
+        <p className="mx-auto max-w-2xl text-center text-[17px] leading-relaxed text-white/65 mb-10">
+          BTrade analyse chaque exécution, détecte vos biais et certifie votre
+          conformité Prop Firm — pour que vous gardiez votre compte financé,
+          pas seulement vos espoirs.
+        </p>
+
+        {/* CTAs */}
+        <div className="flex flex-col sm:flex-row gap-3 justify-center mb-16">
+          <Link
+            to="/register"
+            className="group inline-flex items-center justify-center gap-2 h-12 px-7 rounded-xl bg-accent hover:bg-accent-2 text-white font-semibold text-[14px] shadow-[0_10px_40px_-10px_rgba(243,108,0,0.6)] transition-all"
+          >
+            Commencer gratuitement
+            <ArrowRight size={16} className="group-hover:translate-x-0.5 transition-transform" />
+          </Link>
+          <button
+            type="button"
+            className="inline-flex items-center justify-center gap-2 h-12 px-7 rounded-xl glass-frost text-white font-medium text-[14px] hover:bg-white/[0.08] transition-all"
+          >
+            <PlayCircle size={18} className="text-white/70" />
+            Voir la démo
+          </button>
+        </div>
+
+        {/* Trust row */}
+        <div className="flex flex-wrap justify-center items-center gap-x-8 gap-y-3 text-[12px] text-white/45 mb-20">
+          <span className="inline-flex items-center gap-2">
+            <ShieldCheck size={14} className="text-emerald-400/80" />
+            14 jours d'essai, sans carte
+          </span>
+          <span className="inline-flex items-center gap-2">
+            <TrendingUp size={14} className="text-accent/80" />
+            Compatible FTMO, MyFundedFX, FundedNext
+          </span>
+        </div>
+
+        {/* Dashboard preview */}
+        <div className="relative mx-auto max-w-5xl">
+          {/* Glow */}
+          <div className="absolute -inset-x-20 -top-10 -bottom-10 -z-10 opacity-60">
+            <div className="absolute inset-0 bg-gradient-to-tr from-accent/30 via-transparent to-sky-500/20 blur-3xl" />
+          </div>
+
+          <div className="glass-frost glass-rim rounded-2xl p-3 sm:p-4">
+            {/* KPI strip */}
+            <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-3 sm:mb-4">
+              {[
+                { label: 'Profit net (30j)', value: '+14 209 €', tone: 'text-emerald-400' },
+                { label: 'Win rate', value: '64,2 %', tone: 'text-white' },
+                { label: 'Drawdown max', value: '-2,14 %', tone: 'text-rose-400' },
+              ].map((kpi) => (
+                <div
+                  key={kpi.label}
+                  className="glass-subtle rounded-xl px-3 sm:px-5 py-3 sm:py-4"
+                >
+                  <div className="text-[10px] uppercase tracking-[0.18em] text-white/40 font-medium mb-1">
+                    {kpi.label}
+                  </div>
+                  <div className={`text-base sm:text-2xl font-semibold tracking-tight ${kpi.tone}`}>
+                    {kpi.value}
                   </div>
                 </div>
-              </div>
+              ))}
+            </div>
+
+            {/* Screenshot */}
+            <div className="relative rounded-xl overflow-hidden border border-white/[0.06]">
+              <img
+                src={DASH_SHOT}
+                alt="Aperçu du tableau de bord BTrade"
+                className="w-full h-auto aspect-[16/9] object-cover"
+                loading="lazy"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-bg/40 via-transparent to-transparent" />
             </div>
           </div>
         </div>
