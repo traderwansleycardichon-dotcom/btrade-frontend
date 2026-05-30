@@ -189,7 +189,7 @@ export const PricingSection: React.FC = () => {
                           featured ? 'text-accent' : 'text-white'
                         }`}
                       >
-                        {plan.price}€
+                        ${plan.price}
                       </span>
                       <span className="text-white/45 text-sm">/ mois</span>
                     </div>
