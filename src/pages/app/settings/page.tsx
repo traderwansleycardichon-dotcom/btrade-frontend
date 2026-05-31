@@ -19,7 +19,7 @@ interface NavSection {
 }
 
 const SettingsPage: React.FC = () => {
-  const { user, logout, refreshUser } = useAuth();
+  const { user, subscription, logout, refreshUser } = useAuth();
   const queryClient = useQueryClient();
   
   // États pour les modales
@@ -40,6 +40,16 @@ const SettingsPage: React.FC = () => {
       return formatted.charAt(0).toUpperCase() + formatted.slice(1);
     } catch {
       return 'Mai 2024';
+    }
+  };
+
+  const formatExactDate = (dateStr?: string) => {
+    if (!dateStr) return 'Non défini';
+    try {
+      const date = new Date(dateStr);
+      return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+    } catch {
+      return 'Non défini';
     }
   };
 
@@ -101,7 +111,7 @@ const SettingsPage: React.FC = () => {
           badge: (user?.plan === 'pro' || user?.role === 'admin') ? 'PRO' : undefined 
         },
         ...((user?.plan === 'pro' && user?.role !== 'admin') ? [
-          { label: 'Prochain prélèvement', value: '15 Juin 2026' },
+          { label: 'Prochain prélèvement', value: subscription?.currentPeriodEnd ? formatExactDate(subscription.currentPeriodEnd) : 'À venir' },
           { label: 'Mode de paiement', value: '•••• 4242' },
         ] : [])
       ]

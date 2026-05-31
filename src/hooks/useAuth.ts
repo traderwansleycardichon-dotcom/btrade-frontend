@@ -15,23 +15,32 @@ interface User {
   createdAt?: string;
 }
 
+interface Subscription {
+  id: string;
+  plan: string;
+  status: string;
+  currentPeriodEnd: string;
+}
+
 interface AuthState {
   user: User | null;
+  subscription: Subscription | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (accessToken: string, refreshToken: string, user: User) => void;
+  login: (accessToken: string, refreshToken: string, user: User, subscription?: Subscription) => void;
   logout: () => void;
   refreshUser: () => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,
+  subscription: null,
   isAuthenticated: !!localStorage.getItem('btt_access_token'),
   isLoading: !!localStorage.getItem('btt_access_token'),
-  login: (accessToken, refreshToken, user) => {
+  login: (accessToken, refreshToken, user, subscription = null) => {
     localStorage.setItem('btt_access_token', accessToken);
     localStorage.setItem('btt_refresh_token', refreshToken);
-    set({ user, isAuthenticated: true, isLoading: false });
+    set({ user, subscription, isAuthenticated: true, isLoading: false });
   },
   logout: () => {
     localStorage.removeItem('btt_access_token');
@@ -39,7 +48,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     if (queryClient) {
       queryClient.clear();
     }
-    set({ user: null, isAuthenticated: false, isLoading: false });
+    set({ user: null, subscription: null, isAuthenticated: false, isLoading: false });
   },
   refreshUser: async () => {
     try {
@@ -49,10 +58,15 @@ export const useAuthStore = create<AuthState>((set) => ({
         set({ isLoading: true });
       }
       const { data } = await api.get('/api/me');
-      set({ user: data.data.user, isAuthenticated: true, isLoading: false });
+      set({ 
+        user: data.data.user, 
+        subscription: data.data.subscription || null, 
+        isAuthenticated: true, 
+        isLoading: false 
+      });
     } catch (err) {
       localStorage.clear();
-      set({ user: null, isAuthenticated: false, isLoading: false });
+      set({ user: null, subscription: null, isAuthenticated: false, isLoading: false });
     }
   },
 }));

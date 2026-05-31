@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { Outlet, Navigate, useLocation } from 'react-router-dom';
+import { Outlet, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { Sidebar } from './Sidebar';
 import { TopBar } from './TopBar';
 import { useAuth } from '../../hooks/useAuth';
 import { ToastContainer } from '../ui/Toast';
 import { UnreadMessagePopup } from '../messaging/UnreadMessagePopup';
+import { Lock, CreditCard, LogOut } from 'lucide-react';
 
 export const AppLayout: React.FC = () => {
-  const { isAuthenticated, isLoading, refreshUser } = useAuth();
+  const { user, isAuthenticated, isLoading, refreshUser, logout } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
@@ -44,6 +46,40 @@ export const AppLayout: React.FC = () => {
 
   if (!isAuthenticated) {
     return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  // Handle Locked State
+  if (user?.plan === 'locked' && location.pathname !== '/app/upgrade') {
+    return (
+      <div className="min-h-screen bg-bg text-txt flex items-center justify-center p-4">
+        <div className="glass w-full max-w-lg p-10 rounded-[3rem] border-loss/30 bg-loss/5 text-center flex flex-col items-center">
+          <div className="w-20 h-20 bg-loss/20 text-loss rounded-full flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(239,68,68,0.3)]">
+            <Lock size={40} />
+          </div>
+          <h1 className="text-3xl font-black mb-4">Accès Verrouillé</h1>
+          <p className="text-txt-2 mb-8 text-lg">
+            Votre abonnement PRO a expiré ou le paiement a échoué. <br className="hidden sm:block" />
+            Il n'est pas possible de repasser automatiquement au plan FREE. Vous devez régulariser votre paiement pour continuer à utiliser la plateforme.
+          </p>
+          <div className="flex flex-col w-full gap-4">
+            <button 
+              onClick={() => navigate('/app/upgrade')}
+              className="w-full py-4 bg-accent text-white rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-accent-hover transition-all text-lg shadow-lg shadow-accent/20"
+            >
+              <CreditCard size={20} />
+              Payer maintenant
+            </button>
+            <button 
+              onClick={logout}
+              className="w-full py-4 bg-transparent border border-border text-txt rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-elevated transition-all"
+            >
+              <LogOut size={20} />
+              Se déconnecter
+            </button>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
