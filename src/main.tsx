@@ -4,6 +4,7 @@ import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import LandingPage from './pages/index';
 import LoginPage from './pages/login';
+import { PublicRoute } from './components/auth/AuthGuards';
 import { AppLayout } from './components/layout/AppLayout';
 import DashboardPage from './pages/app/dashboard/page';
 import TradesPage from './pages/app/trades/page';
@@ -47,7 +48,11 @@ const queryClient = new QueryClient();
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <LandingPage />,
+    element: (
+      <PublicRoute>
+        <LandingPage />
+      </PublicRoute>
+    ),
   },
   {
     path: '/legal/:slug',
@@ -55,11 +60,19 @@ const router = createBrowserRouter([
   },
   {
     path: '/login',
-    element: <LoginPage />,
+    element: (
+      <PublicRoute>
+        <LoginPage />
+      </PublicRoute>
+    ),
   },
   {
     path: '/register',
-    element: <LoginPage />, // Réutilise LoginPage pour l'instant (RegisterForm à venir)
+    element: (
+      <PublicRoute>
+        <LoginPage defaultRegister />
+      </PublicRoute>
+    ),
   },
   {
     path: '/app/upgrade',

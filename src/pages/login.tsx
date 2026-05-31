@@ -6,12 +6,12 @@ import { RegisterForm } from '../components/auth/RegisterForm';
 import { HeroPane } from '../components/auth/HeroPane';
 import api from '../lib/api';
 
-const LoginPage: React.FC = () => {
+const LoginPage: React.FC<{ defaultRegister?: boolean }> = ({ defaultRegister = false }) => {
   const { isAuthenticated, isLoading, refreshUser, user } = useAuth();
   const navigate = useNavigate();
   const [params] = useSearchParams();
   const queryPlan = params.get('plan');
-  const [isRegister, setIsRegister] = React.useState(queryPlan !== null);
+  const [isRegister, setIsRegister] = React.useState(defaultRegister || queryPlan !== null);
 
   React.useEffect(() => {
     // Si on a un token mais pas de données user, on refresh
