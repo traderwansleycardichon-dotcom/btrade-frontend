@@ -6,7 +6,7 @@ interface User {
   id: string;
   email: string;
   fullName: string;
-  plan: 'free' | 'pro';
+  plan: 'free' | 'pro' | 'locked';
   role?: string;
   onboarded: boolean;
   avatarUrl?: string;
@@ -29,7 +29,7 @@ interface AuthState {
   subscription: Subscription | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (accessToken: string, refreshToken: string, user: User, subscription?: Subscription) => void;
+  login: (accessToken: string, refreshToken: string, user: User, subscription?: Subscription | null) => void;
   logout: () => void;
   refreshUser: () => Promise<void>;
 }

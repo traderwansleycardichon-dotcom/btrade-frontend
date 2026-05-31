@@ -28,7 +28,9 @@ export type FeatureKey = keyof typeof PLAN_FEATURES.pro;
 export const usePlan = () => {
   const { user } = useAuth();
   const plan = user?.plan || 'free';
-  const features = PLAN_FEATURES[plan] || PLAN_FEATURES.free;
+  // Les utilisateurs "locked" sont bloqués au niveau du layout ; ici on retombe sur les features "free" par sécurité.
+  const featureKey: 'free' | 'pro' = plan === 'pro' ? 'pro' : 'free';
+  const features = PLAN_FEATURES[featureKey];
 
   const canUse = (featureName: FeatureKey): boolean => {
     return !!features[featureName];
