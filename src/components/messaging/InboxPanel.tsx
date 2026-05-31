@@ -8,6 +8,7 @@ import {
   useConversations,
   useThread,
   useSendMessage,
+  useAdminConversations,
   Conversation,
   ChatMessage,
 } from '../../hooks/useMessaging';
@@ -324,11 +325,18 @@ interface InboxPanelProps {
   availableUsers?: { id: string; fullName: string | null; email: string }[];
   /** Peut initier de nouvelles conversations */
   canCompose?: boolean;
+  /** Vue administrateur globale (affiche TOUTES les conversations) */
+  isAdminView?: boolean;
 }
 
-export const InboxPanel: React.FC<InboxPanelProps> = ({ availableUsers = [], canCompose = false }) => {
+export const InboxPanel: React.FC<InboxPanelProps> = ({ availableUsers = [], canCompose = false, isAdminView = false }) => {
   const { user } = useAuth();
-  const { data: conversations = [], isLoading } = useConversations();
+  
+  const userQuery = useConversations();
+  const adminQuery = useAdminConversations();
+  
+  const { data: conversations = [], isLoading } = isAdminView ? adminQuery : userQuery;
+  
   const [activeConvId, setActiveConvId] = useState<string | null>(null);
   const [showNewConv, setShowNewConv] = useState(false);
   const [searchConv, setSearchConv] = useState('');

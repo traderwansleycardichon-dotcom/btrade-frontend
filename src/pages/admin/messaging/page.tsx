@@ -27,7 +27,7 @@ const AdminMessagingPage: React.FC = () => {
         </div>
       </div>
       <div className="h-[calc(100%-4rem)]">
-        <InboxPanel canCompose={true} availableUsers={users} />
+        <InboxPanel canCompose={true} availableUsers={users} isAdminView={true} />
       </div>
     </div>
   );
