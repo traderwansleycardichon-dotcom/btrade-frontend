@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Ticket, Plus, Trash2, Calendar, Percent, RefreshCw, X } from 'lucide-react';
 import { Modal } from '../../../components/ui/Modal';
-import { useAuth } from '../../../hooks/useAuth';
+import api from '../../../lib/api';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
@@ -22,7 +22,6 @@ interface PromoCode {
 }
 
 export const PromoCodesPage: React.FC = () => {
-  const { getAuthToken } = useAuth();
   const [promoCodes, setPromoCodes] = useState<PromoCode[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -41,18 +40,14 @@ export const PromoCodesPage: React.FC = () => {
   const fetchPromoCodes = async () => {
     try {
       setLoading(true);
-      const token = getAuthToken();
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/admin/billing/promo-codes`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      const data = await res.json();
-      if (data.success) {
-        setPromoCodes(data.data);
+      const res = await api.get('/api/admin/billing/promo-codes');
+      if (res.data.success) {
+        setPromoCodes(res.data.data);
       } else {
-        setError(data.error);
+        setError(res.data.error);
       }
-    } catch (err) {
-      setError('Erreur lors du chargement des codes promo');
+    } catch (err: any) {
+      setError(err.response?.data?.error || 'Erreur lors du chargement des codes promo');
     } finally {
       setLoading(false);
     }
@@ -68,7 +63,6 @@ export const PromoCodesPage: React.FC = () => {
     setError(null);
 
     try {
-      const token = getAuthToken();
       const payload: any = {
         code,
         percent_off: percentOff,
@@ -82,17 +76,9 @@ export const PromoCodesPage: React.FC = () => {
         payload.expires_at = new Date(expiresAtDate).toISOString();
       }
 
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/admin/billing/promo-codes`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(payload),
-      });
+      const res = await api.post('/api/admin/billing/promo-codes', payload);
 
-      const data = await res.json();
-      if (data.success) {
+      if (res.data.success) {
         setIsModalOpen(false);
         setCode('');
         setPercentOff('100');
@@ -101,10 +87,10 @@ export const PromoCodesPage: React.FC = () => {
         setExpiresAtDate('');
         fetchPromoCodes();
       } else {
-        setError(data.error || 'Erreur lors de la création');
+        setError(res.data.error || 'Erreur lors de la création');
       }
-    } catch (err) {
-      setError('Erreur réseau');
+    } catch (err: any) {
+      setError(err.response?.data?.error || 'Erreur réseau');
     } finally {
       setIsSubmitting(false);
     }
