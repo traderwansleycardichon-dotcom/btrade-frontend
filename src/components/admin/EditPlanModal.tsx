@@ -70,12 +70,13 @@ export const EditPlanModal: React.FC<EditPlanModalProps> = ({ isOpen, onClose, u
           </label>
           <div className="grid grid-cols-2 gap-4">
             <button
+              disabled={user.plan === 'pro' || user.plan === 'locked'}
               onClick={() => setSelectedPlan('free')}
               className={`p-4 rounded-xl border flex flex-col items-center gap-2 transition-all ${
                 selectedPlan === 'free' 
                   ? 'border-accent bg-accent/10 text-accent' 
                   : 'border-border bg-surface text-txt-2 hover:border-accent/30'
-              }`}
+              } ${['pro', 'locked'].includes(user.plan) ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
               <ShieldAlert size={24} />
               <span className="font-bold">Free</span>
@@ -92,6 +93,9 @@ export const EditPlanModal: React.FC<EditPlanModalProps> = ({ isOpen, onClose, u
               <span className="font-bold">Pro</span>
             </button>
           </div>
+          {['pro', 'locked'].includes(user.plan) && (
+            <p className="text-xs text-loss mt-2 text-center">Il n'est pas possible de repasser manuellement au plan Free.</p>
+          )}
         </div>
 
         <div className="pt-4 border-t border-border">

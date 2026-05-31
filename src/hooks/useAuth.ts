@@ -20,6 +20,8 @@ interface Subscription {
   plan: string;
   status: string;
   currentPeriodEnd: string;
+  stripeSubId?: string;
+  stripeCustomerId?: string;
 }
 
 interface AuthState {

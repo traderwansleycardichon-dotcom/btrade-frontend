@@ -114,7 +114,7 @@ const SettingsPage: React.FC = () => {
         },
         ...((user?.plan === 'pro' && user?.role !== 'admin') ? [
           { label: 'Prochain prélèvement', value: subscription?.currentPeriodEnd ? formatExactDate(subscription.currentPeriodEnd) : 'À venir' },
-          { label: 'Mode de paiement', value: '•••• 4242' },
+          ...(subscription?.stripeSubId ? [{ label: 'Mode de paiement', value: '•••• 4242' }] : []),
           { label: 'Gérer mon abonnement', value: 'Mettre à jour / Renouveler', action: () => navigate('/app/upgrade') }
         ] : [])
       ]
