@@ -246,6 +246,15 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen = false, onMobileCl
             <LogOut size={18} />
           </button>
         </div>
+
+        {user?.role === 'admin' && (
+          <NavLink
+            to="/admin/dashboard"
+            className="w-full flex items-center justify-center gap-2 py-2 mt-2 bg-loss/10 text-loss rounded-lg font-bold hover:bg-loss/20 transition-colors border border-loss/20 text-xs"
+          >
+            Retour SuperAdmin
+          </NavLink>
+        )}
       </div>
       </aside>
 

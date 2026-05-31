@@ -95,8 +95,19 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
           ))}
         </nav>
 
+        {/* Mode Client Switch */}
+        <div className="px-4 py-2 mt-auto">
+          <NavLink
+            to="/app/dashboard"
+            className="w-full flex items-center justify-center gap-2 py-3 bg-accent text-bg rounded-xl font-bold hover:bg-accent-hover transition-colors shadow-lg shadow-accent/20"
+          >
+            <Activity size={18} />
+            Mode Client (Pro)
+          </NavLink>
+        </div>
+
         {/* User Profile */}
-        <div className="p-4 border-t border-border">
+        <div className="p-4 border-t border-border mt-4">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-loss to-orange-500 flex items-center justify-center font-bold text-lg text-white shadow-lg">
               {user?.fullName?.charAt(0) || 'A'}
