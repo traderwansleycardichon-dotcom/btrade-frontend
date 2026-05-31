@@ -1,12 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../hooks/useAuth';
 import { useUnreadMessagesCount } from '../../hooks/useMessaging';
 import { MessageSquare, AlertCircle } from 'lucide-react';
 
 export const UnreadMessagePopup: React.FC = () => {
+  const { user } = useAuth();
   const { data: count = 0 } = useUnreadMessagesCount();
   const [visible, setVisible] = useState(false);
   const navigate = useNavigate();
+  
+  const isAdmin = user?.role === 'admin';
 
   // Affiche le popup de manière récurrente (toutes les 20 secondes) s'il y a des non-lus
   useEffect(() => {
@@ -36,7 +40,9 @@ export const UnreadMessagePopup: React.FC = () => {
               Message important
             </h4>
             <p className="text-xs text-txt-2 mt-1 leading-relaxed">
-              L'administrateur vous a envoyé un message. Veuillez le lire pour retirer cette notification.
+              {isAdmin 
+                ? "Un utilisateur vous a répondu. Veuillez lire le message pour retirer cette notification."
+                : "L'administrateur vous a envoyé un message. Veuillez le lire pour retirer cette notification."}
             </p>
           </div>
         </div>
@@ -51,7 +57,7 @@ export const UnreadMessagePopup: React.FC = () => {
           <button 
             onClick={() => {
               setVisible(false);
-              navigate('/app/messages');
+              navigate(isAdmin ? '/admin/messaging' : '/app/messages');
             }}
             className="flex-1 py-2 rounded-xl text-xs font-bold bg-accent hover:bg-accent-2 text-white transition-colors shadow-lg shadow-accent/20"
           >
