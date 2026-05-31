@@ -4,6 +4,8 @@ import { Bell, Check, Info, AlertTriangle, Target, Wallet, Clock } from 'lucide-
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { Modal } from '../ui/Modal';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../hooks/useAuth';
 
 interface NotificationsDropdownProps {
   isOpen: boolean;
@@ -24,6 +26,8 @@ export const NotificationsDropdown: React.FC<NotificationsDropdownProps> = ({ is
   const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [selectedNotif, setSelectedNotif] = useState<any>(null);
+  const navigate = useNavigate();
+  const { user } = useAuth();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -88,8 +92,17 @@ export const NotificationsDropdown: React.FC<NotificationsDropdownProps> = ({ is
                   key={notif.id}
                   className={`p-4 hover:bg-elevated/50 transition-colors cursor-pointer flex gap-4 ${notif.lu ? 'opacity-60' : 'bg-accent/5'}`}
                   onClick={() => {
-                    setSelectedNotif(notif);
                     if (!notif.lu) markAsRead.mutate(notif.id);
+                    if (notif.type === 'NEW_MESSAGE') {
+                      onClose();
+                      if (user?.role === 'admin') {
+                        navigate('/admin/messaging');
+                      } else {
+                        navigate('/app/messages');
+                      }
+                    } else {
+                      setSelectedNotif(notif);
+                    }
                   }}
                 >
                   <div className="shrink-0 mt-1">
