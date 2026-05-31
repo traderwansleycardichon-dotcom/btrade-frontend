@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Ticket, Plus, Trash2, Calendar, Percent, RefreshCw, X } from 'lucide-react';
-import { Card } from '../../../components/ui/Card';
 import { Modal } from '../../../components/ui/Modal';
 import { useAuth } from '../../../hooks/useAuth';
 import { format } from 'date-fns';
@@ -136,7 +135,7 @@ export const PromoCodesPage: React.FC = () => {
         </button>
       </div>
 
-      <Card className="p-0 overflow-hidden">
+      <div className="glass rounded-3xl border border-border p-0 overflow-hidden">
         {loading ? (
           <div className="p-8 flex justify-center">
             <RefreshCw className="animate-spin text-accent" size={24} />
@@ -185,7 +184,7 @@ export const PromoCodesPage: React.FC = () => {
             </table>
           </div>
         )}
-      </Card>
+      </div>
 
       {/* Modal Création Code Promo */}
       <Modal
