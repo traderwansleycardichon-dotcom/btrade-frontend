@@ -3,6 +3,7 @@ import { Outlet, Navigate, useLocation, Link } from 'react-router-dom';
 import { AdminSidebar } from './AdminSidebar';
 import { useAuth } from '../../hooks/useAuth';
 import { ToastContainer } from '../ui/Toast';
+import { UnreadMessagePopup } from '../messaging/UnreadMessagePopup';
 import { ShieldAlert, Menu } from 'lucide-react';
 
 export const AdminLayout: React.FC = () => {
@@ -70,6 +71,7 @@ export const AdminLayout: React.FC = () => {
         </main>
       </div>
       <ToastContainer />
+      <UnreadMessagePopup />
     </div>
   );
 };
