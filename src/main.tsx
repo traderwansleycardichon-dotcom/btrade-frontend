@@ -45,7 +45,7 @@ import UpgradePage from './pages/app/upgrade/page';
 import MessagesPage from './pages/app/messages/page';
 import AdminMessagingPage from './pages/admin/messaging/page';
 
-const queryClient = new QueryClient();
+export const queryClient = new QueryClient();
 
 const router = createBrowserRouter([
   {

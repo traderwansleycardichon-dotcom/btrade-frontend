@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import api from '../lib/api';
+import { queryClient } from '../main';
 
 interface User {
   id: string;
@@ -35,6 +36,9 @@ export const useAuthStore = create<AuthState>((set) => ({
   logout: () => {
     localStorage.removeItem('btt_access_token');
     localStorage.removeItem('btt_refresh_token');
+    if (queryClient) {
+      queryClient.clear();
+    }
     set({ user: null, isAuthenticated: false, isLoading: false });
   },
   refreshUser: async () => {
