@@ -55,6 +55,7 @@ const ConvItem: React.FC<{
         <div className="flex items-center justify-between gap-1 mb-0.5">
           <span className={`text-xs truncate ${hasUnread ? 'font-bold text-txt' : 'font-medium text-txt-2'}`}>
             {other?.fullName || other?.email || 'Support BTrade'}
+            {conv.sujet && <span className="text-txt-3 font-normal ml-1 hidden sm:inline">- {conv.sujet}</span>}
           </span>
           <span className="text-[10px] text-txt-3 shrink-0">
             {timeAgo(lastMsg.createdAt)}
@@ -62,7 +63,7 @@ const ConvItem: React.FC<{
         </div>
         <div className="flex items-center justify-between gap-1">
           <p className={`text-[11px] truncate ${hasUnread ? 'text-txt font-medium' : 'text-txt-3'}`}>
-            {conv.sujet || lastMsg.contenu || '…'}
+            {lastMsg.contenu || '…'}
           </p>
           {hasUnread && (
             <span className="bg-accent text-white text-[9px] font-black px-1.5 py-0.5 rounded-full shrink-0 min-w-[18px] text-center">
