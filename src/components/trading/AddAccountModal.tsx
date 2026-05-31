@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Modal } from '../ui/Modal';
 import { useAccounts } from '../../hooks/useAccounts';
 import { useToast } from '../../hooks/useToast';
-import { Wallet, Landmark, Cpu, Percent, Target, AlertTriangle } from 'lucide-react';
+import { Wallet, Landmark, Cpu, Target, AlertTriangle } from 'lucide-react';
 
 interface AddAccountModalProps {
   isOpen: boolean;
@@ -19,19 +19,26 @@ export const AddAccountModal: React.FC<AddAccountModalProps> = ({ isOpen, onClos
     tailleCompte: 50000,
     broker: '',
     plateforme: 'MT5',
-    profitTargetPct: 10,
-    maxDrawdownPct: 10,
+    // Saisis en $ côté UI, convertis en % avant envoi au backend
+    profitTargetAmount: 5000,
+    maxDrawdownAmount: 5000,
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const size = Number(formData.tailleCompte);
+    // $ → % pour le backend (qui stocke en pourcentage)
+    const profitTargetPct =
+      size > 0 ? (Number(formData.profitTargetAmount) / size) * 100 : 0;
+    const maxDrawdownPct =
+      size > 0 ? (Number(formData.maxDrawdownAmount) / size) * 100 : 0;
     try {
       await createAccount.mutateAsync({
         ...formData,
         propFirm: formData.broker,
-        tailleCompte: Number(formData.tailleCompte),
-        profitTargetPct: Number(formData.profitTargetPct),
-        maxDrawdownPct: Number(formData.maxDrawdownPct),
+        tailleCompte: size,
+        profitTargetPct,
+        maxDrawdownPct,
       });
       addToast('Compte de trading ajouté avec succès !');
       onClose();
@@ -131,25 +138,35 @@ export const AddAccountModal: React.FC<AddAccountModalProps> = ({ isOpen, onClos
           <div className="col-span-2 grid grid-cols-2 gap-4 pt-4 border-t border-border mt-2">
             <div className="col-span-1">
               <label className="block text-[10px] font-bold text-txt-2 uppercase tracking-widest mb-2 flex items-center gap-2">
-                <Target size={12} className="text-win" /> Objectif Profit (%)
+                <Target size={12} className="text-win" /> Objectif Profit ($)
               </label>
-              <input 
-                type="number" 
-                value={formData.profitTargetPct}
-                onChange={(e) => setFormData({...formData, profitTargetPct: Number(e.target.value)})}
-                className="w-full bg-bg border border-border rounded-xl py-3 px-4 focus:border-accent/50 outline-none transition-all font-mono" 
+              <input
+                type="number"
+                value={formData.profitTargetAmount}
+                onChange={(e) => setFormData({...formData, profitTargetAmount: Number(e.target.value)})}
+                className="w-full bg-bg border border-border rounded-xl py-3 px-4 focus:border-accent/50 outline-none transition-all font-mono"
               />
+              {formData.tailleCompte > 0 && formData.profitTargetAmount > 0 && (
+                <p className="mt-1 text-[10px] text-txt-3">
+                  ≈ {((formData.profitTargetAmount / formData.tailleCompte) * 100).toFixed(2)}% du capital
+                </p>
+              )}
             </div>
             <div className="col-span-1">
               <label className="block text-[10px] font-bold text-txt-2 uppercase tracking-widest mb-2 flex items-center gap-2">
-                <AlertTriangle size={12} className="text-loss" /> Max Drawdown (%)
+                <AlertTriangle size={12} className="text-loss" /> Max Drawdown ($)
               </label>
-              <input 
-                type="number" 
-                value={formData.maxDrawdownPct}
-                onChange={(e) => setFormData({...formData, maxDrawdownPct: Number(e.target.value)})}
-                className="w-full bg-bg border border-border rounded-xl py-3 px-4 focus:border-accent/50 outline-none transition-all font-mono" 
+              <input
+                type="number"
+                value={formData.maxDrawdownAmount}
+                onChange={(e) => setFormData({...formData, maxDrawdownAmount: Number(e.target.value)})}
+                className="w-full bg-bg border border-border rounded-xl py-3 px-4 focus:border-accent/50 outline-none transition-all font-mono"
               />
+              {formData.tailleCompte > 0 && formData.maxDrawdownAmount > 0 && (
+                <p className="mt-1 text-[10px] text-txt-3">
+                  ≈ {((formData.maxDrawdownAmount / formData.tailleCompte) * 100).toFixed(2)}% du capital
+                </p>
+              )}
             </div>
           </div>
         )}

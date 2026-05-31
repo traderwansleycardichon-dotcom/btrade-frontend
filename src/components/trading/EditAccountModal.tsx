@@ -29,20 +29,24 @@ export const EditAccountModal: React.FC<Props> = ({ account, isOpen, onClose }) 
     prop_firm: '',
     taille_compte: 0,
     balance_courante: 0,
-    profit_target_pct: 0,
-    max_drawdown_pct: 0,
+    // Saisi en $ côté UI, converti en % côté backend
+    profit_target_amount: 0,
+    max_drawdown_amount: 0,
     statut: 'actif',
   });
 
   useEffect(() => {
     if (!account) return;
+    const size = Number(account.tailleCompte || 0);
+    const ptPct = Number(account.profitTargetPct || 0);
+    const ddPct = Number(account.maxDrawdownPct || 0);
     setForm({
       nom: account.nom || '',
       prop_firm: account.propFirm || '',
-      taille_compte: Number(account.tailleCompte || 0),
+      taille_compte: size,
       balance_courante: Number(account.balanceCourante || 0),
-      profit_target_pct: Number(account.profitTargetPct || 0),
-      max_drawdown_pct: Number(account.maxDrawdownPct || 0),
+      profit_target_amount: size > 0 ? Math.round((size * ptPct) / 100) : 0,
+      max_drawdown_amount: size > 0 ? Math.round((size * ddPct) / 100) : 0,
       statut: account.statut || 'actif',
     });
   }, [account]);
@@ -51,16 +55,26 @@ export const EditAccountModal: React.FC<Props> = ({ account, isOpen, onClose }) 
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const size = Number(form.taille_compte);
+    // $ → % pour le backend (qui stocke en pourcentage)
+    const profitTargetPct =
+      size > 0 && form.profit_target_amount > 0
+        ? (form.profit_target_amount / size) * 100
+        : null;
+    const maxDrawdownPct =
+      size > 0 && form.max_drawdown_amount > 0
+        ? (form.max_drawdown_amount / size) * 100
+        : null;
     try {
       await updateAccount.mutateAsync({
         id: account.id,
         patch: {
           nom: form.nom,
           prop_firm: form.prop_firm || null,
-          taille_compte: Number(form.taille_compte),
+          taille_compte: size,
           balance_courante: Number(form.balance_courante),
-          profit_target_pct: Number(form.profit_target_pct) || null,
-          max_drawdown_pct: Number(form.max_drawdown_pct) || null,
+          profit_target_pct: profitTargetPct,
+          max_drawdown_pct: maxDrawdownPct,
           statut: form.statut,
         },
       });
@@ -161,32 +175,42 @@ export const EditAccountModal: React.FC<Props> = ({ account, isOpen, onClose }) 
 
         <div>
           <label className="block text-[10px] font-bold text-txt-2 uppercase tracking-widest mb-1.5">
-            Profit target (%)
+            Profit target ($)
           </label>
           <input
             type="number"
-            step="0.1"
-            value={form.profit_target_pct}
+            step="1"
+            value={form.profit_target_amount}
             onChange={e =>
-              setForm({ ...form, profit_target_pct: parseFloat(e.target.value) || 0 })
+              setForm({ ...form, profit_target_amount: parseFloat(e.target.value) || 0 })
             }
             className="w-full bg-bg border border-border rounded-lg py-2 px-3 text-xs mono focus:border-accent/50 outline-none"
           />
+          {form.taille_compte > 0 && form.profit_target_amount > 0 && (
+            <p className="mt-1 text-[10px] text-txt-3">
+              ≈ {((form.profit_target_amount / form.taille_compte) * 100).toFixed(2)}% du capital
+            </p>
+          )}
         </div>
 
         <div>
           <label className="block text-[10px] font-bold text-txt-2 uppercase tracking-widest mb-1.5">
-            Max drawdown (%)
+            Max drawdown ($)
           </label>
           <input
             type="number"
-            step="0.1"
-            value={form.max_drawdown_pct}
+            step="1"
+            value={form.max_drawdown_amount}
             onChange={e =>
-              setForm({ ...form, max_drawdown_pct: parseFloat(e.target.value) || 0 })
+              setForm({ ...form, max_drawdown_amount: parseFloat(e.target.value) || 0 })
             }
             className="w-full bg-bg border border-border rounded-lg py-2 px-3 text-xs mono focus:border-accent/50 outline-none"
           />
+          {form.taille_compte > 0 && form.max_drawdown_amount > 0 && (
+            <p className="mt-1 text-[10px] text-txt-3">
+              ≈ {((form.max_drawdown_amount / form.taille_compte) * 100).toFixed(2)}% du capital
+            </p>
+          )}
         </div>
       </form>
     </Modal>
