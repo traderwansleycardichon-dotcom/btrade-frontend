@@ -42,6 +42,8 @@ import { PromoCodesPage } from './pages/admin/promo-codes/PromoCodesPage';
 import LegalPage from './pages/legal/LegalPage';
 
 import UpgradePage from './pages/app/upgrade/page';
+import MessagesPage from './pages/app/messages/page';
+import AdminMessagingPage from './pages/admin/messaging/page';
 
 const queryClient = new QueryClient();
 
@@ -85,6 +87,7 @@ const router = createBrowserRouter([
       { path: '', element: <Navigate to="/admin/dashboard" replace /> },
       { path: 'dashboard', element: <AdminDashboardPage /> },
       { path: 'users', element: <AdminUsersPage /> },
+      { path: 'messaging', element: <AdminMessagingPage /> },
       { path: 'billing', element: <AdminBillingPage /> },
       { path: 'pricing', element: <AdminPricingPage /> },
       { path: 'promo-codes', element: <PromoCodesPage /> },
@@ -120,6 +123,7 @@ const router = createBrowserRouter([
       { path: 'settings', element: <SettingsPage /> },
       { path: 'economic', element: <EconomicPage /> },
       { path: 'ai-chat', element: <AiChatPage /> },
+      { path: 'messages', element: <MessagesPage /> },
     ],
   },
   // Catch-all fallback to redirect any unknown routes to the landing page

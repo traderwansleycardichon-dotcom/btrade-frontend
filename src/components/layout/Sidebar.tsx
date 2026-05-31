@@ -24,7 +24,8 @@ import {
   Target,
   Globe,
   FileText,
-  Lock
+  Lock,
+  MessageSquare
 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { useAccounts } from '../../hooks/useAccounts';
@@ -130,7 +131,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen = false, onMobileCl
     {
       title: 'Système',
       items: [
-        { label: 'Paramètres', icon: Settings, href: '/app/settings' },
+        { label: 'Messages',   icon: MessageSquare, href: '/app/messages' },
+        { label: 'Paramètres', icon: Settings,       href: '/app/settings' },
       ]
     }
   ];

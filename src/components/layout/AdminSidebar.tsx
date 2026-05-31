@@ -13,7 +13,8 @@ import {
   BookOpen,
   Server,
   X,
-  Ticket
+  Ticket,
+  MessageSquare
 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { useQueryClient } from '@tanstack/react-query';
@@ -42,17 +43,18 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
   };
 
   const navItems = [
-    { label: 'Dashboard', icon: LayoutDashboard, href: '/admin/dashboard' },
-    { label: 'Utilisateurs', icon: Users, href: '/admin/users' },
-    { label: 'Finance', icon: CreditCard, href: '/admin/billing' },
-    { label: 'Plans Tarifaires', icon: Ticket, href: '/admin/pricing' },
-    { label: 'Codes Promo', icon: Ticket, href: '/admin/promo-codes' },
-    { label: 'Helpdesk', icon: LifeBuoy, href: '/admin/support' },
-    { label: 'Broadcast', icon: Megaphone, href: '/admin/broadcast' },
-    { label: 'Playbooks', icon: BookOpen, href: '/admin/cms' },
-    { label: 'Légal', icon: Shield, href: '/admin/legal' },
-    { label: 'Système', icon: Server, href: '/admin/system' },
-    { label: 'Paramètres', icon: Settings, href: '/admin/settings' },
+    { label: 'Dashboard',      icon: LayoutDashboard, href: '/admin/dashboard' },
+    { label: 'Utilisateurs',   icon: Users,           href: '/admin/users' },
+    { label: 'Messagerie',     icon: MessageSquare,   href: '/admin/messaging' },
+    { label: 'Finance',        icon: CreditCard,      href: '/admin/billing' },
+    { label: 'Plans Tarifaires',icon: Ticket,         href: '/admin/pricing' },
+    { label: 'Codes Promo',    icon: Ticket,          href: '/admin/promo-codes' },
+    { label: 'Helpdesk',       icon: LifeBuoy,        href: '/admin/support' },
+    { label: 'Broadcast',      icon: Megaphone,       href: '/admin/broadcast' },
+    { label: 'Playbooks',      icon: BookOpen,        href: '/admin/cms' },
+    { label: 'Légal',          icon: Shield,          href: '/admin/legal' },
+    { label: 'Système',        icon: Server,          href: '/admin/system' },
+    { label: 'Paramètres',     icon: Settings,        href: '/admin/settings' },
   ];
 
   return (
