@@ -137,7 +137,11 @@ export const TradeFormModal: React.FC<Props> = ({ accountId, isOpen, onClose, in
         patch.prix_sortie = Number(form.prix_sortie);
       }
       if (form.pl_brut !== '' && !isNaN(Number(form.pl_brut))) {
-        patch.pl_brut = Number(form.pl_brut);
+        // Le signe est forcé par le résultat : loss → négatif, win → positif, BE → 0
+        const abs = Math.abs(Number(form.pl_brut));
+        patch.pl_brut = form.resultat === 'loss' ? -abs
+          : form.resultat === 'breakeven' ? 0
+          : abs;
       }
       if (form.commission !== '' && !isNaN(Number(form.commission))) {
         patch.commission = Number(form.commission);
@@ -174,7 +178,11 @@ export const TradeFormModal: React.FC<Props> = ({ accountId, isOpen, onClose, in
       payload.prix_sortie = Number(form.prix_sortie);
     }
     if (form.pl_brut !== '' && !isNaN(Number(form.pl_brut))) {
-      payload.pl_brut = Number(form.pl_brut);
+      // Le signe est forcé par le résultat : loss → négatif, win → positif, BE → 0
+      const abs = Math.abs(Number(form.pl_brut));
+      payload.pl_brut = form.resultat === 'loss' ? -abs
+        : form.resultat === 'breakeven' ? 0
+        : abs;
     }
     if (form.commission !== '' && !isNaN(Number(form.commission))) {
       payload.commission = Number(form.commission);
@@ -344,33 +352,11 @@ export const TradeFormModal: React.FC<Props> = ({ accountId, isOpen, onClose, in
           </div>
         </FormField>
 
-        {/* PRIX */}
-        <div className="grid grid-cols-2 gap-3">
-          <FormField label="Prix d'entrée" optional>
-            <input
-              type="number"
-              step="any"
-              value={form.prix_entree}
-              onChange={e => setForm({ ...form, prix_entree: e.target.value })}
-              placeholder="1.08240"
-              className="w-full bg-bg border border-border rounded-lg py-2 px-3 text-xs mono focus:border-accent/50 outline-none"
-            />
-          </FormField>
-          <FormField label="Prix de sortie" optional>
-            <input
-              type="number"
-              step="any"
-              value={form.prix_sortie}
-              onChange={e => setForm({ ...form, prix_sortie: e.target.value })}
-              placeholder="1.08512"
-              className="w-full bg-bg border border-border rounded-lg py-2 px-3 text-xs mono focus:border-accent/50 outline-none"
-            />
-          </FormField>
-        </div>
+        {/* PRIX — champs masqués (valeurs préservées côté backend en mode édition) */}
 
         {/* QUANTITÉ + RÉSULTAT */}
         <div className="grid grid-cols-2 gap-3">
-          <FormField label="Quantité (lots)">
+          <FormField label="Quantité (lot ou contrat)">
             <input
               type="number"
               step="0.01"
@@ -413,9 +399,12 @@ export const TradeFormModal: React.FC<Props> = ({ accountId, isOpen, onClose, in
               step="0.01"
               value={form.pl_brut}
               onChange={e => setForm({ ...form, pl_brut: e.target.value })}
-              placeholder="0.00"
+              placeholder="Montant (signe auto selon résultat)"
               className="w-full bg-bg border border-border rounded-lg py-2 px-3 text-xs mono focus:border-accent/50 outline-none"
             />
+            <p className="mt-1 text-[10px] text-txt-3 leading-snug">
+              Pas besoin du signe « − » : si Loss est sélectionné, le montant est compté en perte automatiquement.
+            </p>
           </FormField>
           <FormField label="Commission ($)" optional>
             <input
