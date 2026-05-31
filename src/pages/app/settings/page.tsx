@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { User, Shield, Bell, CreditCard, Globe, LogOut, Camera, ChevronRight, X, Loader2 } from 'lucide-react';
 import { useAuth } from '../../../hooks/useAuth';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -21,6 +22,7 @@ interface NavSection {
 const SettingsPage: React.FC = () => {
   const { user, subscription, logout, refreshUser } = useAuth();
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   
   // États pour les modales
   const [activeModal, setActiveModal] = useState<'profile' | 'password' | 'photo' | null>(null);
@@ -113,6 +115,7 @@ const SettingsPage: React.FC = () => {
         ...((user?.plan === 'pro' && user?.role !== 'admin') ? [
           { label: 'Prochain prélèvement', value: subscription?.currentPeriodEnd ? formatExactDate(subscription.currentPeriodEnd) : 'À venir' },
           { label: 'Mode de paiement', value: '•••• 4242' },
+          { label: 'Gérer mon abonnement', value: 'Mettre à jour / Renouveler', action: () => navigate('/app/upgrade') }
         ] : [])
       ]
     },
