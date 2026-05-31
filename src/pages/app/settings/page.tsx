@@ -97,10 +97,10 @@ const SettingsPage: React.FC = () => {
       items: [
         { 
           label: 'Plan Actuel', 
-          value: user?.plan ? user.plan.toUpperCase() : 'FREE', 
-          badge: user?.plan === 'pro' ? 'PRO' : undefined 
+          value: user?.role === 'admin' ? 'PRO (Privilège Admin)' : (user?.plan ? user.plan.toUpperCase() : 'FREE'), 
+          badge: (user?.plan === 'pro' || user?.role === 'admin') ? 'PRO' : undefined 
         },
-        ...(user?.plan === 'pro' ? [
+        ...((user?.plan === 'pro' && user?.role !== 'admin') ? [
           { label: 'Prochain prélèvement', value: '15 Juin 2026' },
           { label: 'Mode de paiement', value: '•••• 4242' },
         ] : [])
