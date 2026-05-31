@@ -36,6 +36,7 @@ import AdminCmsPage from './pages/admin/cms/page';
 import AdminSystemPage from './pages/admin/system/page';
 import AdminSettingsPage from './pages/admin/settings/page';
 import AdminLegalPage from './pages/admin/legal/AdminLegalPage';
+import { PromoCodesPage } from './pages/admin/promo-codes/PromoCodesPage';
 import LegalPage from './pages/legal/LegalPage';
 
 import UpgradePage from './pages/app/upgrade/page';
@@ -71,6 +72,7 @@ const router = createBrowserRouter([
       { path: 'dashboard', element: <AdminDashboardPage /> },
       { path: 'users', element: <AdminUsersPage /> },
       { path: 'billing', element: <AdminBillingPage /> },
+      { path: 'promo-codes', element: <PromoCodesPage /> },
       { path: 'support', element: <AdminSupportPage /> },
       { path: 'broadcast', element: <AdminBroadcastPage /> },
       { path: 'cms', element: <AdminCmsPage /> },

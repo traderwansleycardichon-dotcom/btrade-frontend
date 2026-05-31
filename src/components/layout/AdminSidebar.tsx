@@ -12,7 +12,8 @@ import {
   Megaphone,
   BookOpen,
   Server,
-  X
+  X,
+  Ticket
 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { clsx, type ClassValue } from 'clsx';
@@ -34,6 +35,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
     { label: 'Dashboard', icon: LayoutDashboard, href: '/admin/dashboard' },
     { label: 'Utilisateurs', icon: Users, href: '/admin/users' },
     { label: 'Finance', icon: CreditCard, href: '/admin/billing' },
+    { label: 'Codes Promo', icon: Ticket, href: '/admin/promo-codes' },
     { label: 'Helpdesk', icon: LifeBuoy, href: '/admin/support' },
     { label: 'Broadcast', icon: Megaphone, href: '/admin/broadcast' },
     { label: 'Playbooks', icon: BookOpen, href: '/admin/cms' },
