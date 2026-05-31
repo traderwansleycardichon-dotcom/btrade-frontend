@@ -4,6 +4,7 @@ import { Sidebar } from './Sidebar';
 import { TopBar } from './TopBar';
 import { useAuth } from '../../hooks/useAuth';
 import { ToastContainer } from '../ui/Toast';
+import { UnreadMessagePopup } from '../messaging/UnreadMessagePopup';
 
 export const AppLayout: React.FC = () => {
   const { isAuthenticated, isLoading, refreshUser } = useAuth();
@@ -61,6 +62,7 @@ export const AppLayout: React.FC = () => {
       </div>
 
       <ToastContainer />
+      <UnreadMessagePopup />
     </div>
   );
 };
