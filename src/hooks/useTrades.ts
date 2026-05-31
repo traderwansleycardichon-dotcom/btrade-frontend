@@ -28,6 +28,18 @@ export const useTrades = (accountId?: string) => {
     },
   });
 
+  const updateTrade = useMutation({
+    mutationFn: async ({ tradeId, patch }: { tradeId: string; patch: any }) => {
+      const { data } = await api.patch(`/api/trades/${tradeId}`, patch);
+      return data.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['trades', accountId] });
+      queryClient.invalidateQueries({ queryKey: ['accounts', accountId, 'stats'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+    },
+  });
+
   const deleteTrade = useMutation({
     mutationFn: async (tradeId: string) => {
       await api.delete(`/api/trades/${tradeId}`);
@@ -43,6 +55,7 @@ export const useTrades = (accountId?: string) => {
     trades: tradesQuery.data || [],
     isLoading: tradesQuery.isLoading,
     createTrade,
+    updateTrade,
     deleteTrade,
   };
 };

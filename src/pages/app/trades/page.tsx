@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
-import { Plus, Trash2, TrendingUp } from 'lucide-react';
+import { Plus, Trash2, TrendingUp, Pencil } from 'lucide-react';
 import { useAccounts } from '../../../hooks/useAccounts';
 import { useTrades } from '../../../hooks/useTrades';
 import { useToast } from '../../../hooks/useToast';
@@ -23,6 +23,7 @@ const TradesPage: React.FC = () => {
 
   const [selectedAccountId, setSelectedAccountId] = useState<string | null>(null);
   const [isAddOpen, setIsAddOpen] = useState(false);
+  const [editTrade, setEditTrade] = useState<any>(null);
   const [filter, setFilter] = useState<'tous' | 'wins' | 'losses' | 'be'>('tous');
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -237,14 +238,23 @@ const TradesPage: React.FC = () => {
                         <span className={`chip ${resChip}`} style={{ fontSize: 10 }}>{resLabel}</span>
                       </td>
                       <td className="px-3 py-2 text-right">
-                        <button
-                          onClick={() => onDelete(t.id, t.instrument)}
-                          disabled={deleteTrade.isPending}
-                          className="p-1 text-txt-2 hover:text-loss transition-colors disabled:opacity-50"
-                          title="Supprimer"
-                        >
-                          <Trash2 size={12} />
-                        </button>
+                        <div className="flex items-center justify-end gap-1">
+                          <button
+                            onClick={() => setEditTrade(t)}
+                            className="p-1 text-txt-2 hover:text-accent transition-colors"
+                            title="Modifier"
+                          >
+                            <Pencil size={12} />
+                          </button>
+                          <button
+                            onClick={() => onDelete(t.id, t.instrument)}
+                            disabled={deleteTrade.isPending}
+                            className="p-1 text-txt-2 hover:text-loss transition-colors disabled:opacity-50"
+                            title="Supprimer"
+                          >
+                            <Trash2 size={12} />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   );
@@ -256,11 +266,19 @@ const TradesPage: React.FC = () => {
       </div>
 
       {activeId && (
-        <TradeFormModal
-          accountId={activeId}
-          isOpen={isAddOpen}
-          onClose={() => setIsAddOpen(false)}
-        />
+        <>
+          <TradeFormModal
+            accountId={activeId}
+            isOpen={isAddOpen}
+            onClose={() => setIsAddOpen(false)}
+          />
+          <TradeFormModal
+            accountId={activeId}
+            isOpen={!!editTrade}
+            onClose={() => setEditTrade(null)}
+            initialTrade={editTrade}
+          />
+        </>
       )}
     </div>
   );

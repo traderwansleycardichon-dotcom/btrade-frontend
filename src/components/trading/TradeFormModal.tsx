@@ -8,10 +8,24 @@ interface Props {
   accountId: string;
   isOpen: boolean;
   onClose: () => void;
+  /** Si fourni, le modal passe en mode "édition" au lieu de "création" */
+  initialTrade?: any;
 }
 
 const todayISO = () => new Date().toISOString().slice(0, 10);
 const nowTime = () => new Date().toTimeString().slice(0, 5);
+
+/** Extrait la date (YYYY-MM-DD) d'une ISO string */
+const isoToDate = (iso?: string | null) => {
+  if (!iso) return '';
+  return new Date(iso).toISOString().slice(0, 10);
+};
+
+/** Extrait l'heure (HH:mm) d'une ISO string */
+const isoToTime = (iso?: string | null) => {
+  if (!iso) return '';
+  return new Date(iso).toTimeString().slice(0, 5);
+};
 
 const INSTRUMENT_SUGGESTIONS = [
   'EURUSD', 'GBPUSD', 'USDJPY', 'XAUUSD', 'NAS100', 'US30',
@@ -37,26 +51,28 @@ const FormField: React.FC<{
   </div>
 );
 
-export const TradeFormModal: React.FC<Props> = ({ accountId, isOpen, onClose }) => {
-  const { createTrade } = useTrades(accountId);
+export const TradeFormModal: React.FC<Props> = ({ accountId, isOpen, onClose, initialTrade }) => {
+  const { createTrade, updateTrade } = useTrades(accountId);
   const { addToast } = useToast();
 
-  const [form, setForm] = useState({
-    instrument: '',
-    direction: 'long' as 'long' | 'short',
-    dateEntree: todayISO(),
-    timeEntree: nowTime(),
-    dateSortie: '',
-    timeSortie: '',
-    prix_entree: '' as string,
-    prix_sortie: '' as string,
-    quantite: 1,
-    pl_brut: '' as string,
-    commission: '' as string,
-    resultat: 'win' as 'win' | 'loss' | 'breakeven',
-    setup: '',
-    note: '',
-    // Analyse technique optionnelle
+  const isEditMode = !!initialTrade;
+
+  const buildInitialForm = (trade?: any) => ({
+    instrument: trade?.instrument || '',
+    direction: (trade?.direction === 'sell' ? 'short' : trade?.direction === 'buy' ? 'long' : trade?.direction) || 'long' as 'long' | 'short',
+    dateEntree: trade ? isoToDate(trade.dateEntree) : todayISO(),
+    timeEntree: trade ? isoToTime(trade.dateEntree) : nowTime(),
+    dateSortie: trade ? isoToDate(trade.dateSortie) : '',
+    timeSortie: trade ? isoToTime(trade.dateSortie) : '',
+    prix_entree: trade?.prixEntree !== null && trade?.prixEntree !== undefined ? String(trade.prixEntree) : '' as string,
+    prix_sortie: trade?.prixSortie !== null && trade?.prixSortie !== undefined ? String(trade.prixSortie) : '' as string,
+    quantite: trade?.quantite ?? 1,
+    pl_brut: trade?.plBrut !== null && trade?.plBrut !== undefined ? String(trade.plBrut) : '' as string,
+    commission: trade?.commission !== null && trade?.commission !== undefined ? String(trade.commission) : '' as string,
+    resultat: trade?.resultat || 'win' as 'win' | 'loss' | 'breakeven',
+    setup: trade?.setup || '',
+    note: trade?.note || '',
+    // Analyse technique optionnelle (uniquement à la création)
     analyse_titre: '',
     analyse_contenu: '',
     analyse_type: 'pre-trade' as 'pre-trade' | 'in-trade' | 'post-trade',
@@ -64,35 +80,18 @@ export const TradeFormModal: React.FC<Props> = ({ accountId, isOpen, onClose }) 
     analyse_biais: '' as '' | 'haussier' | 'baissier' | 'neutre',
     analyse_image_url: '',
   });
+
+  const [form, setForm] = useState(buildInitialForm());
   const [showAnalyse, setShowAnalyse] = useState(false);
 
-  // Reset à chaque ouverture
+  // Reset à chaque ouverture — pré-rempli en mode édition
   useEffect(() => {
     if (isOpen) {
-      setForm(f => ({
-        ...f,
-        instrument: '',
-        prix_entree: '',
-        prix_sortie: '',
-        pl_brut: '',
-        commission: '',
-        setup: '',
-        note: '',
-        quantite: 1,
-        dateEntree: todayISO(),
-        timeEntree: nowTime(),
-        dateSortie: '',
-        timeSortie: '',
-        analyse_titre: '',
-        analyse_contenu: '',
-        analyse_type: 'pre-trade',
-        analyse_timeframe: '',
-        analyse_biais: '',
-        analyse_image_url: '',
-      }));
+      setForm(buildInitialForm(initialTrade));
       setShowAnalyse(false);
     }
-  }, [isOpen]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, initialTrade]);
 
   const setDateQuick = (offsetDays: number) => {
     const d = new Date();
@@ -119,6 +118,43 @@ export const TradeFormModal: React.FC<Props> = ({ accountId, isOpen, onClose }) 
       ? new Date(`${form.dateSortie}T${form.timeSortie || form.timeEntree || '12:00'}:00`).toISOString()
       : null;
 
+    if (isEditMode) {
+      // — Mode ÉDITION — on utilise les clés snake_case que le backend attend
+      const patch: any = {
+        instrument: form.instrument.trim().toUpperCase(),
+        direction: form.direction,
+        date_entree: dateEntreeISO,
+        date_sortie: dateSortieISO,
+        quantite: Number(form.quantite),
+        resultat: form.resultat,
+        setup: form.setup.trim() || null,
+        note: form.note.trim() || null,
+      };
+      if (form.prix_entree !== '' && !isNaN(Number(form.prix_entree))) {
+        patch.prix_entree = Number(form.prix_entree);
+      }
+      if (form.prix_sortie !== '' && !isNaN(Number(form.prix_sortie))) {
+        patch.prix_sortie = Number(form.prix_sortie);
+      }
+      if (form.pl_brut !== '' && !isNaN(Number(form.pl_brut))) {
+        patch.pl_brut = Number(form.pl_brut);
+      }
+      if (form.commission !== '' && !isNaN(Number(form.commission))) {
+        patch.commission = Number(form.commission);
+      }
+
+      try {
+        await updateTrade.mutateAsync({ tradeId: initialTrade.id, patch });
+        addToast('Trade modifié ✓');
+        onClose();
+      } catch (err: any) {
+        const msg = err?.response?.data?.errors?.join(' · ') || 'Erreur modification trade';
+        addToast(msg, 'error');
+      }
+      return;
+    }
+
+    // — Mode CRÉATION —
     const payload: any = {
       instrument: form.instrument.trim().toUpperCase(),
       direction: form.direction,
@@ -164,11 +200,13 @@ export const TradeFormModal: React.FC<Props> = ({ accountId, isOpen, onClose }) 
     }
   };
 
+  const isPending = isEditMode ? updateTrade.isPending : createTrade.isPending;
+
   return (
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="Nouveau trade"
+      title={isEditMode ? `Modifier — ${initialTrade?.instrument || 'Trade'}` : 'Nouveau trade'}
       size="lg"
       footer={
         <div className="flex gap-2 justify-end">
@@ -177,10 +215,12 @@ export const TradeFormModal: React.FC<Props> = ({ accountId, isOpen, onClose }) 
           </button>
           <button
             onClick={submit}
-            disabled={createTrade.isPending}
+            disabled={isPending}
             className="btn-primary text-xs px-4 py-2 rounded-lg disabled:opacity-50"
           >
-            {createTrade.isPending ? 'Création…' : 'Créer le trade'}
+            {isPending
+              ? (isEditMode ? 'Enregistrement…' : 'Création…')
+              : (isEditMode ? 'Enregistrer les modifications' : 'Créer le trade')}
           </button>
         </div>
       }
@@ -414,93 +454,95 @@ export const TradeFormModal: React.FC<Props> = ({ accountId, isOpen, onClose }) 
           />
         </FormField>
 
-        {/* ANALYSE TECHNIQUE OPTIONNELLE */}
-        <div className="pt-3 border-t border-border">
-          <button
-            type="button"
-            onClick={() => setShowAnalyse(!showAnalyse)}
-            className="w-full flex items-center justify-between text-[11px] font-bold uppercase tracking-widest text-txt-2 hover:text-txt"
-          >
-            <span>+ Joindre une analyse technique</span>
-            <span className="text-txt-3">{showAnalyse ? '−' : '+'}</span>
-          </button>
+        {/* ANALYSE TECHNIQUE OPTIONNELLE — uniquement en mode création */}
+        {!isEditMode && (
+          <div className="pt-3 border-t border-border">
+            <button
+              type="button"
+              onClick={() => setShowAnalyse(!showAnalyse)}
+              className="w-full flex items-center justify-between text-[11px] font-bold uppercase tracking-widest text-txt-2 hover:text-txt"
+            >
+              <span>+ Joindre une analyse technique</span>
+              <span className="text-txt-3">{showAnalyse ? '−' : '+'}</span>
+            </button>
 
-          {showAnalyse && (
-            <div className="mt-3 space-y-3 p-3 bg-bg/40 rounded-lg border border-border">
-              <div className="grid grid-cols-2 gap-3">
-                <FormField label="Titre de l'analyse" optional>
-                  <input
-                    value={form.analyse_titre}
-                    onChange={e => setForm({ ...form, analyse_titre: e.target.value })}
-                    placeholder="Setup London Breakout EURUSD"
-                    className="w-full bg-bg border border-border rounded-lg py-2 px-3 text-xs focus:border-accent/50 outline-none"
+            {showAnalyse && (
+              <div className="mt-3 space-y-3 p-3 bg-bg/40 rounded-lg border border-border">
+                <div className="grid grid-cols-2 gap-3">
+                  <FormField label="Titre de l'analyse" optional>
+                    <input
+                      value={form.analyse_titre}
+                      onChange={e => setForm({ ...form, analyse_titre: e.target.value })}
+                      placeholder="Setup London Breakout EURUSD"
+                      className="w-full bg-bg border border-border rounded-lg py-2 px-3 text-xs focus:border-accent/50 outline-none"
+                    />
+                  </FormField>
+                  <FormField label="Type" optional>
+                    <select
+                      value={form.analyse_type}
+                      onChange={e => setForm({ ...form, analyse_type: e.target.value as any })}
+                      className="w-full bg-bg border border-border rounded-lg py-2 px-3 text-xs focus:border-accent/50 outline-none"
+                    >
+                      <option value="pre-trade">Pré-trade</option>
+                      <option value="in-trade">En cours</option>
+                      <option value="post-trade">Post-trade</option>
+                    </select>
+                  </FormField>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <FormField label="Timeframe" optional>
+                    <input
+                      value={form.analyse_timeframe}
+                      onChange={e => setForm({ ...form, analyse_timeframe: e.target.value })}
+                      placeholder="H1, M15, D1…"
+                      className="w-full bg-bg border border-border rounded-lg py-2 px-3 text-xs mono focus:border-accent/50 outline-none"
+                    />
+                  </FormField>
+                  <FormField label="Biais" optional>
+                    <div className="grid grid-cols-3 gap-1">
+                      {(['haussier', 'neutre', 'baissier'] as const).map(b => (
+                        <button
+                          key={b}
+                          type="button"
+                          onClick={() => setForm({ ...form, analyse_biais: form.analyse_biais === b ? '' : b })}
+                          className={`py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider border transition-colors ${
+                            form.analyse_biais === b
+                              ? b === 'haussier' ? 'border-win/40 bg-win/10 text-win'
+                                : b === 'baissier' ? 'border-loss/40 bg-loss/10 text-loss'
+                                : 'border-accent/40 bg-accent/10 text-accent'
+                              : 'border-border bg-bg text-txt-2 hover:text-txt'
+                          }`}
+                        >
+                          {b === 'haussier' ? '↑' : b === 'baissier' ? '↓' : '→'} {b.charAt(0).toUpperCase()}
+                        </button>
+                      ))}
+                    </div>
+                  </FormField>
+                </div>
+
+                <FormField label="Contenu / Plan de trade" optional>
+                  <textarea
+                    rows={4}
+                    value={form.analyse_contenu}
+                    onChange={e => setForm({ ...form, analyse_contenu: e.target.value })}
+                    placeholder="Niveaux clés, zone d'entrée, SL/TP, scénarios…"
+                    className="w-full bg-bg border border-border rounded-lg py-2 px-3 text-xs focus:border-accent/50 outline-none resize-none leading-relaxed"
                   />
                 </FormField>
-                <FormField label="Type" optional>
-                  <select
-                    value={form.analyse_type}
-                    onChange={e => setForm({ ...form, analyse_type: e.target.value as any })}
-                    className="w-full bg-bg border border-border rounded-lg py-2 px-3 text-xs focus:border-accent/50 outline-none"
-                  >
-                    <option value="pre-trade">Pré-trade</option>
-                    <option value="in-trade">En cours</option>
-                    <option value="post-trade">Post-trade</option>
-                  </select>
-                </FormField>
-              </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <FormField label="Timeframe" optional>
+                <FormField label="URL screenshot" optional>
                   <input
-                    value={form.analyse_timeframe}
-                    onChange={e => setForm({ ...form, analyse_timeframe: e.target.value })}
-                    placeholder="H1, M15, D1…"
+                    value={form.analyse_image_url}
+                    onChange={e => setForm({ ...form, analyse_image_url: e.target.value })}
+                    placeholder="https://… (lien TradingView, Imgur, etc.)"
                     className="w-full bg-bg border border-border rounded-lg py-2 px-3 text-xs mono focus:border-accent/50 outline-none"
                   />
                 </FormField>
-                <FormField label="Biais" optional>
-                  <div className="grid grid-cols-3 gap-1">
-                    {(['haussier', 'neutre', 'baissier'] as const).map(b => (
-                      <button
-                        key={b}
-                        type="button"
-                        onClick={() => setForm({ ...form, analyse_biais: form.analyse_biais === b ? '' : b })}
-                        className={`py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider border transition-colors ${
-                          form.analyse_biais === b
-                            ? b === 'haussier' ? 'border-win/40 bg-win/10 text-win'
-                              : b === 'baissier' ? 'border-loss/40 bg-loss/10 text-loss'
-                              : 'border-accent/40 bg-accent/10 text-accent'
-                            : 'border-border bg-bg text-txt-2 hover:text-txt'
-                        }`}
-                      >
-                        {b === 'haussier' ? '↑' : b === 'baissier' ? '↓' : '→'} {b.charAt(0).toUpperCase()}
-                      </button>
-                    ))}
-                  </div>
-                </FormField>
               </div>
-
-              <FormField label="Contenu / Plan de trade" optional>
-                <textarea
-                  rows={4}
-                  value={form.analyse_contenu}
-                  onChange={e => setForm({ ...form, analyse_contenu: e.target.value })}
-                  placeholder="Niveaux clés, zone d'entrée, SL/TP, scénarios…"
-                  className="w-full bg-bg border border-border rounded-lg py-2 px-3 text-xs focus:border-accent/50 outline-none resize-none leading-relaxed"
-                />
-              </FormField>
-
-              <FormField label="URL screenshot" optional>
-                <input
-                  value={form.analyse_image_url}
-                  onChange={e => setForm({ ...form, analyse_image_url: e.target.value })}
-                  placeholder="https://… (lien TradingView, Imgur, etc.)"
-                  className="w-full bg-bg border border-border rounded-lg py-2 px-3 text-xs mono focus:border-accent/50 outline-none"
-                />
-              </FormField>
-            </div>
-          )}
-        </div>
+            )}
+          </div>
+        )}
       </form>
     </Modal>
   );

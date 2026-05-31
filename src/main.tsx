@@ -27,14 +27,15 @@ import SettingsPage from './pages/app/settings/page';
 import './styles/globals.css';
 
 import { AdminLayout } from './components/layout/AdminLayout';
-import AdminDashboardPage from './pages/admin/dashboard/page';
-import AdminUsersPage from './pages/admin/users/page';
-import AdminBillingPage from './pages/admin/billing/page';
-import AdminSupportPage from './pages/admin/support/page';
-import AdminBroadcastPage from './pages/admin/broadcast/page';
-import AdminCmsPage from './pages/admin/cms/page';
-import AdminSystemPage from './pages/admin/system/page';
-import AdminSettingsPage from './pages/admin/settings/page';
+import AdminDashboardPage from "./pages/admin/dashboard/page";
+import AdminUsersPage from "./pages/admin/users/page";
+import AdminBillingPage from "./pages/admin/billing/page";
+import AdminPricingPage from "./pages/admin/pricing/AdminPricingPage";
+import AdminSupportPage from "./pages/admin/support/page";
+import AdminBroadcastPage from "./pages/admin/broadcast/page";
+import AdminCmsPage from "./pages/admin/cms/page";
+import AdminSystemPage from "./pages/admin/system/page";
+import AdminSettingsPage from "./pages/admin/settings/page";
 import AdminLegalPage from './pages/admin/legal/AdminLegalPage';
 import { PromoCodesPage } from './pages/admin/promo-codes/PromoCodesPage';
 import LegalPage from './pages/legal/LegalPage';
@@ -72,6 +73,7 @@ const router = createBrowserRouter([
       { path: 'dashboard', element: <AdminDashboardPage /> },
       { path: 'users', element: <AdminUsersPage /> },
       { path: 'billing', element: <AdminBillingPage /> },
+      { path: 'pricing', element: <AdminPricingPage /> },
       { path: 'promo-codes', element: <PromoCodesPage /> },
       { path: 'support', element: <AdminSupportPage /> },
       { path: 'broadcast', element: <AdminBroadcastPage /> },

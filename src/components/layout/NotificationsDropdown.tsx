@@ -40,7 +40,16 @@ export const NotificationsDropdown: React.FC<NotificationsDropdownProps> = ({ is
     };
   }, [isOpen, onClose]);
 
+  // Réinitialise la notification sélectionnée à chaque fois que le dropdown
+  // s'ouvre ou se ferme — empêche le modal de réapparaître automatiquement
+  useEffect(() => {
+    if (!isOpen) {
+      setSelectedNotif(null);
+    }
+  }, [isOpen]);
+
   if (!isOpen) return null;
+
 
   return (
     <>

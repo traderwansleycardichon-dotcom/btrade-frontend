@@ -33,6 +33,7 @@ import { usePlan } from '../../hooks/usePlan';
 import { Modal } from '../ui/Modal';
 import { Flame, BarChart2 } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
+import { useQueryClient } from '@tanstack/react-query';
 import { twMerge } from 'tailwind-merge';
 import { LucideIcon } from 'lucide-react';
 
@@ -70,6 +71,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen = false, onMobileCl
   const location = useLocation();
   const navigate = useNavigate();
   const { isFree } = usePlan();
+  const queryClient = useQueryClient();
+
+  const handleReturnToAdmin = () => {
+    // Efface le cache pour éviter toute fuite de données entre les contextes
+    queryClient.clear();
+    navigate('/admin/dashboard');
+  };
 
   const [isUpgradeModalOpen, setIsUpgradeModalOpen] = React.useState(false);
   const [selectedFeature, setSelectedFeature] = React.useState('');
@@ -248,12 +256,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen = false, onMobileCl
         </div>
 
         {user?.role === 'admin' && (
-          <NavLink
-            to="/admin/dashboard"
+          <button
+            onClick={handleReturnToAdmin}
             className="w-full flex items-center justify-center gap-2 py-2 mt-2 bg-loss/10 text-loss rounded-lg font-bold hover:bg-loss/20 transition-colors border border-loss/20 text-xs"
           >
             Retour SuperAdmin
-          </NavLink>
+          </button>
         )}
       </div>
       </aside>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, 
   Users, 
@@ -16,6 +16,7 @@ import {
   Ticket
 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
+import { useQueryClient } from '@tanstack/react-query';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -30,11 +31,21 @@ interface AdminSidebarProps {
 
 export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) => {
   const { user, logout } = useAuth();
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+
+  const handleSwitchToClientMode = () => {
+    // Efface tout le cache React Query pour garantir que l'admin
+    // ne voit JAMAIS des données d'un autre utilisateur
+    queryClient.clear();
+    navigate('/app/dashboard');
+  };
 
   const navItems = [
     { label: 'Dashboard', icon: LayoutDashboard, href: '/admin/dashboard' },
     { label: 'Utilisateurs', icon: Users, href: '/admin/users' },
     { label: 'Finance', icon: CreditCard, href: '/admin/billing' },
+    { label: 'Plans Tarifaires', icon: Ticket, href: '/admin/pricing' },
     { label: 'Codes Promo', icon: Ticket, href: '/admin/promo-codes' },
     { label: 'Helpdesk', icon: LifeBuoy, href: '/admin/support' },
     { label: 'Broadcast', icon: Megaphone, href: '/admin/broadcast' },
@@ -99,13 +110,13 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
 
         {/* Mode Client Switch */}
         <div className="px-4 py-2 mt-auto">
-          <NavLink
-            to="/app/dashboard"
+          <button
+            onClick={handleSwitchToClientMode}
             className="w-full flex items-center justify-center gap-2 py-3 bg-accent text-bg rounded-xl font-bold hover:bg-accent-hover transition-colors shadow-lg shadow-accent/20"
           >
             <Activity size={18} />
             Mode Client (Pro)
-          </NavLink>
+          </button>
         </div>
 
         {/* User Profile */}
