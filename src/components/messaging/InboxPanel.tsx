@@ -132,6 +132,12 @@ const ThreadView: React.FC<{
         </div>
       </div>
 
+      {/* Info Banner */}
+      <div className="bg-accent/10 border-b border-accent/20 px-4 py-2 text-[10px] text-accent flex items-center justify-center gap-1.5 shrink-0">
+        <Clock size={12} />
+        <span className="font-medium">Rappel : Les messages sont automatiquement supprimés 5 jours après avoir été lus.</span>
+      </div>
+
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar">
         {isLoading ? (
@@ -417,11 +423,15 @@ export const InboxPanel: React.FC<InboxPanelProps> = ({ availableUsers = [], can
               <MessageSquare size={24} className="text-accent" />
             </div>
             <p className="font-bold text-sm">Sélectionnez une conversation</p>
-            <p className="text-xs text-txt-3 max-w-xs">
+            <p className="text-xs text-txt-3 max-w-xs mb-4">
               {canCompose
                 ? 'Choisissez une conversation à gauche ou créez-en une nouvelle.'
                 : 'Vos échanges avec le support BTrade apparaîtront ici.'}
             </p>
+            <div className="flex items-center gap-1.5 text-[10px] text-accent bg-accent/10 px-3 py-1.5 rounded-lg">
+              <Clock size={12} />
+              <span className="font-medium">Les messages lus sont supprimés après 5 jours.</span>
+            </div>
           </div>
         )}
       </div>
