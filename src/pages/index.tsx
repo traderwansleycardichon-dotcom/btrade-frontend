@@ -10,6 +10,7 @@ import { YoutubeSection } from '../components/landing/YoutubeSection';
 import { PricingSection } from '../components/landing/PricingSection';
 import { FaqSection } from '../components/landing/FaqSection';
 import { useSettings } from '../contexts/SettingsContext';
+import { LineChart } from 'lucide-react';
 
 const LandingPage: React.FC = () => {
   const { settings } = useSettings();
@@ -30,12 +31,21 @@ const LandingPage: React.FC = () => {
       <footer className="relative border-t border-white/[0.06] bg-bg/60 backdrop-blur-xl">
         <div className="mx-auto max-w-6xl px-6 py-14 grid grid-cols-2 md:grid-cols-4 gap-10">
           <div className="col-span-2">
-            <div className="mb-5">
-              <img
-                src={settings?.platform_logo || "/logo.svg"}
-                alt="Behind the Trades — Journal"
-                className="h-16 w-16 rounded-full shadow-[0_0_24px_rgba(243,108,0,0.25)] object-contain"
-              />
+            <div className="mb-5 flex items-center gap-3">
+              {settings?.platform_logo ? (
+                <img
+                  src={settings.platform_logo}
+                  alt="Behind the Trades — Journal"
+                  className="h-12 w-auto object-contain drop-shadow-[0_0_15px_rgba(243,108,0,0.3)]"
+                />
+              ) : (
+                <>
+                  <div className="w-10 h-10 bg-accent rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(243,108,0,0.3)]">
+                     <LineChart size={20} className="text-white" />
+                  </div>
+                  <span className="font-black text-2xl tracking-tighter">BTrade</span>
+                </>
+              )}
             </div>
             <p className="text-[13px] text-white/45 max-w-sm leading-relaxed">
               Le journal de trading qui pense comme un pro. Le trading comporte
