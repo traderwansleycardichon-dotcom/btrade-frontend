@@ -1,11 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import DatePicker, { registerLocale } from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { fr } from 'date-fns/locale';
 import { Modal } from '../ui/Modal';
 import { useTrades } from '../../hooks/useTrades';
 import { useToast } from '../../hooks/useToast';
-import { TrendingUp, TrendingDown } from 'lucide-react';
+import {
+  TrendingUp, TrendingDown, Search,
+  DollarSign, BarChart3, Gem, Bitcoin, LineChart, Activity, Fuel, Landmark,
+  type LucideIcon,
+} from 'lucide-react';
 
 registerLocale('fr', fr);
 
@@ -24,24 +28,267 @@ const isoToDate = (iso?: string | null): Date | null => {
   return isNaN(d.getTime()) ? null : d;
 };
 
-const INSTRUMENT_SUGGESTIONS = [
-  // Forex majors
-  'EURUSD', 'GBPUSD', 'USDJPY', 'USDCAD', 'AUDUSD', 'USDCHF', 'NZDUSD',
-  // Indices CFD
-  'NAS100', 'US30', 'SPX500', 'GER40', 'UK100',
-  // Metals & energy
-  'XAUUSD', 'XAGUSD', 'WTI', 'BRENT',
-  // Crypto
-  'BTCUSD', 'ETHUSD', 'SOLUSD',
-  // Futures — E-minis (CME)
-  'ES', 'NQ', 'YM', 'RTY',
-  // Futures — Micros (CME)
-  'MES', 'MNQ', 'MYM', 'M2K',
-  // Futures — Commodities
-  'CL', 'MCL', 'NG', 'GC', 'MGC', 'SI', 'SIL',
-  // Futures — Bonds / Rates
-  'ZB', 'ZN', 'ZF', 'ZT',
+type InstrumentGroup = {
+  label: string;
+  Icon: LucideIcon;
+  /** Couleur tailwind text-* pour l'icône & le badge */
+  accent: string;
+  symbols: Array<{ symbol: string; name: string }>;
+};
+
+const INSTRUMENT_GROUPS: InstrumentGroup[] = [
+  {
+    label: 'Forex',
+    Icon: DollarSign,
+    accent: 'text-blue-400',
+    symbols: [
+      { symbol: 'EURUSD', name: 'Euro / Dollar' },
+      { symbol: 'GBPUSD', name: 'Livre / Dollar' },
+      { symbol: 'USDJPY', name: 'Dollar / Yen' },
+      { symbol: 'USDCAD', name: 'Dollar / Dollar canadien' },
+      { symbol: 'AUDUSD', name: 'Dollar australien / Dollar' },
+      { symbol: 'USDCHF', name: 'Dollar / Franc suisse' },
+      { symbol: 'NZDUSD', name: 'Dollar NZ / Dollar' },
+    ],
+  },
+  {
+    label: 'Indices CFD',
+    Icon: BarChart3,
+    accent: 'text-accent',
+    symbols: [
+      { symbol: 'NAS100', name: 'Nasdaq 100' },
+      { symbol: 'US30', name: 'Dow Jones' },
+      { symbol: 'SPX500', name: 'S&P 500' },
+      { symbol: 'GER40', name: 'DAX 40' },
+      { symbol: 'UK100', name: 'FTSE 100' },
+    ],
+  },
+  {
+    label: 'Métaux & énergie',
+    Icon: Gem,
+    accent: 'text-amber-400',
+    symbols: [
+      { symbol: 'XAUUSD', name: 'Or' },
+      { symbol: 'XAGUSD', name: 'Argent' },
+      { symbol: 'WTI', name: 'Pétrole WTI' },
+      { symbol: 'BRENT', name: 'Pétrole Brent' },
+    ],
+  },
+  {
+    label: 'Crypto',
+    Icon: Bitcoin,
+    accent: 'text-orange-400',
+    symbols: [
+      { symbol: 'BTCUSD', name: 'Bitcoin' },
+      { symbol: 'ETHUSD', name: 'Ethereum' },
+      { symbol: 'SOLUSD', name: 'Solana' },
+    ],
+  },
+  {
+    label: 'Futures E-mini (CME)',
+    Icon: LineChart,
+    accent: 'text-emerald-400',
+    symbols: [
+      { symbol: 'ES', name: 'E-mini S&P 500' },
+      { symbol: 'NQ', name: 'E-mini Nasdaq 100' },
+      { symbol: 'YM', name: 'E-mini Dow' },
+      { symbol: 'RTY', name: 'E-mini Russell 2000' },
+    ],
+  },
+  {
+    label: 'Futures Micros (CME)',
+    Icon: Activity,
+    accent: 'text-teal-400',
+    symbols: [
+      { symbol: 'MES', name: 'Micro S&P 500' },
+      { symbol: 'MNQ', name: 'Micro Nasdaq 100' },
+      { symbol: 'MYM', name: 'Micro Dow' },
+      { symbol: 'M2K', name: 'Micro Russell 2000' },
+    ],
+  },
+  {
+    label: 'Futures matières premières',
+    Icon: Fuel,
+    accent: 'text-red-400',
+    symbols: [
+      { symbol: 'CL', name: 'Crude Oil' },
+      { symbol: 'MCL', name: 'Micro Crude Oil' },
+      { symbol: 'NG', name: 'Natural Gas' },
+      { symbol: 'GC', name: 'Gold' },
+      { symbol: 'MGC', name: 'Micro Gold' },
+      { symbol: 'SI', name: 'Silver' },
+      { symbol: 'SIL', name: 'Micro Silver' },
+    ],
+  },
+  {
+    label: 'Futures obligations',
+    Icon: Landmark,
+    accent: 'text-purple-400',
+    symbols: [
+      { symbol: 'ZB', name: '30Y T-Bond' },
+      { symbol: 'ZN', name: '10Y T-Note' },
+      { symbol: 'ZF', name: '5Y T-Note' },
+      { symbol: 'ZT', name: '2Y T-Note' },
+    ],
+  },
 ];
+
+/* Dropdown custom — remplace <datalist> natif, thème dark cohérent */
+const InstrumentPicker: React.FC<{
+  value: string;
+  onChange: (v: string) => void;
+}> = ({ value, onChange }) => {
+  const [open, setOpen] = useState(false);
+  const [highlight, setHighlight] = useState(0);
+  const wrapRef = useRef<HTMLDivElement>(null);
+
+  // Liste filtrée à plat avec leur groupe parent (pour les headers)
+  const filtered = useMemo(() => {
+    const q = value.trim().toUpperCase();
+    type Row =
+      | { kind: 'header'; group: InstrumentGroup }
+      | { kind: 'item'; group: InstrumentGroup; symbol: string; name: string };
+    const rows: Row[] = [];
+    INSTRUMENT_GROUPS.forEach(g => {
+      const matches = g.symbols.filter(s =>
+        !q ||
+        s.symbol.includes(q) ||
+        s.name.toUpperCase().includes(q)
+      );
+      if (matches.length === 0) return;
+      rows.push({ kind: 'header', group: g });
+      matches.forEach(m => rows.push({ kind: 'item', group: g, symbol: m.symbol, name: m.name }));
+    });
+    return rows;
+  }, [value]);
+
+  // Indices des items réellement sélectionnables (skip headers)
+  const itemIndices = useMemo(
+    () => filtered.flatMap((r, i) => (r.kind === 'item' ? [i] : [])),
+    [filtered]
+  );
+
+  // Fermeture au clic extérieur
+  useEffect(() => {
+    if (!open) return;
+    const onDown = (e: MouseEvent) => {
+      if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener('mousedown', onDown);
+    return () => document.removeEventListener('mousedown', onDown);
+  }, [open]);
+
+  // Reset highlight quand la liste change
+  useEffect(() => { setHighlight(0); }, [value]);
+
+  const selectAt = (rowIdx: number) => {
+    const row = filtered[rowIdx];
+    if (row && row.kind === 'item') {
+      onChange(row.symbol);
+      setOpen(false);
+    }
+  };
+
+  const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!open && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) {
+      setOpen(true);
+      e.preventDefault();
+      return;
+    }
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      const pos = itemIndices.indexOf(highlight);
+      const next = pos < 0 || pos >= itemIndices.length - 1 ? itemIndices[0] : itemIndices[pos + 1];
+      if (next !== undefined) setHighlight(next);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      const pos = itemIndices.indexOf(highlight);
+      const prev = pos <= 0 ? itemIndices[itemIndices.length - 1] : itemIndices[pos - 1];
+      if (prev !== undefined) setHighlight(prev);
+    } else if (e.key === 'Enter') {
+      if (open && itemIndices.length > 0) {
+        e.preventDefault();
+        selectAt(highlight);
+      }
+    } else if (e.key === 'Escape') {
+      setOpen(false);
+    }
+  };
+
+  // Trouve la catégorie du symbol courant (pour le badge à côté de l'input)
+  const currentMatch = useMemo(() => {
+    const v = value.trim().toUpperCase();
+    for (const g of INSTRUMENT_GROUPS) {
+      const m = g.symbols.find(s => s.symbol === v);
+      if (m) return { group: g, name: m.name };
+    }
+    return null;
+  }, [value]);
+
+  return (
+    <div className="relative" ref={wrapRef}>
+      <div className="relative">
+        <input
+          required
+          value={value}
+          onChange={e => { onChange(e.target.value.toUpperCase()); setOpen(true); }}
+          onFocus={() => setOpen(true)}
+          onKeyDown={onKeyDown}
+          placeholder="EURUSD, NQ, MES…"
+          autoFocus
+          autoComplete="off"
+          spellCheck={false}
+          className="w-full bg-bg border border-border rounded-lg py-2 pl-9 pr-3 text-sm mono uppercase focus:border-accent/50 outline-none"
+        />
+        <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-txt-3 pointer-events-none" />
+        {currentMatch && (
+          <span className={`absolute right-2 top-1/2 -translate-y-1/2 text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-elevated ${currentMatch.group.accent}`}>
+            {currentMatch.group.label}
+          </span>
+        )}
+      </div>
+
+      {open && (
+        <div
+          className="absolute z-50 left-0 right-0 mt-1.5 max-h-[280px] overflow-y-auto rounded-xl border border-border bg-elevated shadow-2xl shadow-black/40"
+        >
+          {filtered.length === 0 ? (
+            <div className="px-3 py-4 text-center text-[11px] text-txt-3">
+              Pas de correspondance — appuie sur <span className="text-txt-2 mono">Entrée</span> pour utiliser « {value} »
+            </div>
+          ) : (
+            filtered.map((row, i) =>
+              row.kind === 'header' ? (
+                <div
+                  key={`h-${i}`}
+                  className="px-3 pt-2.5 pb-1 sticky top-0 bg-elevated/95 backdrop-blur-sm flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-widest text-txt-3 border-b border-border/60"
+                >
+                  <row.group.Icon size={10} className={row.group.accent} />
+                  {row.group.label}
+                </div>
+              ) : (
+                <button
+                  key={`i-${i}`}
+                  type="button"
+                  onMouseDown={e => { e.preventDefault(); selectAt(i); }}
+                  onMouseEnter={() => setHighlight(i)}
+                  className={`w-full flex items-center justify-between gap-3 px-3 py-1.5 text-left transition-colors ${
+                    highlight === i ? 'bg-bg/70' : 'hover:bg-bg/40'
+                  }`}
+                >
+                  <span className="font-mono text-[12px] font-bold tracking-wide text-txt">
+                    {row.symbol}
+                  </span>
+                  <span className="text-[10px] text-txt-3 truncate">{row.name}</span>
+                </button>
+              )
+            )
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
 
 const SETUP_SUGGESTIONS = [
   'London Breakout', 'NY Reversal', 'Pullback Trend', 'Range Fade',
@@ -236,18 +483,10 @@ export const TradeFormModal: React.FC<Props> = ({ accountId, isOpen, onClose, in
         <div className="grid grid-cols-3 gap-3">
           <div className="col-span-2">
             <FormField label="Instrument">
-              <input
-                required
-                list="instrument-list"
+              <InstrumentPicker
                 value={form.instrument}
-                onChange={e => setForm({ ...form, instrument: e.target.value })}
-                placeholder="EURUSD, XAUUSD, NAS100…"
-                className="w-full bg-bg border border-border rounded-lg py-2 px-3 text-sm mono uppercase focus:border-accent/50 outline-none"
-                autoFocus
+                onChange={(v) => setForm({ ...form, instrument: v })}
               />
-              <datalist id="instrument-list">
-                {INSTRUMENT_SUGGESTIONS.map(s => <option key={s} value={s} />)}
-              </datalist>
             </FormField>
           </div>
 
