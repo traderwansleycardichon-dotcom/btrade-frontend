@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { Upload, X, Loader2, Image as ImageIcon } from 'lucide-react';
-import api from '../../../lib/api';
-import { useToast } from '../../../hooks/useToast';
+import api from '../../lib/api';
+import { useToast } from '../../hooks/useToast';
 
 interface ImageUploadProps {
   value: string;
