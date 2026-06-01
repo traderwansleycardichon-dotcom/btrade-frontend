@@ -5,7 +5,7 @@ import { fr } from 'date-fns/locale';
 import { Modal } from '../ui/Modal';
 import { useTrades } from '../../hooks/useTrades';
 import { useToast } from '../../hooks/useToast';
-import { TrendingUp, TrendingDown, Calendar } from 'lucide-react';
+import { TrendingUp, TrendingDown } from 'lucide-react';
 
 registerLocale('fr', fr);
 
@@ -87,17 +87,6 @@ export const TradeFormModal: React.FC<Props> = ({ accountId, isOpen, onClose, in
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, initialTrade]);
-
-  const setDateQuick = (offsetDays: number) => {
-    setForm(f => {
-      // Garde l'heure courante du picker si dispo, sinon prend l'heure actuelle.
-      const ref = f.datetimeEntree || new Date();
-      const d = new Date();
-      d.setDate(d.getDate() + offsetDays);
-      d.setHours(ref.getHours(), ref.getMinutes(), 0, 0);
-      return { ...f, datetimeEntree: d };
-    });
-  };
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -276,84 +265,42 @@ export const TradeFormModal: React.FC<Props> = ({ accountId, isOpen, onClose, in
           </FormField>
         </div>
 
-        {/* DATE & HEURE D'ENTRÉE + RACCOURCIS */}
-        <div className="grid grid-cols-3 gap-3 items-end">
-          <div className="col-span-2">
-            <FormField label="Date & heure d'entrée">
-              <div className="relative">
-                <DatePicker
-                  selected={form.datetimeEntree}
-                  onChange={(date: Date | null) => setForm({ ...form, datetimeEntree: date })}
-                  showTimeSelect
-                  timeFormat="HH:mm"
-                  timeIntervals={15}
-                  dateFormat="dd/MM/yyyy · HH:mm"
-                  locale="fr"
-                  timeCaption="Heure"
-                  required
-                  className="legacy-datepicker-input"
-                  popperPlacement="bottom-start"
-                  showPopperArrow={false}
-                />
-                <Calendar size={12} className="absolute right-3 top-1/2 -translate-y-1/2 text-txt-3 pointer-events-none" />
-              </div>
-            </FormField>
-          </div>
-          <div>
-            <div className="flex gap-1 flex-wrap">
-              <button
-                type="button"
-                onClick={() => setDateQuick(0)}
-                className="filter-pill"
-                style={{ fontSize: 10 }}
-              >
-                Aujourd'hui
-              </button>
-              <button
-                type="button"
-                onClick={() => setDateQuick(-1)}
-                className="filter-pill"
-                style={{ fontSize: 10 }}
-              >
-                Hier
-              </button>
-            </div>
-          </div>
-        </div>
+        {/* DATE & HEURE D'ENTRÉE */}
+        <FormField label="Date & heure d'entrée">
+          <DatePicker
+            selected={form.datetimeEntree}
+            onChange={(date: Date | null) => setForm({ ...form, datetimeEntree: date })}
+            showTimeSelect
+            timeFormat="HH:mm"
+            timeIntervals={15}
+            dateFormat="dd/MM/yyyy · HH:mm"
+            locale="fr"
+            timeCaption="Heure"
+            required
+            className="legacy-datepicker-input"
+            popperPlacement="bottom-start"
+            showPopperArrow={false}
+          />
+        </FormField>
 
         {/* DATE & HEURE DE SORTIE */}
         <FormField label="Date & heure de sortie" optional>
-          <div className="flex gap-2 items-center">
-            <div className="relative flex-1">
-              <DatePicker
-                selected={form.datetimeSortie}
-                onChange={(date: Date | null) => setForm({ ...form, datetimeSortie: date })}
-                showTimeSelect
-                timeFormat="HH:mm"
-                timeIntervals={15}
-                dateFormat="dd/MM/yyyy · HH:mm"
-                locale="fr"
-                timeCaption="Heure"
-                minDate={form.datetimeEntree || undefined}
-                placeholderText="jj/mm/aaaa · hh:mm"
-                isClearable={false}
-                className="legacy-datepicker-input"
-                popperPlacement="bottom-start"
-                showPopperArrow={false}
-              />
-              <Calendar size={12} className="absolute right-3 top-1/2 -translate-y-1/2 text-txt-3 pointer-events-none" />
-            </div>
-            {form.datetimeSortie && (
-              <button
-                type="button"
-                onClick={() => setForm({ ...form, datetimeSortie: null })}
-                className="text-[10px] text-txt-3 hover:text-loss px-2"
-                title="Vider"
-              >
-                Effacer
-              </button>
-            )}
-          </div>
+          <DatePicker
+            selected={form.datetimeSortie}
+            onChange={(date: Date | null) => setForm({ ...form, datetimeSortie: date })}
+            showTimeSelect
+            timeFormat="HH:mm"
+            timeIntervals={15}
+            dateFormat="dd/MM/yyyy · HH:mm"
+            locale="fr"
+            timeCaption="Heure"
+            minDate={form.datetimeEntree || undefined}
+            placeholderText="jj/mm/aaaa · hh:mm"
+            isClearable
+            className="legacy-datepicker-input"
+            popperPlacement="bottom-start"
+            showPopperArrow={false}
+          />
         </FormField>
 
         {/* PRIX — champs masqués (valeurs préservées côté backend en mode édition) */}
