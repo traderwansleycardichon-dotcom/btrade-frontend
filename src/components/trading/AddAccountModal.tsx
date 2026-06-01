@@ -53,7 +53,7 @@ export const AddAccountModal: React.FC<AddAccountModalProps> = ({ isOpen, onClos
       isOpen={isOpen} 
       onClose={onClose} 
       title="Ajouter un compte de trading"
-        animationData={addIcon}
+      animationData={addIcon}
       footer={
         <div className="flex gap-3 justify-end">
           <button onClick={onClose} className="btn-ghost">Annuler</button>

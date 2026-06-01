@@ -43,7 +43,7 @@ export const AddPayoutModal: React.FC<AddPayoutModalProps> = ({ isOpen, onClose,
       isOpen={isOpen} 
       onClose={onClose} 
       title="Demander un Retrait (Payout)"
-        animationData={moneyIcon}
+      animationData={moneyIcon}
       footer={
         <div className="flex gap-3 justify-end">
           <button onClick={onClose} className="btn-ghost">Annuler</button>

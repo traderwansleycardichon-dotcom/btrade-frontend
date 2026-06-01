@@ -91,7 +91,7 @@ export const EditAccountModal: React.FC<Props> = ({ account, isOpen, onClose }) 
       isOpen={isOpen}
       onClose={onClose}
       title="Modifier le compte"
-        animationData={editIcon}
+      animationData={editIcon}
       footer={
         <div className="flex gap-2 justify-end">
           <button onClick={onClose} className="btn-ghost text-xs px-3 py-2 rounded-lg">

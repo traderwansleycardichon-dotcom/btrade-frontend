@@ -11,7 +11,8 @@ interface ModalProps {
   children: React.ReactNode;
   footer?: React.ReactNode;
   size?: 'sm' | 'md' | 'lg' | 'xl';
-  animationData?: any;
+  animationData?: object;
+  preventClose?: boolean;
 }
 
 export const Modal: React.FC<ModalProps> = ({
@@ -22,6 +23,7 @@ export const Modal: React.FC<ModalProps> = ({
   footer,
   size = 'md',
   animationData,
+  preventClose = false,
 }) => {
   useEffect(() => {
     if (isOpen) {
@@ -47,7 +49,7 @@ export const Modal: React.FC<ModalProps> = ({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={onClose}
+            onClick={preventClose ? undefined : onClose}
             className="absolute inset-0 bg-bg/80 backdrop-blur-sm"
           />
           <motion.div
@@ -67,7 +69,8 @@ export const Modal: React.FC<ModalProps> = ({
               </div>
               <button
                 onClick={onClose}
-                className="p-1 hover:bg-elevated rounded-lg transition-colors text-txt-2 hover:text-txt"
+                disabled={preventClose}
+                className="p-1 hover:bg-elevated rounded-lg transition-colors text-txt-2 hover:text-txt disabled:opacity-30 disabled:cursor-not-allowed"
               >
                 <X size={20} />
               </button>

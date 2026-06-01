@@ -26,6 +26,7 @@ export const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
       onClose={onClose}
       title="Confirmer la suppression"
       size="sm"
+      preventClose={isLoading}
       footer={
         <div className="flex gap-3 justify-end">
           <button

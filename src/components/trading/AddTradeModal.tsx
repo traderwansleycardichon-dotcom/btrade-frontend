@@ -50,7 +50,7 @@ export const AddTradeModal: React.FC<AddTradeModalProps> = ({ isOpen, onClose, a
       isOpen={isOpen} 
       onClose={onClose} 
       title="Enregistrer un nouveau trade"
-        animationData={chartUpIcon}
+      animationData={chartUpIcon}
       footer={
         <div className="flex gap-3 justify-end">
           <button onClick={onClose} className="btn-ghost">Annuler</button>

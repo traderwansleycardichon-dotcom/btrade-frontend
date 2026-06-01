@@ -53,7 +53,7 @@ export const ImportTradesModal: React.FC<ImportTradesModalProps> = ({ isOpen, on
       isOpen={isOpen} 
       onClose={onClose} 
       title="Importer un historique de trades"
-        animationData={barChartIcon}
+      animationData={barChartIcon}
       footer={
         <div className="flex gap-3 justify-end">
           <button onClick={onClose} className="btn-ghost" disabled={isUploading}>Annuler</button>

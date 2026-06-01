@@ -52,7 +52,7 @@ export const AddPsychologyModal: React.FC<AddPsychologyModalProps> = ({ isOpen, 
       isOpen={isOpen} 
       onClose={onClose} 
       title="Nouveau Suivi Psychologique"
-        animationData={brainIcon}
+      animationData={brainIcon}
       footer={
         <div className="flex gap-3 justify-end">
           <button type="button" onClick={onClose} className="btn-ghost">Annuler</button>
