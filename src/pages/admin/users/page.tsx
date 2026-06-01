@@ -22,6 +22,7 @@ export default function AdminUsersPage() {
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState<any>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   
   const { addToast } = useToast();
 
@@ -56,6 +57,7 @@ export default function AdminUsersPage() {
 
   const handleDeleteUser = async () => {
     if (!userToDelete) return;
+    setIsDeleting(true);
     try {
       await api.delete(`/api/admin/users/${userToDelete.id}`);
       addToast('Utilisateur supprimé avec succès.', 'success');
@@ -64,6 +66,8 @@ export default function AdminUsersPage() {
       fetchUsers();
     } catch (err: any) {
       addToast(err.response?.data?.error || 'Erreur lors de la suppression de l\'utilisateur.', 'error');
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -216,6 +220,7 @@ export default function AdminUsersPage() {
         onConfirm={handleDeleteUser}
         userName={userToDelete?.fullName || ''}
         userEmail={userToDelete?.email || ''}
+        isLoading={isDeleting}
       />
     </div>
   );
