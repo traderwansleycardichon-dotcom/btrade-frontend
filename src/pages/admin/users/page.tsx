@@ -101,8 +101,12 @@ export default function AdminUsersPage() {
                   <tr key={user.id} className="hover:bg-surface/50 transition-colors">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center font-bold text-accent">
-                          {user.fullName ? user.fullName.charAt(0) : user.email.charAt(0).toUpperCase()}
+                        <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center font-bold text-accent overflow-hidden border border-accent/20">
+                          {user.avatarUrl ? (
+                            <img src={user.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                          ) : (
+                            user.fullName ? user.fullName.charAt(0) : user.email.charAt(0).toUpperCase()
+                          )}
                         </div>
                         <div>
                           <div className="font-bold">{user.fullName || 'Non défini'}</div>

@@ -95,8 +95,12 @@ export const TicketThreadModal: React.FC<TicketThreadModalProps> = ({
           <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-surface/30">
             {/* Original Message */}
             <div className="flex gap-4">
-              <div className="w-10 h-10 rounded-full bg-surface border border-border flex items-center justify-center flex-shrink-0 text-txt-3">
-                <User size={20} />
+              <div className="w-10 h-10 rounded-full bg-accent/20 text-accent flex items-center justify-center shrink-0 overflow-hidden border border-accent/20">
+                {ticket.user?.avatarUrl ? (
+                  <img src={ticket.user.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                ) : (
+                  <User size={20} />
+                )}
               </div>
               <div className="flex-1 bg-surface border border-border rounded-2xl rounded-tl-none p-4 shadow-sm">
                 <div className="flex justify-between items-center mb-2">
@@ -120,13 +124,17 @@ export const TicketThreadModal: React.FC<TicketThreadModalProps> = ({
               
               return (
                 <div key={reply.id} className={`flex gap-4 ${isMine ? 'flex-row-reverse' : ''}`}>
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 border ${
-                    reply.isAdmin 
-                      ? 'bg-loss/10 border-loss/20 text-loss' 
-                      : 'bg-surface border-border text-txt-3'
-                  }`}>
-                    {reply.isAdmin ? <ShieldAlert size={18} /> : <User size={20} />}
-                  </div>
+                  {!isMine && (
+                    <div className="w-8 h-8 rounded-full bg-accent/20 text-accent flex items-center justify-center shrink-0 mt-2 overflow-hidden border border-accent/20">
+                      {reply.isAdmin ? (
+                        <ShieldAlert size={16} />
+                      ) : ticket.user?.avatarUrl ? (
+                        <img src={ticket.user.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                      ) : (
+                        <User size={16} />
+                      )}
+                    </div>
+                  )}
                   <div className={`flex-1 rounded-2xl p-4 shadow-sm max-w-[85%] ${
                     isMine 
                       ? 'bg-accent/10 border border-accent/20 rounded-tr-none text-accent-content' 

@@ -123,8 +123,8 @@ const ThreadView: React.FC<{
         >
           <ArrowLeft size={16} />
         </button>
-        <div className="w-8 h-8 rounded-full bg-accent/15 border border-accent/30 flex items-center justify-center shrink-0">
-          <span className="text-xs font-black text-accent">{otherName.charAt(0).toUpperCase()}</span>
+        <div className="w-8 h-8 rounded-full bg-accent/15 border border-accent/30 flex items-center justify-center shrink-0 overflow-hidden">
+          {avatar({ fullName: otherName, email: otherName, avatarUrl: t.user?.avatarUrl })}
         </div>
         <div>
           <p className="text-sm font-bold leading-none">{otherName}</p>

@@ -57,8 +57,12 @@ export const EditPlanModal: React.FC<EditPlanModalProps> = ({ isOpen, onClose, u
     >
       <div className="space-y-6">
         <div className="text-center">
-          <div className="w-12 h-12 rounded-full bg-surface flex items-center justify-center font-bold text-lg mx-auto mb-3">
-            {user.fullName ? user.fullName.charAt(0) : user.email.charAt(0).toUpperCase()}
+          <div className="w-12 h-12 rounded-full bg-surface flex items-center justify-center font-bold text-lg mx-auto mb-3 overflow-hidden border border-border/10">
+            {user.avatarUrl ? (
+              <img src={user.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+            ) : (
+              user.fullName ? user.fullName.charAt(0) : user.email.charAt(0).toUpperCase()
+            )}
           </div>
           <div className="font-bold text-txt">{user.fullName || 'Utilisateur'}</div>
           <div className="text-xs text-txt-2">{user.email}</div>
