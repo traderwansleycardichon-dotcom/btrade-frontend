@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Modal } from './../ui/Modal';
+import { Modal } from '../ui/Modal';
 import { Send, Clock, User, ShieldAlert } from 'lucide-react';
-import api from '../../../lib/api';
-import { useToast } from '../../../hooks/useToast';
+import api from '../../lib/api';
+import { useToast } from '../../hooks/useToast';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
