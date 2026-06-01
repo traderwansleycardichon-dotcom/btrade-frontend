@@ -285,6 +285,80 @@ export default function AdminSettingsPage() {
                     />
                   </div>
                 </div>
+
+                <div className="pt-6 border-t border-border/40">
+                  <label className="block text-[10px] font-bold text-txt-3 uppercase tracking-widest mb-2">Logo du certificat</label>
+                  <p className="text-xs text-txt-2 mb-4">Logo officiel qui sera affiché sur les certificats de réussite de l'Academy (PNG, JPG).</p>
+                  
+                  <div className="max-w-xs">
+                    <ImageUpload
+                      label="Upload Logo Certificat"
+                      value={settings?.certificate_logo || ''}
+                      onChange={async (url) => {
+                        try {
+                          await api.patch('/api/settings', { certificate_logo: url });
+                          await refreshSettings();
+                          addToast('Logo du certificat mis à jour', 'success');
+                        } catch (err) {
+                          addToast('Erreur lors de la mise à jour', 'error');
+                        }
+                      }}
+                    />
+                  </div>
+                </div>
+
+                <div className="pt-6 border-t border-border/40">
+                  <label className="block text-[10px] font-bold text-txt-3 uppercase tracking-widest mb-2">Signature du certificat (Image)</label>
+                  <p className="text-xs text-txt-2 mb-4">Signature officielle de l'administrateur qui sera affichée sur les certificats (PNG transparent recommandé).</p>
+                  
+                  <div className="max-w-xs">
+                    <ImageUpload
+                      label="Upload Signature"
+                      value={settings?.certificate_signature_image || ''}
+                      onChange={async (url) => {
+                        try {
+                          await api.patch('/api/settings', { certificate_signature_image: url });
+                          await refreshSettings();
+                          addToast('Signature du certificat mise à jour', 'success');
+                        } catch (err) {
+                          addToast('Erreur lors de la mise à jour', 'error');
+                        }
+                      }}
+                    />
+                  </div>
+                </div>
+
+                <div className="pt-6 border-t border-border/40 space-y-3">
+                  <div>
+                    <label className="block text-[10px] font-bold text-txt-3 uppercase tracking-widest mb-2">Nom du signataire / Rôle</label>
+                    <p className="text-xs text-txt-2 mb-2">Le nom et rôle de l'administrateur qui apparaîtront sous la signature du certificat.</p>
+                    
+                    <div className="flex gap-3 max-w-md">
+                      <input 
+                        type="text" 
+                        defaultValue={settings?.certificate_signer_name || ''}
+                        id="certificate_signer_name_input"
+                        placeholder="Ex: Frantzley Adolphe, Fondateur BTrade"
+                        className="flex-1 bg-elevated border border-border rounded-xl px-4 py-2.5 text-xs focus:border-loss/50 outline-none transition-all text-txt"
+                      />
+                      <button
+                        onClick={async () => {
+                          const val = (document.getElementById('certificate_signer_name_input') as HTMLInputElement)?.value;
+                          try {
+                            await api.patch('/api/settings', { certificate_signer_name: val });
+                            await refreshSettings();
+                            addToast('Nom du signataire enregistré', 'success');
+                          } catch (err) {
+                            addToast('Erreur lors de l\'enregistrement', 'error');
+                          }
+                        }}
+                        className="px-4 py-2 text-xs font-bold text-white bg-loss hover:bg-loss/80 rounded-xl transition-all flex items-center justify-center gap-1.5"
+                      >
+                        Enregistrer
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           )}

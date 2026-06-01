@@ -38,15 +38,9 @@
 
 @layer base {
   html {
-    font-size: 14px;
+    font-size: 12px !important;
     scroll-behavior: smooth;
     scroll-padding-top: 4rem;
-    @screen md {
-      font-size: 15px;
-    }
-    @screen lg {
-      font-size: 16px;
-    }
   }
 
   body {
@@ -244,22 +238,13 @@
 .dashboard-view .btn-secondary,
 .dashboard-view .btn-ghost,
 .dashboard-view .button,
-.dashboard-view button,
 .dashboard-view input,
 .dashboard-view select,
-.dashboard-view textarea,
-.dashboard-view .rounded-3xl,
-.dashboard-view .rounded-2xl,
-.dashboard-view .rounded-xl,
-.dashboard-view .rounded-lg {
-  border-radius: 0.375rem !important;
+.dashboard-view textarea {
+  border-radius: 0.375rem;
 }
 
-/* Dashboard-wide text overrides (applies within .dashboard-view / outlet main) */
-.dashboard-view :not(svg):not(svg *):not(path):not(circle):not(rect):not(line) {
-  font-size: 11px !important;
-  font-weight: 600 !important;
-}
+/* Dashboard-wide text overrides removed to allow component-level typography */
 
 /* ─────────────────────────────────────────────────────────────────────
    react-datepicker — dark theme overrides (Legacy Trades)

@@ -45,6 +45,21 @@ export default function AdminUsersPage() {
     setOpenMenuId(null);
   };
 
+  const handleDeleteUser = async (id: string) => {
+    if (!window.confirm('Voulez-vous vraiment supprimer cet utilisateur ? Cette action est irréversible et supprimera toutes ses données (comptes, trades, etc.).')) {
+      return;
+    }
+    
+    try {
+      await api.delete(`/api/admin/users/${id}`);
+      addToast('Utilisateur supprimé avec succès.', 'success');
+      fetchUsers();
+    } catch (err: any) {
+      addToast(err.response?.data?.error || 'Erreur lors de la suppression de l\'utilisateur.', 'error');
+    }
+    setOpenMenuId(null);
+  };
+
   return (
     <div className="space-y-8 animate-[fadeIn_0.5s_ease-out]">
       <div className="flex justify-between items-center">
@@ -159,7 +174,7 @@ export default function AdminUsersPage() {
                             </button>
                           )}
                           <button 
-                            onClick={() => { setOpenMenuId(null); addToast('En cours de développement', 'info'); }}
+                            onClick={() => handleDeleteUser(user.id)}
                             className="w-full px-4 py-3 text-sm flex items-center gap-2 hover:bg-loss/10 transition-colors text-loss"
                           >
                             <Trash2 size={14} /> Supprimer

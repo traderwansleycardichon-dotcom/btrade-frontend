@@ -12,6 +12,7 @@ import AccountsPage from './pages/app/accounts/page';
 import PayoutsPage from './pages/app/payouts/page';
 import CalendarPage from './pages/app/calendar/page';
 import JournalPage from './pages/app/journal/page';
+import TodoPage from './pages/app/todo/page';
 import PsychologyPage from './pages/app/psychology/page';
 import PatrimoinePage from './pages/app/patrimoine/page';
 import FinancePage from './pages/app/finance/page';
@@ -40,6 +41,8 @@ import AdminSystemPage from "./pages/admin/system/page";
 import AdminSettingsPage from "./pages/admin/settings/page";
 import AdminLegalPage from './pages/admin/legal/AdminLegalPage';
 import { PromoCodesPage } from './pages/admin/promo-codes/PromoCodesPage';
+import AdminAcademyPage from './pages/admin/academy/page';
+import AdminLessonsPage from './pages/admin/academy/[moduleId]/page';
 import LegalPage from './pages/legal/LegalPage';
 import { SettingsProvider } from './contexts/SettingsContext';
 
@@ -99,6 +102,8 @@ const router = createBrowserRouter([
       { path: 'system', element: <AdminSystemPage /> },
       { path: 'settings', element: <AdminSettingsPage /> },
       { path: 'legal', element: <AdminLegalPage /> },
+      { path: 'academy', element: <AdminAcademyPage /> },
+      { path: 'academy/:moduleId', element: <AdminLessonsPage /> },
     ],
   },
   {
@@ -112,6 +117,7 @@ const router = createBrowserRouter([
       { path: 'payouts', element: <PayoutsPage /> },
       { path: 'calendar', element: <CalendarPage /> },
       { path: 'journal', element: <JournalPage /> },
+      { path: 'todo', element: <TodoPage /> },
       { path: 'psychology', element: <PsychologyPage /> },
       { path: 'patrimoine', element: <PatrimoinePage /> },
       { path: 'finance', element: <FinancePage /> },

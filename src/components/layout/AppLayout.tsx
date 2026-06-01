@@ -6,6 +6,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { ToastContainer } from '../ui/Toast';
 import { UnreadMessagePopup } from '../messaging/UnreadMessagePopup';
 import { Lock, CreditCard, LogOut } from 'lucide-react';
+import { TodoSummaryModal } from '../todo/TodoSummaryModal';
 
 export const AppLayout: React.FC = () => {
   const { user, isAuthenticated, isLoading, refreshUser, logout } = useAuth();
@@ -84,6 +85,8 @@ export const AppLayout: React.FC = () => {
 
   return (
     <div className="flex min-h-screen bg-bg text-txt relative dashboard-view">
+      <TodoSummaryModal />
+      
       {/* Sidebar — drawer mobile + fixe desktop */}
       <Sidebar
         mobileOpen={sidebarOpen}

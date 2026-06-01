@@ -81,21 +81,28 @@ const ModuleLessonsHub: React.FC = () => {
       </button>
 
       {/* Module Header card */}
-      <div className="glass p-6 sm:p-8 rounded-3xl border border-border flex flex-col md:flex-row gap-6 items-start md:items-center bg-gradient-to-br from-accent/[0.02] to-transparent">
-        <div className="w-16 h-16 rounded-2xl bg-accent/10 border border-accent/20 flex items-center justify-center text-4xl shrink-0">
-          <span>{module.icone || '📖'}</span>
+      <div className="relative overflow-hidden rounded-3xl glass-frost p-6 sm:p-10 border border-white/10 flex flex-col md:flex-row gap-8 items-start md:items-center shadow-2xl">
+        <div className="absolute inset-0 bg-gradient-to-r from-accent/10 via-transparent to-transparent opacity-50 pointer-events-none" />
+        
+        <div className="relative w-20 h-20 rounded-[2rem] bg-accent/10 border border-accent/20 flex items-center justify-center text-5xl shrink-0 shadow-[0_0_30px_rgba(243,108,0,0.2)]">
+          <div className="absolute inset-0 bg-accent/20 blur-xl rounded-full" />
+          <span className="relative z-10 drop-shadow-md">{module.icone || '📖'}</span>
         </div>
-        <div className="space-y-1.5">
-          <div className="flex items-center gap-2">
-            <span className="text-[10px] font-bold text-accent uppercase tracking-widest px-2 py-0.5 rounded bg-accent/10">
+        
+        <div className="relative z-10 space-y-2">
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="text-[11px] font-bold text-accent uppercase tracking-widest px-3 py-1 rounded-full bg-accent/10 border border-accent/20">
               Module {module.ordre}
             </span>
-            <span className="text-[10px] text-txt-3 font-mono font-bold">
-              {lessons.length} leçons au total
+            <span className="flex items-center gap-1.5 px-3 py-1 bg-surface/50 rounded-full border border-white/5">
+              <BookOpen size={12} className="text-txt-3" />
+              <span className="text-[11px] text-txt-3 font-mono font-bold">
+                {lessons.length} leçons
+              </span>
             </span>
           </div>
-          <h2 className="text-xl sm:text-2xl font-bold">{module.titre}</h2>
-          <p className="text-xs sm:text-sm text-txt-2 leading-relaxed max-w-2xl">{module.description}</p>
+          <h2 className="text-2xl sm:text-3xl font-black tracking-tight">{module.titre}</h2>
+          <p className="text-sm text-txt-2 leading-relaxed max-w-2xl font-medium">{module.description}</p>
         </div>
       </div>
 
@@ -123,74 +130,80 @@ const ModuleLessonsHub: React.FC = () => {
                     }
                   }}
                   className={`
-                    p-4 rounded-2xl border flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 transition-all duration-200
+                    group relative p-5 rounded-2xl border flex flex-col sm:flex-row justify-between items-start sm:items-center gap-5 transition-all duration-300
                     ${isLocked 
-                      ? 'bg-surface/30 border-border/40 opacity-55 cursor-not-allowed' 
-                      : 'glass border-border hover:border-accent/30 cursor-pointer hover:bg-bg/40'
+                      ? 'bg-surface/20 border-white/5 opacity-60 cursor-not-allowed' 
+                      : 'glass-subtle border-white/10 hover:border-accent/40 cursor-pointer hover:shadow-[0_8px_30px_rgba(243,108,0,0.12)] hover:-translate-y-0.5'
                     }
                   `}
                 >
-                  <div className="flex items-start gap-4 min-w-0">
+                  {/* Subtle hover gradient */}
+                  {!isLocked && (
+                    <div className="absolute inset-0 bg-gradient-to-r from-accent/0 via-accent/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl pointer-events-none" />
+                  )}
+
+                  <div className="relative z-10 flex items-start gap-4 min-w-0 w-full sm:w-auto">
                     {/* Index and Icon */}
                     <div className={`
-                      w-10 h-10 rounded-xl flex items-center justify-center shrink-0 font-bold font-mono text-xs
+                      w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 font-bold font-mono text-sm transition-colors duration-300
                       ${isLocked 
-                        ? 'bg-border/30 text-txt-3' 
+                        ? 'bg-white/5 text-txt-3' 
                         : isCompleted 
-                          ? 'bg-win/10 text-win' 
-                          : 'bg-accent/10 text-accent'
+                          ? 'bg-win/10 text-win shadow-[0_0_15px_rgba(16,185,129,0.2)]' 
+                          : 'bg-accent/10 text-accent group-hover:bg-accent group-hover:text-white shadow-[0_0_15px_rgba(243,108,0,0.2)]'
                       }
                     `}>
                       {isLocked ? (
-                        <Lock size={14} />
+                        <Lock size={16} />
                       ) : isCompleted ? (
-                        <CheckCircle size={16} />
+                        <CheckCircle size={20} />
                       ) : (
                         <span>{lesson.ordre}</span>
                       )}
                     </div>
 
                     {/* Lesson Title and steps */}
-                    <div className="min-w-0 space-y-1">
-                      <h4 className={`text-sm font-bold truncate ${isLocked ? 'text-txt-3' : 'text-txt'}`}>
+                    <div className="min-w-0 space-y-1.5 flex-1 pt-0.5">
+                      <h4 className={`text-base font-bold truncate transition-colors ${isLocked ? 'text-txt-3' : 'text-txt group-hover:text-accent'}`}>
                         {lesson.titre}
                       </h4>
                       
                       {!isLocked && (
-                        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] font-medium text-txt-3 font-mono">
-                          <span className={lesson.lecture_done ? 'text-win' : ''}>
-                            {lesson.lecture_done ? '✓ Lecture' : '○ Lecture'}
-                          </span>
-                          <span>·</span>
-                          <span className={lesson.quiz_passed ? 'text-win' : ''}>
-                            {lesson.quiz_passed ? '✓ Quiz' : '○ Quiz'}
-                          </span>
-                          <span>·</span>
-                          <span className={lesson.devoir_done ? 'text-win' : ''}>
-                            {lesson.devoir_done ? '✓ Devoir' : '○ Devoir'}
-                          </span>
+                        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-[11px] font-medium text-txt-3">
+                          <div className={`flex items-center gap-1.5 ${lesson.lecture_done ? 'text-win' : ''}`}>
+                            <div className={`w-1.5 h-1.5 rounded-full ${lesson.lecture_done ? 'bg-win shadow-[0_0_5px_rgba(16,185,129,0.5)]' : 'bg-border'}`} />
+                            Lecture
+                          </div>
+                          <div className={`flex items-center gap-1.5 ${lesson.quiz_passed ? 'text-win' : ''}`}>
+                            <div className={`w-1.5 h-1.5 rounded-full ${lesson.quiz_passed ? 'bg-win shadow-[0_0_5px_rgba(16,185,129,0.5)]' : 'bg-border'}`} />
+                            Quiz
+                          </div>
+                          <div className={`flex items-center gap-1.5 ${lesson.devoir_done ? 'text-win' : ''}`}>
+                            <div className={`w-1.5 h-1.5 rounded-full ${lesson.devoir_done ? 'bg-win shadow-[0_0_5px_rgba(16,185,129,0.5)]' : 'bg-border'}`} />
+                            Devoir
+                          </div>
                         </div>
                       )}
                     </div>
                   </div>
 
                   {/* Actions / Status badges */}
-                  <div className="w-full sm:w-auto flex items-center justify-end shrink-0">
+                  <div className="relative z-10 w-full sm:w-auto flex items-center justify-end shrink-0 mt-2 sm:mt-0">
                     {isLocked ? (
-                      <span className="text-[10px] font-bold text-txt-3 bg-border/20 px-2.5 py-1 rounded-lg flex items-center gap-1">
-                        <Lock size={10} /> Verrouillé
+                      <span className="text-[11px] font-bold text-txt-3 bg-white/5 px-3 py-1.5 rounded-lg flex items-center gap-1.5 border border-white/5">
+                        <Lock size={12} /> Verrouillé
                       </span>
                     ) : isCompleted ? (
-                      <span className="text-[10px] font-bold text-win bg-win/10 px-2.5 py-1 rounded-lg flex items-center gap-1">
-                        <CheckCircle size={10} /> Complété
+                      <span className="text-[11px] font-bold text-win bg-win/10 px-3 py-1.5 rounded-lg flex items-center gap-1.5 border border-win/20">
+                        <CheckCircle size={12} /> Complété
                       </span>
                     ) : isInProgress ? (
-                      <button className="px-3.5 py-1.5 text-xs font-bold text-white bg-accent hover:bg-accent-2 transition-colors rounded-xl flex items-center gap-1.5">
-                        <Play size={10} fill="currentColor" /> Reprendre
+                      <button className="px-5 py-2.5 text-[11px] font-bold text-white bg-accent hover:bg-accent-2 transition-all duration-300 rounded-xl flex items-center gap-2 shadow-[0_0_15px_rgba(243,108,0,0.3)]">
+                        <Play size={12} fill="currentColor" /> Reprendre
                       </button>
                     ) : (
-                      <button className="px-3.5 py-1.5 text-xs font-bold text-txt-2 hover:text-white bg-bg border border-border hover:border-accent/40 transition-all rounded-xl flex items-center gap-1.5">
-                        <Play size={10} /> Commencer
+                      <button className="px-5 py-2.5 text-[11px] font-bold text-txt hover:text-white bg-white/5 border border-white/10 hover:border-accent group-hover:bg-accent group-hover:border-accent transition-all duration-300 rounded-xl flex items-center gap-2">
+                        <Play size={12} className="group-hover:fill-current" /> Commencer
                       </button>
                     )}
                   </div>

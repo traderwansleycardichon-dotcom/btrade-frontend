@@ -5,6 +5,7 @@ import api from '../../../lib/api';
 
 import { AdminActivityChart } from '../../../components/admin/AdminActivityChart';
 import { AdminBillingStats } from '../../../components/admin/AdminBillingStats';
+import { AdminQuickPricing } from '../../../components/admin/AdminQuickPricing';
 
 export default function AdminDashboardPage() {
   const [stats, setStats] = useState<any>(null);
@@ -55,9 +56,14 @@ export default function AdminDashboardPage() {
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <AdminActivityChart />
-        <AdminBillingStats data={stats?.billing} loading={loading} />
+      <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-8">
+        <div className="space-y-8">
+          <AdminActivityChart />
+          <AdminQuickPricing />
+        </div>
+        <div className="space-y-8">
+          <AdminBillingStats data={stats?.billing} loading={loading} />
+        </div>
       </div>
     </div>
   );

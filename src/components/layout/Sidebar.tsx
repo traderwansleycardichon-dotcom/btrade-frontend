@@ -1,7 +1,7 @@
 import React from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { 
-  LayoutDashboard, 
+  LayoutDashboard, CheckSquare, 
   LineChart, 
   Calendar, 
   BookOpen, 
@@ -105,6 +105,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen = false, onMobileCl
       title: 'Journal',
       items: [
         { label: 'Journal de trading', icon: BookOpen, href: '/app/journal' },
+        { label: 'To-Do List',         icon: CheckSquare, href: '/app/todo' },
         { label: 'Psychologie',        icon: Brain,    href: '/app/psychology' },
         { label: 'Analyses techniques',icon: BarChart3,href: '/app/reports', proOnly: true },
       ]

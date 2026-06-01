@@ -46,7 +46,7 @@ export default function AdminBroadcastPage() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8 animate-[fadeIn_0.5s_ease-out]">
+    <div className="space-y-8 animate-[fadeIn_0.5s_ease-out]">
       <div className="text-center">
         <div className="w-16 h-16 bg-loss/10 text-loss rounded-3xl flex items-center justify-center mx-auto mb-4">
           <Megaphone size={32} />
