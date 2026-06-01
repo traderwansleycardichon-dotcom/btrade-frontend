@@ -1,6 +1,7 @@
 import React from 'react';
 import Lottie from 'lottie-react';
 import { Modal } from '../ui/Modal';
+import warningAnimation from '../../assets/animations/warning.json';
 
 interface DeleteConfirmModalProps {
   isOpen: boolean;
@@ -47,7 +48,7 @@ export const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
       <div className="space-y-5 text-center">
         <div className="w-32 h-32 mx-auto">
           <Lottie
-            path="https://assets2.lottiefiles.com/packages/lf20_jvysiwkn.json"
+            animationData={warningAnimation}
             loop={false}
             autoplay
           />
