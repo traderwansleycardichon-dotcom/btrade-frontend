@@ -6,6 +6,7 @@ import api from '../../../lib/api';
 import { useToast } from '../../../hooks/useToast';
 import { EditPlanModal } from '../../../components/admin/EditPlanModal';
 import { InviteStaffModal } from '../../../components/admin/InviteStaffModal';
+import { DeleteConfirmModal } from '../../../components/admin/DeleteConfirmModal';
 
 export default function AdminUsersPage() {
   const [users, setUsers] = useState<any[]>([]);
@@ -19,6 +20,8 @@ export default function AdminUsersPage() {
   const [selectedUser, setSelectedUser] = useState<any>(null);
   const [isPlanModalOpen, setIsPlanModalOpen] = useState(false);
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<any>(null);
   
   const { addToast } = useToast();
 
@@ -45,19 +48,23 @@ export default function AdminUsersPage() {
     setOpenMenuId(null);
   };
 
-  const handleDeleteUser = async (id: string) => {
-    if (!window.confirm('Voulez-vous vraiment supprimer cet utilisateur ? Cette action est irréversible et supprimera toutes ses données (comptes, trades, etc.).')) {
-      return;
-    }
-    
+  const openDeleteModal = (user: any) => {
+    setUserToDelete(user);
+    setIsDeleteModalOpen(true);
+    setOpenMenuId(null);
+  };
+
+  const handleDeleteUser = async () => {
+    if (!userToDelete) return;
     try {
-      await api.delete(`/api/admin/users/${id}`);
+      await api.delete(`/api/admin/users/${userToDelete.id}`);
       addToast('Utilisateur supprimé avec succès.', 'success');
+      setIsDeleteModalOpen(false);
+      setUserToDelete(null);
       fetchUsers();
     } catch (err: any) {
       addToast(err.response?.data?.error || 'Erreur lors de la suppression de l\'utilisateur.', 'error');
     }
-    setOpenMenuId(null);
   };
 
   return (
@@ -174,7 +181,7 @@ export default function AdminUsersPage() {
                             </button>
                           )}
                           <button 
-                            onClick={() => handleDeleteUser(user.id)}
+                            onClick={() => openDeleteModal(user)}
                             className="w-full px-4 py-3 text-sm flex items-center gap-2 hover:bg-loss/10 transition-colors text-loss"
                           >
                             <Trash2 size={14} /> Supprimer
@@ -196,11 +203,19 @@ export default function AdminUsersPage() {
         onSuccess={fetchUsers}
       />
 
-      <EditPlanModal 
-        isOpen={isPlanModalOpen} 
-        onClose={() => setIsPlanModalOpen(false)} 
-        user={selectedUser} 
+      <EditPlanModal
+        isOpen={isPlanModalOpen}
+        onClose={() => setIsPlanModalOpen(false)}
+        user={selectedUser}
         onSuccess={fetchUsers}
+      />
+
+      <DeleteConfirmModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => { setIsDeleteModalOpen(false); setUserToDelete(null); }}
+        onConfirm={handleDeleteUser}
+        userName={userToDelete?.fullName || ''}
+        userEmail={userToDelete?.email || ''}
       />
     </div>
   );
