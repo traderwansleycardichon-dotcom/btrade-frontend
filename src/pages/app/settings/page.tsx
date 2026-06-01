@@ -159,7 +159,7 @@ const SettingsPage: React.FC = () => {
       {/* Header */}
       <div className="flex items-center gap-6">
         <div className="relative group">
-          <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-accent to-accent-2 flex items-center justify-center text-4xl font-bold text-white shadow-2xl group-hover:scale-105 transition-transform overflow-hidden border-4 border-surface">
+          <div className="w-24 h-24 rounded-full bg-gradient-to-br from-accent to-accent-2 flex items-center justify-center text-4xl font-bold text-white shadow-2xl group-hover:scale-105 transition-transform overflow-hidden border-4 border-surface">
             {user?.avatarUrl ? (
               <img src={user.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
             ) : (

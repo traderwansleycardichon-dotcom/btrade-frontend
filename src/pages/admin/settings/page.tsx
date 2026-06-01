@@ -71,7 +71,7 @@ export default function AdminSettingsPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         <div className="md:col-span-1 space-y-4">
           <div className="glass p-6 rounded-3xl border border-border text-center">
-            <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-loss to-orange-500 mx-auto mb-4 flex items-center justify-center text-white text-2xl font-bold shadow-xl overflow-hidden border-2 border-surface">
+            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-loss to-orange-500 mx-auto mb-4 flex items-center justify-center text-white text-2xl font-bold shadow-xl overflow-hidden border-2 border-surface">
               {user?.avatarUrl ? (
                 <img src={user.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
               ) : (

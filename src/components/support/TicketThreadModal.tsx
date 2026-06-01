@@ -95,7 +95,7 @@ export const TicketThreadModal: React.FC<TicketThreadModalProps> = ({
           <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-surface/30">
             {/* Original Message */}
             <div className="flex gap-4">
-              <div className="w-10 h-10 rounded-full bg-accent/20 text-accent flex items-center justify-center shrink-0 overflow-hidden border border-accent/20">
+              <div className="w-12 h-12 rounded-full bg-accent/20 flex items-center justify-center font-bold text-accent shrink-0 overflow-hidden border border-accent/20">
                 {ticket.user?.avatarUrl ? (
                   <img src={ticket.user.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
                 ) : (
@@ -125,7 +125,7 @@ export const TicketThreadModal: React.FC<TicketThreadModalProps> = ({
               return (
                 <div key={reply.id} className={`flex gap-4 ${isMine ? 'flex-row-reverse' : ''}`}>
                   {!isMine && (
-                    <div className="w-8 h-8 rounded-full bg-accent/20 text-accent flex items-center justify-center shrink-0 mt-2 overflow-hidden border border-accent/20">
+                    <div className="w-8 h-8 rounded-full shrink-0 flex items-center justify-center font-bold text-xs bg-surface border border-border overflow-hidden">
                       {reply.isAdmin ? (
                         <ShieldAlert size={16} />
                       ) : ticket.user?.avatarUrl ? (

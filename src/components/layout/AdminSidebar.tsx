@@ -137,7 +137,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
         {/* User Profile */}
         <div className="p-4 border-t border-border mt-4">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-loss to-orange-500 flex items-center justify-center font-bold text-lg text-white shadow-lg overflow-hidden border border-border/10">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-loss to-orange-500 flex items-center justify-center font-bold text-lg text-white shadow-lg overflow-hidden border border-border/10">
               {user?.avatarUrl ? (
                 <img src={user.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
               ) : (
