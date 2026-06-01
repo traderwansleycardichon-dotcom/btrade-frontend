@@ -92,7 +92,13 @@ export default function AdminBillingPage() {
                       </span>
                     </td>
                     <td className="px-6 py-4 font-mono text-sm">
-                      ${tx.amount.toFixed(2)}
+                      {tx.amount === 'Gifted' ? (
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded uppercase bg-win/10 text-win">
+                          Gifted
+                        </span>
+                      ) : (
+                        `$${tx.amount.toFixed(2)}`
+                      )}
                     </td>
                     <td className="px-6 py-4">
                       <span className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded uppercase ${tx.status === 'succeeded' ? 'bg-win/10 text-win' : 'bg-loss/10 text-loss'}`}>
