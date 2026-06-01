@@ -377,6 +377,12 @@ const ScopeItem: React.FC<{
 // ──────────────────────────────────────────────────────────────────────
 // Mini Calendar (mois courant)
 
+/** Clé "YYYY-MM-DD" en heure LOCALE (pas UTC), pour matcher trade ↔ cellule
+ *  quel que soit le fuseau du user. Indispensable côté Europe/+1 où l'ISO
+ *  UTC de minuit local tombe la veille. */
+const localDayKey = (d: Date) =>
+  `${d.getFullYear()}-${(d.getMonth() + 1).toString().padStart(2, '0')}-${d.getDate().toString().padStart(2, '0')}`;
+
 const MiniCalendar: React.FC<{ trades: any[]; onSeeAll: () => void }> = ({ trades, onSeeAll }) => {
   const { cells, monthPL, tradedDays } = useMemo(() => {
     const now = new Date();
@@ -389,7 +395,7 @@ const MiniCalendar: React.FC<{ trades: any[]; onSeeAll: () => void }> = ({ trade
     trades.forEach(t => {
       const d = t.dateEntree ? new Date(t.dateEntree) : null;
       if (!d || d.getMonth() !== now.getMonth() || d.getFullYear() !== now.getFullYear()) return;
-      const k = d.toISOString().slice(0, 10);
+      const k = localDayKey(d);
       const prev = byDay.get(k) || { pl: 0, count: 0 };
       byDay.set(k, { pl: prev.pl + num(t.plNet), count: prev.count + 1 });
     });
@@ -398,7 +404,7 @@ const MiniCalendar: React.FC<{ trades: any[]; onSeeAll: () => void }> = ({ trade
     for (let i = 0; i < offset; i++) out.push({ pl: 0, count: 0, day: null, today: false, weekend: false });
     for (let d = 1; d <= totalDays; d++) {
       const date = new Date(now.getFullYear(), now.getMonth(), d);
-      const k = date.toISOString().slice(0, 10);
+      const k = localDayKey(date);
       const entry = byDay.get(k) || { pl: 0, count: 0 };
       out.push({
         pl: entry.pl,

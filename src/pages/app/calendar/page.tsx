@@ -15,6 +15,12 @@ const fmt = (v: number) =>
 
 const dayOfWeek = (d: Date) => (d.getDay() + 6) % 7;
 
+/** Clé "YYYY-MM-DD" en heure LOCALE (et non UTC). Sans ça, un user à
+ *  l'est de UTC voit ses trades décalés de +1 jour dans le calendrier
+ *  parce que `new Date(y, m, d).toISOString()` tombe la veille en UTC. */
+const localDayKey = (d: Date) =>
+  `${d.getFullYear()}-${(d.getMonth() + 1).toString().padStart(2, '0')}-${d.getDate().toString().padStart(2, '0')}`;
+
 type DayCell = { date: Date | null; key: string | null };
 type WeekSummary = {
   weekNum: number;
@@ -52,7 +58,7 @@ const CalendarPage: React.FC = () => {
       const d = t.dateEntree ? new Date(t.dateEntree) : null;
       if (!d) return;
       if (d.getFullYear() !== cursor.y || d.getMonth() !== cursor.m) return;
-      const key = d.toISOString().slice(0, 10);
+      const key = localDayKey(d);
       const prev = map.get(key) || { pl: 0, count: 0, journaled: 0, analyzed: 0 };
       const isJournaled = journaledSet.has(t.id);
       const isAnalyzed = analyzedSet.has(t.id);
@@ -75,7 +81,7 @@ const CalendarPage: React.FC = () => {
     for (let i = 0; i < offset; i++) cells.push({ date: null, key: null });
     for (let d = 1; d <= totalDays; d++) {
       const date = new Date(cursor.y, cursor.m, d);
-      cells.push({ date, key: date.toISOString().slice(0, 10) });
+      cells.push({ date, key: localDayKey(date) });
     }
     while (cells.length % 7 !== 0) cells.push({ date: null, key: null });
     return cells;
