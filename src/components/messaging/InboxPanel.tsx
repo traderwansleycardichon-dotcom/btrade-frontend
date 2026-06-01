@@ -83,8 +83,9 @@ const ThreadView: React.FC<{
   rootId: string;
   myId: string;
   otherName: string;
+  otherAvatarUrl?: string | null;
   onBack: () => void;
-}> = ({ rootId, myId, otherName, onBack }) => {
+}> = ({ rootId, myId, otherName, otherAvatarUrl, onBack }) => {
   const { data: messages = [], isLoading } = useThread(rootId);
   const sendMsg = useSendMessage();
   const [text, setText] = useState('');
@@ -124,7 +125,7 @@ const ThreadView: React.FC<{
           <ArrowLeft size={16} />
         </button>
         <div className="w-8 h-8 rounded-full bg-accent/15 border border-accent/30 flex items-center justify-center shrink-0 overflow-hidden">
-          {avatar({ fullName: otherName, email: otherName, avatarUrl: t.user?.avatarUrl })}
+          {avatar({ fullName: otherName, email: otherName, avatarUrl: otherAvatarUrl })}
         </div>
         <div>
           <p className="text-sm font-bold leading-none">{otherName}</p>
@@ -424,6 +425,7 @@ export const InboxPanel: React.FC<InboxPanelProps> = ({ availableUsers = [], can
             rootId={activeConvId}
             myId={user?.id || ''}
             otherName={other.fullName || other.email}
+            otherAvatarUrl={other.avatarUrl}
             onBack={() => setActiveConvId(null)}
           />
         ) : (
