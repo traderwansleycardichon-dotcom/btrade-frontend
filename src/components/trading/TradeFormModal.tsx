@@ -12,19 +12,24 @@ interface Props {
   initialTrade?: any;
 }
 
-const todayISO = () => new Date().toISOString().slice(0, 10);
-const nowTime = () => new Date().toTimeString().slice(0, 5);
+const pad = (n: number) => n.toString().padStart(2, '0');
 
-/** Extrait la date (YYYY-MM-DD) d'une ISO string */
-const isoToDate = (iso?: string | null) => {
-  if (!iso) return '';
-  return new Date(iso).toISOString().slice(0, 10);
+/** Formate un Date en "YYYY-MM-DDTHH:mm" en heure locale (format de <input type="datetime-local">). */
+const toLocalDatetimeInput = (date: Date) => {
+  const yyyy = date.getFullYear();
+  const mm = pad(date.getMonth() + 1);
+  const dd = pad(date.getDate());
+  const hh = pad(date.getHours());
+  const mi = pad(date.getMinutes());
+  return `${yyyy}-${mm}-${dd}T${hh}:${mi}`;
 };
 
-/** Extrait l'heure (HH:mm) d'une ISO string */
-const isoToTime = (iso?: string | null) => {
+const nowDatetimeLocal = () => toLocalDatetimeInput(new Date());
+
+/** Convertit une ISO string backend en valeur "YYYY-MM-DDTHH:mm" locale pour le picker. */
+const isoToLocalDatetime = (iso?: string | null) => {
   if (!iso) return '';
-  return new Date(iso).toTimeString().slice(0, 5);
+  return toLocalDatetimeInput(new Date(iso));
 };
 
 const INSTRUMENT_SUGGESTIONS = [
@@ -60,10 +65,8 @@ export const TradeFormModal: React.FC<Props> = ({ accountId, isOpen, onClose, in
   const buildInitialForm = (trade?: any) => ({
     instrument: trade?.instrument || '',
     direction: (trade?.direction === 'sell' ? 'short' : trade?.direction === 'buy' ? 'long' : trade?.direction) || 'long' as 'long' | 'short',
-    dateEntree: trade ? isoToDate(trade.dateEntree) : todayISO(),
-    timeEntree: trade ? isoToTime(trade.dateEntree) : nowTime(),
-    dateSortie: trade ? isoToDate(trade.dateSortie) : '',
-    timeSortie: trade ? isoToTime(trade.dateSortie) : '',
+    datetimeEntree: trade ? isoToLocalDatetime(trade.dateEntree) : nowDatetimeLocal(),
+    datetimeSortie: trade ? isoToLocalDatetime(trade.dateSortie) : '',
     prix_entree: trade?.prixEntree !== null && trade?.prixEntree !== undefined ? String(trade.prixEntree) : '' as string,
     prix_sortie: trade?.prixSortie !== null && trade?.prixSortie !== undefined ? String(trade.prixSortie) : '' as string,
     quantite: trade?.quantite ?? 1,
@@ -94,9 +97,14 @@ export const TradeFormModal: React.FC<Props> = ({ accountId, isOpen, onClose, in
   }, [isOpen, initialTrade]);
 
   const setDateQuick = (offsetDays: number) => {
-    const d = new Date();
-    d.setDate(d.getDate() + offsetDays);
-    setForm(f => ({ ...f, dateEntree: d.toISOString().slice(0, 10) }));
+    setForm(f => {
+      // Garde l'heure courante du picker si dispo, sinon prend l'heure actuelle.
+      const ref = f.datetimeEntree ? new Date(f.datetimeEntree) : new Date();
+      const d = new Date();
+      d.setDate(d.getDate() + offsetDays);
+      d.setHours(ref.getHours(), ref.getMinutes(), 0, 0);
+      return { ...f, datetimeEntree: toLocalDatetimeInput(d) };
+    });
   };
 
   const submit = async (e: React.FormEvent) => {
@@ -105,17 +113,16 @@ export const TradeFormModal: React.FC<Props> = ({ accountId, isOpen, onClose, in
       addToast('Instrument requis', 'error');
       return;
     }
-    if (!form.dateEntree) {
+    if (!form.datetimeEntree) {
       addToast('Date d\'entrée requise', 'error');
       return;
     }
 
-    const dateEntreeISO = new Date(
-      `${form.dateEntree}T${form.timeEntree || '12:00'}:00`
-    ).toISOString();
+    // datetime-local est interprété par new Date(...) comme heure locale → toISOString() convertit en UTC pour le backend.
+    const dateEntreeISO = new Date(form.datetimeEntree).toISOString();
 
-    const dateSortieISO = form.dateSortie
-      ? new Date(`${form.dateSortie}T${form.timeSortie || form.timeEntree || '12:00'}:00`).toISOString()
+    const dateSortieISO = form.datetimeSortie
+      ? new Date(form.datetimeSortie).toISOString()
       : null;
 
     if (isEditMode) {
@@ -281,25 +288,17 @@ export const TradeFormModal: React.FC<Props> = ({ accountId, isOpen, onClose, in
           </FormField>
         </div>
 
-        {/* DATE ENTRÉE + RACCOURCIS */}
+        {/* DATE & HEURE D'ENTRÉE + RACCOURCIS */}
         <div className="grid grid-cols-3 gap-3 items-end">
           <div className="col-span-2">
-            <FormField label="Date d'entrée">
-              <div className="flex gap-2">
-                <input
-                  type="date"
-                  required
-                  value={form.dateEntree}
-                  onChange={e => setForm({ ...form, dateEntree: e.target.value })}
-                  className="flex-1 bg-bg border border-border rounded-lg py-2 px-3 text-xs mono focus:border-accent/50 outline-none"
-                />
-                <input
-                  type="time"
-                  value={form.timeEntree}
-                  onChange={e => setForm({ ...form, timeEntree: e.target.value })}
-                  className="w-24 bg-bg border border-border rounded-lg py-2 px-3 text-xs mono focus:border-accent/50 outline-none"
-                />
-              </div>
+            <FormField label="Date & heure d'entrée">
+              <input
+                type="datetime-local"
+                required
+                value={form.datetimeEntree}
+                onChange={e => setForm({ ...form, datetimeEntree: e.target.value })}
+                className="w-full bg-bg border border-border rounded-lg py-2 px-3 text-xs mono focus:border-accent/50 outline-none"
+              />
             </FormField>
           </div>
           <div>
@@ -324,25 +323,20 @@ export const TradeFormModal: React.FC<Props> = ({ accountId, isOpen, onClose, in
           </div>
         </div>
 
-        {/* DATE SORTIE */}
-        <FormField label="Date de sortie" optional>
-          <div className="flex gap-2">
+        {/* DATE & HEURE DE SORTIE */}
+        <FormField label="Date & heure de sortie" optional>
+          <div className="flex gap-2 items-center">
             <input
-              type="date"
-              value={form.dateSortie}
-              onChange={e => setForm({ ...form, dateSortie: e.target.value })}
+              type="datetime-local"
+              value={form.datetimeSortie}
+              min={form.datetimeEntree || undefined}
+              onChange={e => setForm({ ...form, datetimeSortie: e.target.value })}
               className="flex-1 bg-bg border border-border rounded-lg py-2 px-3 text-xs mono focus:border-accent/50 outline-none"
             />
-            <input
-              type="time"
-              value={form.timeSortie}
-              onChange={e => setForm({ ...form, timeSortie: e.target.value })}
-              className="w-24 bg-bg border border-border rounded-lg py-2 px-3 text-xs mono focus:border-accent/50 outline-none"
-            />
-            {form.dateSortie && (
+            {form.datetimeSortie && (
               <button
                 type="button"
-                onClick={() => setForm({ ...form, dateSortie: '', timeSortie: '' })}
+                onClick={() => setForm({ ...form, datetimeSortie: '' })}
                 className="text-[10px] text-txt-3 hover:text-loss px-2"
                 title="Vider"
               >
