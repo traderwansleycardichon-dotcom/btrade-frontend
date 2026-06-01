@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { User, Shield, Bell, CreditCard, Globe, LogOut, Camera, ChevronRight, X, Loader2 } from 'lucide-react';
 import { useAuth } from '../../../hooks/useAuth';
+import { useToast } from '../../../hooks/useToast';
+import { Modal } from '../../../components/ui/Modal';
+import { ImageUpload } from '../../../components/ui/ImageUpload';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../../../lib/api';
 
@@ -312,22 +315,10 @@ const SettingsPage: React.FC = () => {
             </div>
             <div className="space-y-4">
               <div className="flex justify-center mb-4">
-                <div className="w-20 h-20 rounded-2xl bg-elevated flex items-center justify-center overflow-hidden border border-border">
-                  {avatarUrl ? (
-                    <img src={avatarUrl} alt="Preview" className="w-full h-full object-cover" />
-                  ) : (
-                    <Camera className="text-txt-3" size={32} />
-                  )}
-                </div>
-              </div>
-              <div>
-                <label className="text-[10px] font-bold text-txt-3 uppercase tracking-widest mb-2 block">URL de l'image</label>
-                <input 
-                  type="text" 
+                <ImageUpload 
                   value={avatarUrl}
-                  onChange={(e) => setAvatarUrl(e.target.value)}
-                  className="w-full bg-elevated border border-border rounded-2xl py-3 px-4 focus:outline-none focus:border-accent transition-all"
-                  placeholder="https://..."
+                  onChange={setAvatarUrl}
+                  className="w-full"
                 />
               </div>
               <button 

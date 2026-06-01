@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import DatePicker, { registerLocale } from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { fr } from 'date-fns/locale';
+import { ImageUpload } from '../ui/ImageUpload';
 import { Modal } from '../ui/Modal';
 import { useTrades } from '../../hooks/useTrades';
 import { useToast } from '../../hooks/useToast';
@@ -724,14 +725,11 @@ export const TradeFormModal: React.FC<Props> = ({ accountId, isOpen, onClose, in
                   />
                 </FormField>
 
-                <FormField label="URL screenshot" optional>
-                  <input
-                    value={form.analyse_image_url}
-                    onChange={e => setForm({ ...form, analyse_image_url: e.target.value })}
-                    placeholder="https://… (lien TradingView, Imgur, etc.)"
-                    className="w-full bg-bg border border-border rounded-lg py-2 px-3 text-xs mono focus:border-accent/50 outline-none"
-                  />
-                </FormField>
+                <ImageUpload 
+                  label="Screenshot de l'analyse (optionnel)"
+                  value={form.analyse_image_url || ''}
+                  onChange={url => setForm({ ...form, analyse_image_url: url })}
+                />
               </div>
             )}
           </div>
