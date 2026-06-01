@@ -38,11 +38,11 @@ const SettingsPage: React.FC = () => {
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
 
   const formatJoinedDate = (dateStr?: string) => {
-    if (!dateStr) return 'Mai 2024';
+    if (!dateStr) return 'le 1 Mai 2024';
     try {
       const date = new Date(dateStr);
-      const formatted = date.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
-      return formatted.charAt(0).toUpperCase() + formatted.slice(1);
+      const formatted = date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+      return 'le ' + formatted;
     } catch {
       return 'Mai 2024';
     }
