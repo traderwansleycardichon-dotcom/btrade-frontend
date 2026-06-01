@@ -59,7 +59,7 @@ export default function AdminSettingsPage() {
   };
 
   return (
-    <div className="max-w-5xl mx-auto space-y-8 animate-[fadeIn_0.5s_ease-out]">
+    <div className="space-y-8 animate-[fadeIn_0.5s_ease-out]">
       <div>
         <h1 className="text-2xl font-black mb-2 flex items-center gap-3">
           <Settings className="text-loss" />
