@@ -17,6 +17,7 @@ import {
   MessageSquare
 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
+import { useSettings } from '../../contexts/SettingsContext';
 import { useQueryClient } from '@tanstack/react-query';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
@@ -34,6 +35,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
   const { user, logout } = useAuth();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const { settings } = useSettings();
 
   const handleSwitchToClientMode = () => {
     // Efface tout le cache React Query pour garantir que l'admin
@@ -74,13 +76,24 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
         {/* Brand & Close Mobile */}
         <div className="p-6 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-loss rounded-lg flex items-center justify-center shadow-[0_0_15px_rgba(239,68,68,0.4)]">
-              <Shield size={20} className="text-white" />
-            </div>
-            <div>
-              <span className="font-bold text-lg tracking-tight block leading-tight">BTrade</span>
-              <span className="text-[10px] font-black text-loss uppercase tracking-widest">Admin Control</span>
-            </div>
+            {settings?.platform_logo ? (
+              <>
+                <img src={settings.platform_logo} alt="Logo BTrade" className="h-8 w-auto object-contain" />
+                <div>
+                  <span className="text-[10px] font-black text-loss uppercase tracking-widest block leading-tight mt-1">Admin Control</span>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="w-8 h-8 bg-loss rounded-lg flex items-center justify-center shadow-[0_0_15px_rgba(239,68,68,0.4)]">
+                  <Shield size={20} className="text-white" />
+                </div>
+                <div>
+                  <span className="font-bold text-lg tracking-tight block leading-tight">BTrade</span>
+                  <span className="text-[10px] font-black text-loss uppercase tracking-widest">Admin Control</span>
+                </div>
+              </>
+            )}
           </div>
           <button 
             onClick={onClose}

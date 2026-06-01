@@ -32,6 +32,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { useAccounts } from '../../hooks/useAccounts';
 import { useMultiAccountTrades } from '../../hooks/useMultiAccountTrades';
 import { usePlan } from '../../hooks/usePlan';
+import { useSettings } from '../../contexts/SettingsContext';
 import { Modal } from '../ui/Modal';
 import { Flame, BarChart2 } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
@@ -73,6 +74,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen = false, onMobileCl
   const location = useLocation();
   const navigate = useNavigate();
   const { isFree } = usePlan();
+  const { settings } = useSettings();
   const queryClient = useQueryClient();
 
   const handleReturnToAdmin = () => {
@@ -161,10 +163,16 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen = false, onMobileCl
       {/* Brand */}
       <div className="p-5 lg:p-6 flex items-center gap-3 justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-accent rounded-lg flex items-center justify-center shadow-[0_0_15px_rgba(243,108,0,0.4)]">
-            <TrendingUp size={20} className="text-white" />
-          </div>
-          <span className="font-bold text-lg tracking-tight">BTrade</span>
+          {settings?.platform_logo ? (
+            <img src={settings.platform_logo} alt="Logo BTrade" className="h-8 w-auto object-contain" />
+          ) : (
+            <>
+              <div className="w-8 h-8 bg-accent rounded-lg flex items-center justify-center shadow-[0_0_15px_rgba(243,108,0,0.4)]">
+                <TrendingUp size={20} className="text-white" />
+              </div>
+              <span className="font-bold text-lg tracking-tight">BTrade</span>
+            </>
+          )}
         </div>
         {/* Bouton fermer (mobile uniquement) */}
         <button

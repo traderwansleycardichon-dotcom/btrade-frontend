@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Menu, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useSettings } from '../../contexts/SettingsContext';
 
 export const Navbar: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const { settings } = useSettings();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
@@ -30,7 +32,7 @@ export const Navbar: React.FC = () => {
           {/* Logo */}
           <Link to="/" className="flex items-center group" aria-label="Behind the Trades — Journal">
             <img
-              src="/logo.svg"
+              src={settings?.platform_logo || "/logo.svg"}
               alt="Behind the Trades — Journal"
               className="h-10 w-10 rounded-full shadow-[0_0_24px_rgba(243,108,0,0.35)] transition-transform group-hover:scale-105"
             />

@@ -3,12 +3,15 @@ import { Settings, User, Lock, Bell, Shield, Save, CheckCircle, AlertTriangle } 
 import { useAuth } from '../../../hooks/useAuth';
 import { useToast } from '../../../hooks/useToast';
 import api from '../../../lib/api';
+import { ImageUpload } from '../../../components/ui/ImageUpload';
+import { useSettings } from '../../../contexts/SettingsContext';
 
 export default function AdminSettingsPage() {
   const { user, refreshUser } = useAuth();
   const { addToast } = useToast();
+  const { settings, refreshSettings } = useSettings();
   const [loading, setLoading] = useState(false);
-  const [currentTab, setCurrentTab] = useState<'profile' | 'security' | 'permissions'>('profile');
+  const [currentTab, setCurrentTab] = useState<'profile' | 'security' | 'permissions' | 'apparence'>('profile');
   
   const [formData, setFormData] = useState({
     fullName: user?.fullName || '',
@@ -97,6 +100,12 @@ export default function AdminSettingsPage() {
               className={`w-full px-4 py-3 text-left text-sm font-bold flex items-center gap-3 transition-all ${currentTab === 'permissions' ? 'bg-loss/10 text-loss border-l-4 border-loss' : 'text-txt-2 hover:bg-elevated'}`}
             >
               <Shield size={18} /> Permissions
+            </button>
+            <button 
+              onClick={() => setCurrentTab('apparence')}
+              className={`w-full px-4 py-3 text-left text-sm font-bold flex items-center gap-3 transition-all ${currentTab === 'apparence' ? 'bg-loss/10 text-loss border-l-4 border-loss' : 'text-txt-2 hover:bg-elevated'}`}
+            >
+              <Settings size={18} /> Apparence
             </button>
           </nav>
         </div>
@@ -243,6 +252,38 @@ export default function AdminSettingsPage() {
                 <div className="flex gap-3 text-xs text-txt-2">
                   <AlertTriangle size={16} className="text-loss shrink-0" />
                   <p>En tant que <strong>Super Administrateur</strong>, vous disposez de toutes les permissions. Ces réglages ne peuvent être modifiés que par un autre administrateur de niveau "Root".</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {currentTab === 'apparence' && (
+            <div className="glass p-8 rounded-3xl border border-border space-y-8 animate-[slideUp_0.3s_ease-out]">
+              <h3 className="font-bold text-lg mb-6 flex items-center gap-2">
+                <Settings size={20} className="text-loss" />
+                Apparence de la plateforme
+              </h3>
+
+              <div className="space-y-6">
+                <div>
+                  <label className="block text-[10px] font-bold text-txt-3 uppercase tracking-widest mb-2">Logo de la plateforme</label>
+                  <p className="text-xs text-txt-2 mb-4">Ce logo remplacera le texte "BTrade" dans la barre de navigation et le menu latéral.</p>
+                  
+                  <div className="max-w-xs">
+                    <ImageUpload
+                      label="Upload Logo (PNG, JPG)"
+                      value={settings?.platform_logo || ''}
+                      onChange={async (url) => {
+                        try {
+                          await api.patch('/api/settings', { platform_logo: url });
+                          await refreshSettings();
+                          addToast('Logo mis à jour', 'success');
+                        } catch (err) {
+                          addToast('Erreur lors de la mise à jour du logo', 'error');
+                        }
+                      }}
+                    />
+                  </div>
                 </div>
               </div>
             </div>

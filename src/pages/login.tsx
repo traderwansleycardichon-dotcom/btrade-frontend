@@ -1,13 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { LoginForm } from '../components/auth/LoginForm';
 import { RegisterForm } from '../components/auth/RegisterForm';
 import { HeroPane } from '../components/auth/HeroPane';
+import { useSettings } from '../contexts/SettingsContext';
 import api from '../lib/api';
 
 const LoginPage: React.FC<{ defaultRegister?: boolean }> = ({ defaultRegister = false }) => {
   const { isAuthenticated, isLoading, refreshUser, user } = useAuth();
+  const { settings } = useSettings();
   const navigate = useNavigate();
   const [params] = useSearchParams();
   const queryPlan = params.get('plan');
@@ -65,10 +67,16 @@ const LoginPage: React.FC<{ defaultRegister?: boolean }> = ({ defaultRegister = 
       <main className="flex-1 flex flex-col items-center justify-center p-8 md:p-16 relative overflow-y-auto">
         {/* Mobile Logo */}
         <div className="lg:hidden absolute top-8 left-8 flex items-center gap-2">
-          <div className="w-8 h-8 bg-accent rounded-lg flex items-center justify-center">
-             <span className="font-black text-white">B</span>
-          </div>
-          <span className="font-black text-xl tracking-tighter">BTrade</span>
+          {settings?.platform_logo ? (
+            <img src={settings.platform_logo} alt="Logo BTrade" className="h-8 w-auto object-contain" />
+          ) : (
+            <>
+              <div className="w-8 h-8 bg-accent rounded-lg flex items-center justify-center">
+                 <span className="font-black text-white">B</span>
+              </div>
+              <span className="font-black text-xl tracking-tighter">BTrade</span>
+            </>
+          )}
         </div>
 
         {isRegister ? (

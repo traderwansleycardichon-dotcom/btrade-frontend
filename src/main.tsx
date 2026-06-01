@@ -41,6 +41,7 @@ import AdminSettingsPage from "./pages/admin/settings/page";
 import AdminLegalPage from './pages/admin/legal/AdminLegalPage';
 import { PromoCodesPage } from './pages/admin/promo-codes/PromoCodesPage';
 import LegalPage from './pages/legal/LegalPage';
+import { SettingsProvider } from './contexts/SettingsContext';
 
 import UpgradePage from './pages/app/upgrade/page';
 import MessagesPage from './pages/app/messages/page';
@@ -142,7 +143,9 @@ const router = createBrowserRouter([
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} future={{ v7_startTransition: true }} />
+      <SettingsProvider>
+        <RouterProvider router={router} future={{ v7_startTransition: true }} />
+      </SettingsProvider>
     </QueryClientProvider>
   </React.StrictMode>
 );
