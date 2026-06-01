@@ -25,8 +25,22 @@ const isoToDate = (iso?: string | null): Date | null => {
 };
 
 const INSTRUMENT_SUGGESTIONS = [
-  'EURUSD', 'GBPUSD', 'USDJPY', 'XAUUSD', 'NAS100', 'US30',
-  'BTCUSD', 'ETHUSD', 'SPX500',
+  // Forex majors
+  'EURUSD', 'GBPUSD', 'USDJPY', 'USDCAD', 'AUDUSD', 'USDCHF', 'NZDUSD',
+  // Indices CFD
+  'NAS100', 'US30', 'SPX500', 'GER40', 'UK100',
+  // Metals & energy
+  'XAUUSD', 'XAGUSD', 'WTI', 'BRENT',
+  // Crypto
+  'BTCUSD', 'ETHUSD', 'SOLUSD',
+  // Futures — E-minis (CME)
+  'ES', 'NQ', 'YM', 'RTY',
+  // Futures — Micros (CME)
+  'MES', 'MNQ', 'MYM', 'M2K',
+  // Futures — Commodities
+  'CL', 'MCL', 'NG', 'GC', 'MGC', 'SI', 'SIL',
+  // Futures — Bonds / Rates
+  'ZB', 'ZN', 'ZF', 'ZT',
 ];
 
 const SETUP_SUGGESTIONS = [
