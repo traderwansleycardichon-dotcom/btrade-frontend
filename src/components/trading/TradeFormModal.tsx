@@ -1,8 +1,13 @@
 import React, { useEffect, useState } from 'react';
+import DatePicker, { registerLocale } from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import { fr } from 'date-fns/locale';
 import { Modal } from '../ui/Modal';
 import { useTrades } from '../../hooks/useTrades';
 import { useToast } from '../../hooks/useToast';
-import { TrendingUp, TrendingDown } from 'lucide-react';
+import { TrendingUp, TrendingDown, Calendar } from 'lucide-react';
+
+registerLocale('fr', fr);
 
 interface Props {
   accountId: string;
@@ -12,24 +17,11 @@ interface Props {
   initialTrade?: any;
 }
 
-const pad = (n: number) => n.toString().padStart(2, '0');
-
-/** Formate un Date en "YYYY-MM-DDTHH:mm" en heure locale (format de <input type="datetime-local">). */
-const toLocalDatetimeInput = (date: Date) => {
-  const yyyy = date.getFullYear();
-  const mm = pad(date.getMonth() + 1);
-  const dd = pad(date.getDate());
-  const hh = pad(date.getHours());
-  const mi = pad(date.getMinutes());
-  return `${yyyy}-${mm}-${dd}T${hh}:${mi}`;
-};
-
-const nowDatetimeLocal = () => toLocalDatetimeInput(new Date());
-
-/** Convertit une ISO string backend en valeur "YYYY-MM-DDTHH:mm" locale pour le picker. */
-const isoToLocalDatetime = (iso?: string | null) => {
-  if (!iso) return '';
-  return toLocalDatetimeInput(new Date(iso));
+/** Convertit une ISO string backend en Date (ou null si vide). */
+const isoToDate = (iso?: string | null): Date | null => {
+  if (!iso) return null;
+  const d = new Date(iso);
+  return isNaN(d.getTime()) ? null : d;
 };
 
 const INSTRUMENT_SUGGESTIONS = [
@@ -65,8 +57,8 @@ export const TradeFormModal: React.FC<Props> = ({ accountId, isOpen, onClose, in
   const buildInitialForm = (trade?: any) => ({
     instrument: trade?.instrument || '',
     direction: (trade?.direction === 'sell' ? 'short' : trade?.direction === 'buy' ? 'long' : trade?.direction) || 'long' as 'long' | 'short',
-    datetimeEntree: trade ? isoToLocalDatetime(trade.dateEntree) : nowDatetimeLocal(),
-    datetimeSortie: trade ? isoToLocalDatetime(trade.dateSortie) : '',
+    datetimeEntree: (trade ? isoToDate(trade.dateEntree) : new Date()) as Date | null,
+    datetimeSortie: (trade ? isoToDate(trade.dateSortie) : null) as Date | null,
     prix_entree: trade?.prixEntree !== null && trade?.prixEntree !== undefined ? String(trade.prixEntree) : '' as string,
     prix_sortie: trade?.prixSortie !== null && trade?.prixSortie !== undefined ? String(trade.prixSortie) : '' as string,
     quantite: trade?.quantite ?? 1,
@@ -99,11 +91,11 @@ export const TradeFormModal: React.FC<Props> = ({ accountId, isOpen, onClose, in
   const setDateQuick = (offsetDays: number) => {
     setForm(f => {
       // Garde l'heure courante du picker si dispo, sinon prend l'heure actuelle.
-      const ref = f.datetimeEntree ? new Date(f.datetimeEntree) : new Date();
+      const ref = f.datetimeEntree || new Date();
       const d = new Date();
       d.setDate(d.getDate() + offsetDays);
       d.setHours(ref.getHours(), ref.getMinutes(), 0, 0);
-      return { ...f, datetimeEntree: toLocalDatetimeInput(d) };
+      return { ...f, datetimeEntree: d };
     });
   };
 
@@ -118,12 +110,8 @@ export const TradeFormModal: React.FC<Props> = ({ accountId, isOpen, onClose, in
       return;
     }
 
-    // datetime-local est interprété par new Date(...) comme heure locale → toISOString() convertit en UTC pour le backend.
-    const dateEntreeISO = new Date(form.datetimeEntree).toISOString();
-
-    const dateSortieISO = form.datetimeSortie
-      ? new Date(form.datetimeSortie).toISOString()
-      : null;
+    const dateEntreeISO = form.datetimeEntree.toISOString();
+    const dateSortieISO = form.datetimeSortie ? form.datetimeSortie.toISOString() : null;
 
     if (isEditMode) {
       // — Mode ÉDITION — on utilise les clés snake_case que le backend attend
@@ -292,13 +280,23 @@ export const TradeFormModal: React.FC<Props> = ({ accountId, isOpen, onClose, in
         <div className="grid grid-cols-3 gap-3 items-end">
           <div className="col-span-2">
             <FormField label="Date & heure d'entrée">
-              <input
-                type="datetime-local"
-                required
-                value={form.datetimeEntree}
-                onChange={e => setForm({ ...form, datetimeEntree: e.target.value })}
-                className="w-full bg-bg border border-border rounded-lg py-2 px-3 text-xs mono focus:border-accent/50 outline-none"
-              />
+              <div className="relative">
+                <DatePicker
+                  selected={form.datetimeEntree}
+                  onChange={(date: Date | null) => setForm({ ...form, datetimeEntree: date })}
+                  showTimeSelect
+                  timeFormat="HH:mm"
+                  timeIntervals={15}
+                  dateFormat="dd/MM/yyyy · HH:mm"
+                  locale="fr"
+                  timeCaption="Heure"
+                  required
+                  className="legacy-datepicker-input"
+                  popperPlacement="bottom-start"
+                  showPopperArrow={false}
+                />
+                <Calendar size={12} className="absolute right-3 top-1/2 -translate-y-1/2 text-txt-3 pointer-events-none" />
+              </div>
             </FormField>
           </div>
           <div>
@@ -326,17 +324,29 @@ export const TradeFormModal: React.FC<Props> = ({ accountId, isOpen, onClose, in
         {/* DATE & HEURE DE SORTIE */}
         <FormField label="Date & heure de sortie" optional>
           <div className="flex gap-2 items-center">
-            <input
-              type="datetime-local"
-              value={form.datetimeSortie}
-              min={form.datetimeEntree || undefined}
-              onChange={e => setForm({ ...form, datetimeSortie: e.target.value })}
-              className="flex-1 bg-bg border border-border rounded-lg py-2 px-3 text-xs mono focus:border-accent/50 outline-none"
-            />
+            <div className="relative flex-1">
+              <DatePicker
+                selected={form.datetimeSortie}
+                onChange={(date: Date | null) => setForm({ ...form, datetimeSortie: date })}
+                showTimeSelect
+                timeFormat="HH:mm"
+                timeIntervals={15}
+                dateFormat="dd/MM/yyyy · HH:mm"
+                locale="fr"
+                timeCaption="Heure"
+                minDate={form.datetimeEntree || undefined}
+                placeholderText="jj/mm/aaaa · hh:mm"
+                isClearable={false}
+                className="legacy-datepicker-input"
+                popperPlacement="bottom-start"
+                showPopperArrow={false}
+              />
+              <Calendar size={12} className="absolute right-3 top-1/2 -translate-y-1/2 text-txt-3 pointer-events-none" />
+            </div>
             {form.datetimeSortie && (
               <button
                 type="button"
-                onClick={() => setForm({ ...form, datetimeSortie: '' })}
+                onClick={() => setForm({ ...form, datetimeSortie: null })}
                 className="text-[10px] text-txt-3 hover:text-loss px-2"
                 title="Vider"
               >
