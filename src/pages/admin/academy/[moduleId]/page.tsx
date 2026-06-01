@@ -118,7 +118,7 @@ export const AdminLessonsPage = () => {
   }
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
+    <div className="space-y-8 animate-[fadeIn_0.5s_ease-out]">
       <button onClick={() => navigate('/admin/academy')} className="flex items-center gap-2 text-txt-2 hover:text-txt font-bold mb-6 transition-colors">
         <ArrowLeft size={20} />
         Retour aux modules
