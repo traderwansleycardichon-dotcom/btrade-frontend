@@ -4,11 +4,13 @@ import api from '../../../lib/api';
 import { useToast } from '../../../hooks/useToast';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { TicketThreadModal } from '../../../components/support/TicketThreadModal';
 
 export default function AdminSupportPage() {
   const [tickets, setTickets] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [selectedTicketId, setSelectedTicketId] = useState<string | null>(null);
   const { addToast } = useToast();
 
   useEffect(() => {
@@ -139,7 +141,7 @@ export default function AdminSupportPage() {
                       <button 
                         className="p-2 text-txt-3 hover:text-accent transition-colors rounded-lg hover:bg-accent/5"
                         title="Répondre"
-                        onClick={() => addToast('Module de réponse en cours de déploiement', 'info')}
+                        onClick={() => setSelectedTicketId(ticket.id)}
                       >
                         <MessageSquare size={16} />
                       </button>
@@ -151,6 +153,13 @@ export default function AdminSupportPage() {
           </table>
         </div>
       </div>
+      
+      <TicketThreadModal 
+        isOpen={!!selectedTicketId}
+        onClose={() => { setSelectedTicketId(null); fetchTickets(); }}
+        ticketId={selectedTicketId}
+        isAdminView={true}
+      />
     </div>
   );
 }

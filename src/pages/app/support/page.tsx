@@ -5,11 +5,13 @@ import { useToast } from '../../../hooks/useToast';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { Modal } from '../../../components/ui/Modal';
+import { TicketThreadModal } from '../../../components/support/TicketThreadModal';
 
 export default function SupportPage() {
   const [tickets, setTickets] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedTicketId, setSelectedTicketId] = useState<string | null>(null);
   
   // Form states
   const [subject, setSubject] = useState('');
@@ -125,7 +127,11 @@ export default function SupportPage() {
                   </td>
                 </tr>
               ) : tickets.map(ticket => (
-                <tr key={ticket.id} className="hover:bg-surface/50 transition-colors">
+                <tr 
+                  key={ticket.id} 
+                  className="hover:bg-surface/50 transition-colors cursor-pointer"
+                  onClick={() => setSelectedTicketId(ticket.id)}
+                >
                   <td className="px-6 py-4">
                     <div className="text-sm font-bold text-txt mb-1">{ticket.subject}</div>
                     <div className="text-xs text-txt-2 line-clamp-2 max-w-xl">{ticket.message}</div>
@@ -196,6 +202,13 @@ export default function SupportPage() {
           </div>
         </form>
       </Modal>
+
+      <TicketThreadModal 
+        isOpen={!!selectedTicketId}
+        onClose={() => { setSelectedTicketId(null); fetchTickets(); }}
+        ticketId={selectedTicketId}
+        isAdminView={false}
+      />
     </div>
   );
 }
