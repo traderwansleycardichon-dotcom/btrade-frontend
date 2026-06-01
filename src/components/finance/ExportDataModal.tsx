@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Modal } from '../ui/Modal';
+import barChartIcon from '../../assets/animations/1f4ca.json';
 import { useExport } from '../../hooks/useExport';
 import { useToast } from '../../hooks/useToast';
 import { FileText, Download, Calendar, CheckCircle2 } from 'lucide-react';
@@ -36,7 +37,7 @@ export const ExportDataModal: React.FC<ExportDataModalProps> = ({ isOpen, onClos
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Exporter les Données">
+    <Modal isOpen={isOpen} onClose={onClose} title="Exporter les Données" animationData={barChartIcon}>
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="space-y-4">
           <div>

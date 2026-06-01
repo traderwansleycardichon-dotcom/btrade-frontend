@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Modal } from '../ui/Modal';
+import rocketIcon from '../../assets/animations/1f680.json';
 import { useInvestments } from '../../hooks/useInvestments';
 import { useToast } from '../../hooks/useToast';
 import { Briefcase, DollarSign, Calendar, Hash, Tag, FileText } from 'lucide-react';
@@ -58,7 +59,7 @@ export const AddInvestmentModal: React.FC<AddInvestmentModalProps> = ({ isOpen, 
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Nouvel Investissement">
+    <Modal isOpen={isOpen} onClose={onClose} title="Nouvel Investissement" animationData={rocketIcon}>
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="grid grid-cols-2 gap-4">
           <div className="col-span-2">

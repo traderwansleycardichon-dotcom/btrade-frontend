@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import Lottie from 'lottie-react';
+import graduationIcon from '../../assets/animations/1f393.json';
 import { UserPlus, Mail, User, X, Copy, Check, Shield } from 'lucide-react';
 import { useToast } from '../../hooks/useToast';
 import api from '../../lib/api';
@@ -47,7 +49,7 @@ export const InviteStaffModal: React.FC<InviteStaffModalProps> = ({ isOpen, onCl
       <div className="w-full max-w-md glass rounded-3xl border border-border shadow-2xl overflow-hidden animate-[zoomIn_0.3s_ease-out]">
         <div className="px-8 py-6 border-b border-border bg-surface/50 flex justify-between items-center">
           <h3 className="font-black text-xl flex items-center gap-2">
-            <UserPlus size={24} className="text-loss" />
+            <div className="w-10 h-10 shrink-0"><Lottie animationData={graduationIcon} loop={false} autoplay /></div>
             Inviter un Staff
           </h3>
           <button onClick={onClose} className="p-2 text-txt-3 hover:text-txt transition-colors"><X size={20} /></button>

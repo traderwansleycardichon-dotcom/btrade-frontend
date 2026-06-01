@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Modal } from '../ui/Modal';
+import brainIcon from '../../assets/animations/1f9e0.json';
 import { usePsychology } from '../../hooks/usePsychology';
 import { useToast } from '../../hooks/useToast';
 import { Brain, FileText, Activity, Battery } from 'lucide-react';
@@ -51,6 +52,7 @@ export const AddPsychologyModal: React.FC<AddPsychologyModalProps> = ({ isOpen, 
       isOpen={isOpen} 
       onClose={onClose} 
       title="Nouveau Suivi Psychologique"
+        animationData={brainIcon}
       footer={
         <div className="flex gap-3 justify-end">
           <button type="button" onClick={onClose} className="btn-ghost">Annuler</button>

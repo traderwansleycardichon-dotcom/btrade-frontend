@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Modal } from '../ui/Modal';
+import moneyIcon from '../../assets/animations/1f4b8.json';
 import { usePayouts } from '../../hooks/usePayouts';
 import { useToast } from '../../hooks/useToast';
 import { Wallet, DollarSign, Calendar } from 'lucide-react';
@@ -42,6 +43,7 @@ export const AddPayoutModal: React.FC<AddPayoutModalProps> = ({ isOpen, onClose,
       isOpen={isOpen} 
       onClose={onClose} 
       title="Demander un Retrait (Payout)"
+        animationData={moneyIcon}
       footer={
         <div className="flex gap-3 justify-end">
           <button onClick={onClose} className="btn-ghost">Annuler</button>

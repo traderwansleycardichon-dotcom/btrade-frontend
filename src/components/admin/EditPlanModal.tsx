@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Modal } from '../ui/Modal';
+import crownIcon from '../../assets/animations/1f451.json';
 import { ShieldAlert, Zap } from 'lucide-react';
 import api from '../../lib/api';
 import { useToast } from '../../hooks/useToast';
@@ -41,6 +42,7 @@ export const EditPlanModal: React.FC<EditPlanModalProps> = ({ isOpen, onClose, u
       isOpen={isOpen}
       onClose={onClose}
       title="Modifier l'Abonnement"
+      animationData={crownIcon}
       size="sm"
       footer={
         <div className="flex gap-3 justify-end">

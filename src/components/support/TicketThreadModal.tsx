@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Modal } from '../ui/Modal';
+import chatIcon from '../../assets/animations/1f4ac.json';
 import { Send, Clock, User, ShieldAlert } from 'lucide-react';
 import api from '../../lib/api';
 import { useToast } from '../../hooks/useToast';
@@ -86,6 +87,7 @@ export const TicketThreadModal: React.FC<TicketThreadModalProps> = ({
       onClose={onClose}
       title={ticket ? `Ticket: ${ticket.subject}` : 'Chargement...'}
       size="lg"
+      animationData={chatIcon}
     >
       {loading && !ticket ? (
         <div className="py-20 text-center text-txt-3">Chargement des messages...</div>

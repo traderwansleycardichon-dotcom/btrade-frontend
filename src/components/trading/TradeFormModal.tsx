@@ -4,6 +4,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import { fr } from 'date-fns/locale';
 import { ImageUpload } from '../ui/ImageUpload';
 import { Modal } from '../ui/Modal';
+import chartUpIcon from '../../assets/animations/1f4c8.json';
 import { useTrades } from '../../hooks/useTrades';
 import { useToast } from '../../hooks/useToast';
 import {
@@ -462,6 +463,7 @@ export const TradeFormModal: React.FC<Props> = ({ accountId, isOpen, onClose, in
       onClose={onClose}
       title={isEditMode ? `Modifier — ${initialTrade?.instrument || 'Trade'}` : 'Nouveau trade'}
       size="lg"
+      animationData={chartUpIcon}
       footer={
         <div className="flex gap-2 justify-end">
           <button onClick={onClose} className="btn-ghost text-xs px-3 py-2 rounded-lg">

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Modal } from '../ui/Modal';
+import addIcon from '../../assets/animations/2795.json';
 import { useAccounts } from '../../hooks/useAccounts';
 import { useToast } from '../../hooks/useToast';
 import { Wallet, Landmark, Cpu, Target, AlertTriangle } from 'lucide-react';
@@ -52,6 +53,7 @@ export const AddAccountModal: React.FC<AddAccountModalProps> = ({ isOpen, onClos
       isOpen={isOpen} 
       onClose={onClose} 
       title="Ajouter un compte de trading"
+        animationData={addIcon}
       footer={
         <div className="flex gap-3 justify-end">
           <button onClick={onClose} className="btn-ghost">Annuler</button>

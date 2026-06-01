@@ -1,5 +1,6 @@
 import React from 'react';
 import { Modal } from '../ui/Modal';
+import barChartIcon from '../../assets/animations/1f4ca.json';
 import { useAccounts } from '../../hooks/useAccounts';
 import { TrendingUp, BarChart2, Target, PieChart, Activity, ArrowUpRight, ArrowDownRight } from 'lucide-react';
 
@@ -21,6 +22,7 @@ export const AccountStatsModal: React.FC<AccountStatsModalProps> = ({ account, i
       onClose={onClose} 
       title={`Statistiques : ${account.nom}`}
       size="xl"
+      animationData={barChartIcon}
     >
       {isLoading ? (
         <div className="flex flex-col items-center justify-center py-20 gap-4">

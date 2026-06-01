@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Modal } from '../ui/Modal';
+import targetIcon from '../../assets/animations/1f3af.json';
 import { useObjectifs } from '../../hooks/useObjectifs';
 import { useToast } from '../../hooks/useToast';
 import { Target, DollarSign, Calendar, Palette, Star } from 'lucide-react';
@@ -54,7 +55,7 @@ export const AddGoalModal: React.FC<AddGoalModalProps> = ({ isOpen, onClose }) =
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Nouvel Objectif">
+    <Modal isOpen={isOpen} onClose={onClose} title="Nouvel Objectif" animationData={targetIcon}>
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="grid grid-cols-2 gap-4">
           <div className="col-span-2">

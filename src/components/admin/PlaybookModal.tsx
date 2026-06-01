@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import Lottie from 'lottie-react';
+import chartUpIcon from '../../assets/animations/1f4c8.json';
 import { BookOpen, X, Save, Type, AlignLeft, ShieldCheck, Activity } from 'lucide-react';
 import { useToast } from '../../hooks/useToast';
 import api from '../../lib/api';
@@ -68,9 +70,7 @@ export const PlaybookModal: React.FC<PlaybookModalProps> = ({ isOpen, onClose, o
       <div className="w-full max-w-2xl glass rounded-3xl border border-border shadow-2xl overflow-hidden animate-[zoomIn_0.3s_ease-out]">
         <div className="px-8 py-6 border-b border-border bg-surface/50 flex justify-between items-center">
           <h3 className="font-black text-xl flex items-center gap-3">
-            <div className="p-2 bg-win/10 text-win rounded-xl">
-              <BookOpen size={24} />
-            </div>
+            <div className="w-10 h-10 shrink-0"><Lottie animationData={chartUpIcon} loop={false} autoplay /></div>
             {playbook ? 'Modifier le Playbook' : 'Nouveau Playbook Officiel'}
           </h3>
           <button onClick={onClose} className="p-2 text-txt-3 hover:text-txt transition-colors"><X size={20} /></button>

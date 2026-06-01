@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Modal } from '../ui/Modal';
+import chartUpIcon from '../../assets/animations/1f4c8.json';
 import { useTrades } from '../../hooks/useTrades';
 import { useToast } from '../../hooks/useToast';
 
@@ -49,6 +50,7 @@ export const AddTradeModal: React.FC<AddTradeModalProps> = ({ isOpen, onClose, a
       isOpen={isOpen} 
       onClose={onClose} 
       title="Enregistrer un nouveau trade"
+        animationData={chartUpIcon}
       footer={
         <div className="flex gap-3 justify-end">
           <button onClick={onClose} className="btn-ghost">Annuler</button>

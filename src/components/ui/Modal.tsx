@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import Lottie from 'lottie-react';
 
 interface ModalProps {
   isOpen: boolean;
@@ -10,6 +11,7 @@ interface ModalProps {
   children: React.ReactNode;
   footer?: React.ReactNode;
   size?: 'sm' | 'md' | 'lg' | 'xl';
+  animationData?: any;
 }
 
 export const Modal: React.FC<ModalProps> = ({
@@ -18,7 +20,8 @@ export const Modal: React.FC<ModalProps> = ({
   title,
   children,
   footer,
-  size = 'md'
+  size = 'md',
+  animationData,
 }) => {
   useEffect(() => {
     if (isOpen) {
@@ -54,8 +57,15 @@ export const Modal: React.FC<ModalProps> = ({
             className={`relative w-full ${sizeClasses[size]} glass rounded-2xl overflow-hidden shadow-2xl dashboard-view`}
           >
             <div className="flex items-center justify-between p-6 border-b border-border">
-              <h2 className="text-xl font-bold text-txt">{title}</h2>
-              <button 
+              <div className="flex items-center gap-3">
+                {animationData && (
+                  <div className="w-12 h-12 shrink-0">
+                    <Lottie animationData={animationData} loop={false} autoplay />
+                  </div>
+                )}
+                <h2 className="text-xl font-bold text-txt">{title}</h2>
+              </div>
+              <button
                 onClick={onClose}
                 className="p-1 hover:bg-elevated rounded-lg transition-colors text-txt-2 hover:text-txt"
               >

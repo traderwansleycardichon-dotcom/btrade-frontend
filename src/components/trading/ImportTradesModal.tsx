@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { Modal } from '../ui/Modal';
+import barChartIcon from '../../assets/animations/1f4ca.json';
 import { Upload, FileText, CheckCircle2, AlertTriangle, Cpu } from 'lucide-react';
 import { useToast } from '../../hooks/useToast';
 
@@ -52,6 +53,7 @@ export const ImportTradesModal: React.FC<ImportTradesModalProps> = ({ isOpen, on
       isOpen={isOpen} 
       onClose={onClose} 
       title="Importer un historique de trades"
+        animationData={barChartIcon}
       footer={
         <div className="flex gap-3 justify-end">
           <button onClick={onClose} className="btn-ghost" disabled={isUploading}>Annuler</button>

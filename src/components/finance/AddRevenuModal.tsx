@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Modal } from '../ui/Modal';
+import coinIcon from '../../assets/animations/1fa99.json';
 import { useRevenus } from '../../hooks/useFinance';
 import { useToast } from '../../hooks/useToast';
 import { DollarSign, Calendar, Tag, FileText } from 'lucide-react';
@@ -45,7 +46,7 @@ export const AddRevenuModal: React.FC<AddRevenuModalProps> = ({ isOpen, onClose 
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Ajouter un Revenu">
+    <Modal isOpen={isOpen} onClose={onClose} title="Ajouter un Revenu" animationData={coinIcon}>
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="grid grid-cols-2 gap-4">
           <div className="col-span-2">

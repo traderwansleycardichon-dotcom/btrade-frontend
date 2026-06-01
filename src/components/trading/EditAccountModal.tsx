@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Modal } from '../ui/Modal';
+import editIcon from '../../assets/animations/270f_fe0f.json';
 import { useAccounts } from '../../hooks/useAccounts';
 import { useToast } from '../../hooks/useToast';
 
@@ -90,6 +91,7 @@ export const EditAccountModal: React.FC<Props> = ({ account, isOpen, onClose }) 
       isOpen={isOpen}
       onClose={onClose}
       title="Modifier le compte"
+        animationData={editIcon}
       footer={
         <div className="flex gap-2 justify-end">
           <button onClick={onClose} className="btn-ghost text-xs px-3 py-2 rounded-lg">
