@@ -420,20 +420,12 @@ const MiniCalendar: React.FC<{ trades: any[]; onSeeAll: () => void }> = ({ trade
 
   const monthLabel = new Date().toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
 
-  // Couleur cellule (cohérent avec la page Calendar complète)
-  const cellBg = (pl: number) => {
-    if (pl === 0) return 'rgba(24,28,37,0.4)';
-    const intensity = Math.min(Math.abs(pl) / 500, 1);
-    return pl > 0
-      ? `rgba(243,108,0,${0.15 + intensity * 0.45})`
-      : `rgba(239,68,68,${0.12 + intensity * 0.35})`;
-  };
-
-  // Format compact des montants pour tenir dans une petite cellule
-  const compact = (v: number) => {
-    const abs = Math.abs(v);
-    if (abs >= 1000) return `${(v / 1000).toFixed(abs >= 10000 ? 0 : 1)}k`;
-    return Math.round(v).toString();
+  // Coloration simple : plein accent si gagnant, pâle si perdant, neutre sinon
+  const cellBg = (pl: number, hasTrade: boolean) => {
+    if (!hasTrade) return 'rgba(24,28,37,0.4)';
+    if (pl > 0) return 'rgba(243,108,0,0.85)';   // accent plein
+    if (pl < 0) return 'rgba(239,68,68,0.18)';   // rouge pâle
+    return 'rgba(24,28,37,0.5)';                 // breakeven
   };
 
   return (
@@ -463,32 +455,29 @@ const MiniCalendar: React.FC<{ trades: any[]; onSeeAll: () => void }> = ({ trade
           if (c.day === null) {
             return <div key={i} className="aspect-square rounded opacity-25" style={{ background: 'rgba(24,28,37,0.2)' }} />;
           }
-          const hasPL = c.count > 0;
+          const hasTrade = c.count > 0;
+          const isWin = hasTrade && c.pl > 0;
           return (
             <div
               key={i}
-              className={`aspect-square rounded flex flex-col items-center justify-center text-[9px] mono relative transition-colors ${
+              className={`aspect-square rounded flex items-center justify-center text-[10px] mono transition-colors ${
                 c.today ? 'ring-1 ring-accent ring-inset' : ''
-              } ${c.weekend && !hasPL ? 'opacity-50' : ''}`}
-              style={{ background: cellBg(c.pl) }}
+              } ${c.weekend && !hasTrade ? 'opacity-50' : ''}`}
+              style={{ background: cellBg(c.pl, hasTrade) }}
               title={
-                hasPL
+                hasTrade
                   ? `${c.day} ${monthLabel} · ${c.count} trade${c.count > 1 ? 's' : ''} · ${c.pl >= 0 ? '+' : '-'}$${fmt(Math.abs(c.pl), { maximumFractionDigits: 0 })}`
                   : `${c.day} ${monthLabel} · pas de trade`
               }
             >
               <span className={`leading-none ${
-                c.today ? 'text-accent font-bold' : hasPL ? 'text-txt font-bold' : 'text-txt-3'
+                isWin ? 'text-white font-bold'
+                  : c.today ? 'text-accent font-bold'
+                  : hasTrade ? 'text-loss font-bold'
+                  : 'text-txt-3'
               }`}>
                 {c.day}
               </span>
-              {hasPL && (
-                <span className={`leading-none mt-0.5 text-[8px] font-bold ${
-                  c.pl > 0 ? 'text-win' : c.pl < 0 ? 'text-loss' : 'text-txt-2'
-                }`}>
-                  {c.pl >= 0 ? '+' : '-'}{compact(c.pl)}
-                </span>
-              )}
             </div>
           );
         })}
