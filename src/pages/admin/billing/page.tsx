@@ -7,6 +7,7 @@ export default function AdminBillingPage() {
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<any>(null);
   const [transactions, setTransactions] = useState<any[]>([]);
+  const [showAllTransactions, setShowAllTransactions] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -14,7 +15,7 @@ export default function AdminBillingPage() {
       try {
         const [statsRes, transRes] = await Promise.all([
           api.get('/api/admin/billing/stats'),
-          api.get('/api/admin/billing/transactions')
+          api.get(`/api/admin/billing/transactions?all=${showAllTransactions}`)
         ]);
         setStats(statsRes.data.data);
         setTransactions(transRes.data.data);
@@ -26,7 +27,7 @@ export default function AdminBillingPage() {
     };
 
     fetchData();
-  }, []);
+  }, [showAllTransactions]);
 
   return (
     <div className="space-y-8 animate-[fadeIn_0.5s_ease-out]">
@@ -65,9 +66,14 @@ export default function AdminBillingPage() {
         <div className="lg:col-span-2 glass rounded-3xl overflow-hidden border border-border">
           <div className="px-6 py-4 border-b border-border bg-surface/50 flex justify-between items-center">
             <h3 className="font-bold">Transactions Récentes</h3>
-            <button className="text-xs font-bold text-loss hover:underline">Voir tout</button>
+            <button 
+              onClick={() => setShowAllTransactions(!showAllTransactions)}
+              className="text-xs font-bold text-loss hover:underline"
+            >
+              {showAllTransactions ? 'Voir moins' : 'Voir tout'}
+            </button>
           </div>
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto max-h-[500px] overflow-y-auto">
             <table className="w-full text-left">
               <thead className="bg-surface/30">
                 <tr>
