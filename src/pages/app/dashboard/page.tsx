@@ -378,64 +378,117 @@ const ScopeItem: React.FC<{
 // Mini Calendar (mois courant)
 
 const MiniCalendar: React.FC<{ trades: any[]; onSeeAll: () => void }> = ({ trades, onSeeAll }) => {
-  const cells = useMemo(() => {
+  const { cells, monthPL, tradedDays } = useMemo(() => {
     const now = new Date();
     const first = new Date(now.getFullYear(), now.getMonth(), 1);
     const last = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-    const offset = (first.getDay() + 6) % 7;
+    const offset = (first.getDay() + 6) % 7; // semaine commence lundi
     const totalDays = last.getDate();
-    const byDay = new Map<string, number>();
+
+    const byDay = new Map<string, { pl: number; count: number }>();
     trades.forEach(t => {
       const d = t.dateEntree ? new Date(t.dateEntree) : null;
       if (!d || d.getMonth() !== now.getMonth() || d.getFullYear() !== now.getFullYear()) return;
       const k = d.toISOString().slice(0, 10);
-      byDay.set(k, (byDay.get(k) || 0) + num(t.plNet));
+      const prev = byDay.get(k) || { pl: 0, count: 0 };
+      byDay.set(k, { pl: prev.pl + num(t.plNet), count: prev.count + 1 });
     });
-    const out: Array<{ pl: number; day: number | null; today: boolean }> = [];
-    for (let i = 0; i < offset; i++) out.push({ pl: 0, day: null, today: false });
+
+    const out: Array<{ pl: number; count: number; day: number | null; today: boolean; weekend: boolean }> = [];
+    for (let i = 0; i < offset; i++) out.push({ pl: 0, count: 0, day: null, today: false, weekend: false });
     for (let d = 1; d <= totalDays; d++) {
       const date = new Date(now.getFullYear(), now.getMonth(), d);
       const k = date.toISOString().slice(0, 10);
-      out.push({ pl: byDay.get(k) || 0, day: d, today: date.toDateString() === new Date().toDateString() });
+      const entry = byDay.get(k) || { pl: 0, count: 0 };
+      out.push({
+        pl: entry.pl,
+        count: entry.count,
+        day: d,
+        today: date.toDateString() === new Date().toDateString(),
+        weekend: date.getDay() === 0 || date.getDay() === 6,
+      });
     }
-    return out;
+
+    let total = 0;
+    let traded = 0;
+    byDay.forEach(({ pl, count }) => {
+      total += pl;
+      if (count > 0) traded++;
+    });
+    return { cells: out, monthPL: total, tradedDays: traded };
   }, [trades]);
 
   const monthLabel = new Date().toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
 
+  // Couleur cellule (cohérent avec la page Calendar complète)
   const cellBg = (pl: number) => {
     if (pl === 0) return 'rgba(24,28,37,0.4)';
-    const intensity = Math.min(Math.abs(pl) / 400, 1);
+    const intensity = Math.min(Math.abs(pl) / 500, 1);
     return pl > 0
-      ? `rgba(243,108,0,${0.2 + intensity * 0.5})`
-      : `rgba(239,68,68,${0.15 + intensity * 0.4})`;
+      ? `rgba(243,108,0,${0.15 + intensity * 0.45})`
+      : `rgba(239,68,68,${0.12 + intensity * 0.35})`;
+  };
+
+  // Format compact des montants pour tenir dans une petite cellule
+  const compact = (v: number) => {
+    const abs = Math.abs(v);
+    if (abs >= 1000) return `${(v / 1000).toFixed(abs >= 10000 ? 0 : 1)}k`;
+    return Math.round(v).toString();
   };
 
   return (
-    <div className="glass p-6 rounded-3xl h-full">
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="font-bold text-base capitalize">{monthLabel}</h3>
+    <div className="glass p-6 rounded-3xl h-full flex flex-col">
+      <div className="flex justify-between items-center mb-3">
+        <div>
+          <h3 className="font-bold text-base capitalize leading-tight">{monthLabel}</h3>
+          <p className="text-[10px] mono text-txt-3 mt-0.5">
+            <span className={monthPL > 0 ? 'text-win' : monthPL < 0 ? 'text-loss' : 'text-txt-3'}>
+              {monthPL >= 0 ? '+' : '-'}${fmt(Math.abs(monthPL), { maximumFractionDigits: 0 })}
+            </span>
+            {' · '}
+            <span>{tradedDays} j tradés</span>
+          </p>
+        </div>
         <button onClick={onSeeAll} className="text-[10px] font-bold uppercase tracking-widest text-accent hover:text-accent-2">
           Vue plus &rsaquo;
         </button>
       </div>
+
       <div className="grid grid-cols-7 gap-1 text-[9px] mb-1.5 font-bold uppercase tracking-wider text-txt-3">
         {['L', 'M', 'M', 'J', 'V', 'S', 'D'].map((d, i) => <div key={i} className="text-center">{d}</div>)}
       </div>
-      <div className="grid grid-cols-7 gap-1">
+
+      <div className="grid grid-cols-7 gap-1 flex-1">
         {cells.map((c, i) => {
-          if (c.day === null)
-            return <div key={i} className="aspect-square rounded opacity-30" style={{ background: 'rgba(24,28,37,0.2)' }} />;
+          if (c.day === null) {
+            return <div key={i} className="aspect-square rounded opacity-25" style={{ background: 'rgba(24,28,37,0.2)' }} />;
+          }
+          const hasPL = c.count > 0;
           return (
             <div
               key={i}
-              className={`aspect-square rounded flex items-center justify-center text-[10px] mono ${
-                c.today ? 'ring-1 ring-accent' : ''
-              } ${c.pl !== 0 ? 'font-bold' : 'text-txt-3'}`}
+              className={`aspect-square rounded flex flex-col items-center justify-center text-[9px] mono relative transition-colors ${
+                c.today ? 'ring-1 ring-accent ring-inset' : ''
+              } ${c.weekend && !hasPL ? 'opacity-50' : ''}`}
               style={{ background: cellBg(c.pl) }}
-              title={c.pl !== 0 ? `${c.pl >= 0 ? '+' : '-'}$${fmt(Math.abs(c.pl), { maximumFractionDigits: 0 })}` : ''}
+              title={
+                hasPL
+                  ? `${c.day} ${monthLabel} · ${c.count} trade${c.count > 1 ? 's' : ''} · ${c.pl >= 0 ? '+' : '-'}$${fmt(Math.abs(c.pl), { maximumFractionDigits: 0 })}`
+                  : `${c.day} ${monthLabel} · pas de trade`
+              }
             >
-              {c.day}
+              <span className={`leading-none ${
+                c.today ? 'text-accent font-bold' : hasPL ? 'text-txt font-bold' : 'text-txt-3'
+              }`}>
+                {c.day}
+              </span>
+              {hasPL && (
+                <span className={`leading-none mt-0.5 text-[8px] font-bold ${
+                  c.pl > 0 ? 'text-win' : c.pl < 0 ? 'text-loss' : 'text-txt-2'
+                }`}>
+                  {c.pl >= 0 ? '+' : '-'}{compact(c.pl)}
+                </span>
+              )}
             </div>
           );
         })}
