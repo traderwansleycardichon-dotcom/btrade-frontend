@@ -2,9 +2,11 @@ import React from 'react';
 import { LineChart, ArrowLeft, Star } from 'lucide-react';
 import { SparkLine } from '../ui/SparkLine';
 import { MOCK_TESTIMONIALS } from '../../lib/mocks';
+import { useSettings } from '../../contexts/SettingsContext';
 
 export const HeroPane: React.FC = () => {
   const testimonial = MOCK_TESTIMONIALS[0];
+  const { settings } = useSettings();
 
   return (
     <div className="hidden lg:flex flex-col flex-1 bg-surface relative overflow-hidden p-16">
@@ -17,10 +19,16 @@ export const HeroPane: React.FC = () => {
       {/* Top Header */}
       <div className="relative flex justify-between items-center mb-auto">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-accent rounded-xl flex items-center justify-center shadow-lg">
-            <LineChart size={24} className="text-white" />
-          </div>
-          <span className="text-2xl font-black tracking-tight">BTrade</span>
+          {settings?.platform_logo ? (
+            <img src={settings.platform_logo} alt="Logo BTrade" className="h-10 w-auto object-contain" />
+          ) : (
+            <>
+              <div className="w-10 h-10 bg-accent rounded-xl flex items-center justify-center shadow-lg">
+                <LineChart size={24} className="text-white" />
+              </div>
+              <span className="text-2xl font-black tracking-tight">BTrade</span>
+            </>
+          )}
         </div>
         <a href="/" className="flex items-center gap-2 text-txt-2 hover:text-txt font-bold text-sm transition-colors group">
           <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />

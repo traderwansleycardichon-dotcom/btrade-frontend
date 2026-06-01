@@ -2,9 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Shield, ChevronLeft, Loader2, AlertCircle } from 'lucide-react';
 import api from '../../lib/api';
+import { useSettings } from '../../contexts/SettingsContext';
 
 const LegalPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
+  const { settings } = useSettings();
   const [page, setPage] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -52,10 +54,16 @@ const LegalPage: React.FC = () => {
       <header className="border-b border-border bg-surface/50 backdrop-blur-xl sticky top-0 z-50">
         <div className="container mx-auto px-6 h-20 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 bg-accent rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(243,108,0,0.3)] group-hover:scale-105 transition-transform">
-               <span className="font-black text-white text-xl">B</span>
-            </div>
-            <span className="font-black text-2xl tracking-tighter">BTrade</span>
+            {settings?.platform_logo ? (
+              <img src={settings.platform_logo} alt="Logo BTrade" className="h-10 w-auto object-contain" />
+            ) : (
+              <>
+                <div className="w-10 h-10 bg-accent rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(243,108,0,0.3)] group-hover:scale-105 transition-transform">
+                   <span className="font-black text-white text-xl">B</span>
+                </div>
+                <span className="font-black text-2xl tracking-tighter">BTrade</span>
+              </>
+            )}
           </Link>
           <div className="hidden md:flex items-center gap-2 text-txt-3 text-sm font-bold uppercase tracking-widest">
             <Shield size={16} />

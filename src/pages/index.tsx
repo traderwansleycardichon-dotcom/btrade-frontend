@@ -9,8 +9,11 @@ import { ComparisonTable } from '../components/landing/ComparisonTable';
 import { YoutubeSection } from '../components/landing/YoutubeSection';
 import { PricingSection } from '../components/landing/PricingSection';
 import { FaqSection } from '../components/landing/FaqSection';
+import { useSettings } from '../contexts/SettingsContext';
 
 const LandingPage: React.FC = () => {
+  const { settings } = useSettings();
+
   return (
     <div className="landing-shell min-h-screen bg-bg text-white font-sans selection:bg-accent/30 selection:text-white overflow-x-hidden">
       <Navbar />
@@ -29,9 +32,9 @@ const LandingPage: React.FC = () => {
           <div className="col-span-2">
             <div className="mb-5">
               <img
-                src="/logo.svg"
+                src={settings?.platform_logo || "/logo.svg"}
                 alt="Behind the Trades — Journal"
-                className="h-16 w-16 rounded-full shadow-[0_0_24px_rgba(243,108,0,0.25)]"
+                className="h-16 w-16 rounded-full shadow-[0_0_24px_rgba(243,108,0,0.25)] object-contain"
               />
             </div>
             <p className="text-[13px] text-white/45 max-w-sm leading-relaxed">

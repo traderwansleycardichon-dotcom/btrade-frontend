@@ -1,7 +1,10 @@
 import React from 'react';
 import { LineChart, Github, Twitter, MessageSquare } from 'lucide-react';
+import { useSettings } from '../../contexts/SettingsContext';
 
 export const Footer: React.FC = () => {
+  const { settings } = useSettings();
+
   return (
     <footer className="py-20 border-t border-border bg-bg relative overflow-hidden">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_100%,#F36C0005,transparent_50%)] pointer-events-none" />
@@ -10,10 +13,16 @@ export const Footer: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
           <div className="col-span-1 md:col-span-2">
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-8 h-8 bg-accent rounded-lg flex items-center justify-center">
-                <LineChart size={18} className="text-white" />
-              </div>
-              <span className="font-black text-xl tracking-tight">BTrade</span>
+              {settings?.platform_logo ? (
+                <img src={settings.platform_logo} alt="Logo BTrade" className="h-10 w-auto object-contain" />
+              ) : (
+                <>
+                  <div className="w-8 h-8 bg-accent rounded-lg flex items-center justify-center">
+                    <LineChart size={18} className="text-white" />
+                  </div>
+                  <span className="font-black text-xl tracking-tight">BTrade</span>
+                </>
+              )}
             </div>
             <p className="text-txt-2 text-sm max-w-sm leading-relaxed">
               Le journal de trading nouvelle génération pour les traders sérieux. 
