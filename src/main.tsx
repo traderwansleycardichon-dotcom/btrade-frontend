@@ -25,6 +25,7 @@ import EconomicPage from './pages/app/economic/page';
 import AnalysesPage from './pages/app/analyses/page';
 import AiChatPage from './pages/app/ai-chat/page';
 import SettingsPage from './pages/app/settings/page';
+import SupportPage from './pages/app/support/page';
 import './styles/globals.css';
 
 import { AdminLayout } from './components/layout/AdminLayout';
@@ -124,6 +125,7 @@ const router = createBrowserRouter([
       { path: 'economic', element: <EconomicPage /> },
       { path: 'ai-chat', element: <AiChatPage /> },
       { path: 'messages', element: <MessagesPage /> },
+      { path: 'support', element: <SupportPage /> },
     ],
   },
   // Catch-all fallback to redirect any unknown routes to the landing page

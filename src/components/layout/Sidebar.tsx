@@ -11,6 +11,7 @@ import {
   Wallet, 
   CreditCard, 
   Settings,
+  LifeBuoy,
   LogOut,
   ChevronRight,
   GraduationCap,
@@ -132,6 +133,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen = false, onMobileCl
       title: 'Système',
       items: [
         { label: 'Messages',   icon: MessageSquare, href: '/app/messages' },
+        { label: 'Support & Aide', icon: LifeBuoy, href: '/app/support' },
         { label: 'Paramètres', icon: Settings,       href: '/app/settings' },
       ]
     }
