@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, Plus, Edit2, Trash2, GripVertical, FileText, CheckCircle2 } from 'lucide-react';
 import api from '../../../../lib/api';
 import { useToast } from '../../../../hooks/useToast';
+import { ImageUpload } from '../../../../components/ui/ImageUpload';
 
 interface Question {
   id: string;
@@ -19,6 +20,7 @@ interface Lesson {
   titre: string;
   contenu: string;
   videoUrl?: string;
+  thumbnail?: string;
   ordre: number;
   actif: boolean;
   quizQuestions: Question[];
@@ -32,10 +34,15 @@ export const AdminLessonsPage = () => {
 
   const [isLessonModalOpen, setIsLessonModalOpen] = useState(false);
   const [editingLesson, setEditingLesson] = useState<Lesson | null>(null);
+  const [thumbnail, setThumbnail] = useState('');
 
   const [isQuestionModalOpen, setIsQuestionModalOpen] = useState(false);
   const [editingQuestion, setEditingQuestion] = useState<Question | null>(null);
   const [currentLessonForQuestion, setCurrentLessonForQuestion] = useState<string | null>(null);
+
+  useEffect(() => {
+    setThumbnail(editingLesson?.thumbnail || '');
+  }, [editingLesson]);
 
   const { data: modules = [], isLoading } = useQuery({
     queryKey: ['admin-modules'],
@@ -247,13 +254,20 @@ export const AdminLessonsPage = () => {
                 titre: formData.get('titre') as string,
                 contenu: formData.get('contenu') as string,
                 video_url: formData.get('video_url') as string,
+                thumbnail: thumbnail || null,
                 ordre: Number(formData.get('ordre')),
                 actif: formData.get('actif') === 'on'
-              });
+              } as any);
             }} className="p-6 overflow-y-auto space-y-4">
               <div>
                 <label className="block text-sm font-bold text-txt-2 mb-1">Titre de la leçon</label>
                 <input name="titre" defaultValue={editingLesson?.titre} required className="w-full bg-elevated border border-border rounded-xl px-4 py-2.5 text-txt focus:outline-none focus:border-loss transition-colors" />
+              </div>
+              <div>
+                <label className="block text-sm font-bold text-txt-2 mb-1">Thumbnail de la Leçon</label>
+                <div className="max-w-[120px]">
+                  <ImageUpload value={thumbnail} onChange={setThumbnail} />
+                </div>
               </div>
               <div>
                 <label className="block text-sm font-bold text-txt-2 mb-1">Lien de la vidéo YouTube (Optionnel)</label>
