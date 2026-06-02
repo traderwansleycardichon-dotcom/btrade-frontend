@@ -69,7 +69,7 @@ export default function AdminCmsPage() {
         <div className="glass p-6 rounded-3xl border border-border bg-gradient-to-br from-surface to-accent/5">
           <Layout size={32} className="text-accent mb-4" />
           <h3 className="font-bold mb-1">Playbooks Globaux</h3>
-          <p className="text-xs text-txt-2 mb-4">Stratégies visibles par tous les membres BTrade.</p>
+          <p className="text-xs text-txt-2 mb-4">Stratégies visibles par tous les membres Behind The Trade.</p>
           <div className="text-2xl font-black">{playbooks.length}</div>
         </div>
         <div className="glass p-6 rounded-3xl border border-border">
@@ -88,7 +88,7 @@ export default function AdminCmsPage() {
 
       <div className="glass rounded-3xl border border-border overflow-hidden">
         <div className="px-6 py-4 border-b border-border bg-surface/50 flex justify-between items-center">
-          <h3 className="font-bold">Playbooks BTrade Officiels</h3>
+          <h3 className="font-bold">Playbooks Behind The Trade Officiels</h3>
           <div className="relative">
             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-txt-3" />
             <input type="text" placeholder="Filtrer..." className="pl-9 pr-4 py-1.5 rounded-lg bg-elevated border border-border text-xs outline-none focus:border-accent/50" />

@@ -81,7 +81,7 @@ const FormationHub: React.FC = () => {
         <head>
           <title>BTrade Academy - Certificat</title>
           <style>
-            @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Montserrat:wght@400;500;700&display=swap');
+            @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Montserrat:wght@300;400;600&display=swap');
             body {
               background: #0A0B0E;
               color: #FFFFFF;
@@ -132,7 +132,7 @@ const FormationHub: React.FC = () => {
             .sig-img { height: 45px; width: auto; object-fit: contain; margin-bottom: 5px; }
             .sig-placeholder { font-family: 'Georgia', serif; font-style: italic; font-size: 18px; color: #FFFFFF; border-bottom: 1px dashed rgba(255,255,255,0.15); padding-bottom: 10px; margin-bottom: 5px; }
             .signature-title { font-size: 9px; color: #6B7280; text-transform: uppercase; letter-spacing: 1.5px; margin-top: 5px; }
-            .verification-code { font-family: monospace; font-size: 9px; color: #6B7280; position: absolute; bottom: 15px; left: 45px; }
+            .verification-code { font-family: monospace; font-size: 9px; color: #6B7280; text-align:center;  bottom: 15px; left: 45px; }
           </style>
         </head>
         <body>
@@ -144,7 +144,7 @@ const FormationHub: React.FC = () => {
               </div>
               <div class="main-content">
                 <div class="title">Certificat de Réussite</div>
-                <div class="subtitle">BTrade Academy Premium</div>
+                <div class="subtitle">Behind the Trade Academy</div>
                 <div class="award-to">Ce certificat de formation est fièrement décerné à</div>
                 <div class="student-name">${cert.userName}</div>
                 <div class="description">

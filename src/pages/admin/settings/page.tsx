@@ -267,7 +267,7 @@ export default function AdminSettingsPage() {
               <div className="space-y-6">
                 <div>
                   <label className="block text-[10px] font-bold text-txt-3 uppercase tracking-widest mb-2">Logo de la plateforme</label>
-                  <p className="text-xs text-txt-2 mb-4">Ce logo remplacera le texte "BTrade" dans la barre de navigation et le menu latéral.</p>
+                  <p className="text-xs text-txt-2 mb-4">Ce logo remplacera le texte "Behind The Trade" dans la barre de navigation et le menu latéral.</p>
                   
                   <div className="max-w-xs">
                     <ImageUpload
@@ -338,7 +338,7 @@ export default function AdminSettingsPage() {
                         type="text" 
                         defaultValue={settings?.certificate_signer_name || ''}
                         id="certificate_signer_name_input"
-                        placeholder="Ex: Frantzley Adolphe, Fondateur BTrade"
+                        placeholder="Ex: Frantzley Adolphe, Fondateur Behind The Trade"
                         className="flex-1 bg-elevated border border-border rounded-xl px-4 py-2.5 text-xs focus:border-loss/50 outline-none transition-all text-txt"
                       />
                       <button

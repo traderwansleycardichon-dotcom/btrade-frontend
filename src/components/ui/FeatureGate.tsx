@@ -31,7 +31,7 @@ export const FeatureGate: React.FC<FeatureGateProps> = ({
         {children}
       </div>
 
-      {/* Overlay Premium styled BTrade */}
+      {/* Overlay Premium styled Behind The Trade */}
       <div className="absolute inset-0 bg-bg/75 backdrop-blur-[2px] flex flex-col items-center justify-center p-6 text-center z-10">
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}

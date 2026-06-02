@@ -23,7 +23,7 @@ export default function AdminDashboardPage() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-black mb-2">Tableau de bord Global</h1>
-          <p className="text-txt-2 text-sm">Vue d'ensemble de la plateforme BTrade</p>
+          <p className="text-txt-2 text-sm">Vue d'ensemble de la plateforme Behind The Trade</p>
         </div>
         <div className="bg-loss/10 text-loss px-3 py-1 rounded-lg text-xs font-bold border border-loss/20 flex items-center gap-2">
           <AlertTriangle size={14} />

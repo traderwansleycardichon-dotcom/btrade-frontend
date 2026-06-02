@@ -144,7 +144,7 @@ export const TicketThreadModal: React.FC<TicketThreadModalProps> = ({
                   }`}>
                     <div className={`flex justify-between items-center mb-2 ${isMine ? 'flex-row-reverse' : ''}`}>
                       <span className="font-bold text-sm">
-                        {reply.isAdmin ? 'Support BTrade' : (ticket.user?.fullName || 'Utilisateur')}
+                        {reply.isAdmin ? 'Support Behind The Trade' : (ticket.user?.fullName || 'Utilisateur')}
                       </span>
                       <span className="text-xs opacity-50 flex items-center gap-1">
                         <Clock size={12} />

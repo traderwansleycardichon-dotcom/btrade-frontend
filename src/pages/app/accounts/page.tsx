@@ -377,7 +377,7 @@ const AccountsPage: React.FC = () => {
               }}
               className="flex-1 bg-accent hover:bg-accent/90 text-white py-3 rounded-xl font-bold transition-all text-xs shadow-md hover:scale-105"
             >
-              Découvrir BTrade Pro
+              Découvrir Behind The Trade Pro
             </button>
           </div>
         </div>

@@ -52,7 +52,7 @@ export default function AdminBroadcastPage() {
           <Megaphone size={32} />
         </div>
         <h1 className="text-2xl font-black mb-2">Broadcast Global</h1>
-        <p className="text-txt-2 text-sm">Envoyez une notification système à l'ensemble des membres de BTrade.</p>
+        <p className="text-txt-2 text-sm">Envoyez une notification système à l'ensemble des membres de Behind The Trade.</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">

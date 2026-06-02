@@ -175,7 +175,7 @@ const SettingsPage: React.FC = () => {
         </div>
         <div>
           <h2 className="text-3xl font-black tracking-tight">{user?.fullName || 'Utilisateur'}</h2>
-          <p className="text-txt-2">Membre BTrade depuis {formatJoinedDate(user?.createdAt)} • <span className="text-accent font-bold">Plan {user?.plan ? user.plan.toUpperCase() : 'FREE'}</span></p>
+          <p className="text-txt-2">Membre Behind The Trade depuis {formatJoinedDate(user?.createdAt)} • <span className="text-accent font-bold">Plan {user?.plan ? user.plan.toUpperCase() : 'FREE'}</span></p>
         </div>
       </div>
 

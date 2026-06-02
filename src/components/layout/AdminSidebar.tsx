@@ -78,7 +78,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
           <div className="flex items-center gap-3">
             {settings?.platform_logo ? (
               <>
-                <img src={settings.platform_logo} alt="Logo BTrade" className="h-8 w-auto object-contain" />
+                <img src={settings.platform_logo} alt="Logo Behind The Trade" className="h-8 w-auto object-contain" />
                 <div>
                   <span className="text-[10px] font-black text-loss uppercase tracking-widest block leading-tight mt-1">Admin Control</span>
                 </div>
@@ -89,7 +89,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
                   <Shield size={20} className="text-white" />
                 </div>
                 <div>
-                  <span className="font-bold text-lg tracking-tight block leading-tight">BTrade</span>
+                  <span className="font-bold text-lg tracking-tight block leading-tight">Behind The Trade</span>
                   <span className="text-[10px] font-black text-loss uppercase tracking-widest">Admin Control</span>
                 </div>
               </>

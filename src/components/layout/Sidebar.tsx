@@ -60,7 +60,7 @@ interface NavGroup {
 
 /**
  * Sidebar Component
- * Gère la navigation principale de l'application BTrade.
+ * Gère la navigation principale de l'application Behind The Trade.
  * Les liens sont regroupés par sections logiques pour une meilleure UX.
  */
 
@@ -165,13 +165,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen = false, onMobileCl
       <div className="p-5 lg:p-6 flex items-center gap-3 justify-between">
         <div className="flex items-center gap-3">
           {settings?.platform_logo ? (
-            <img src={settings.platform_logo} alt="Logo BTrade" className="h-8 w-auto object-contain" />
+            <img src={settings.platform_logo} alt="Logo Behind The Trade" className="h-8 w-auto object-contain" />
           ) : (
             <>
               <div className="w-8 h-8 bg-accent rounded-lg flex items-center justify-center shadow-[0_0_15px_rgba(243,108,0,0.4)]">
                 <TrendingUp size={20} className="text-white" />
               </div>
-              <span className="font-bold text-lg tracking-tight">BTrade</span>
+              <span className="font-bold text-lg tracking-tight">Behind The Trade</span>
             </>
           )}
         </div>
@@ -287,7 +287,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen = false, onMobileCl
       <Modal
         isOpen={isUpgradeModalOpen}
         onClose={() => setIsUpgradeModalOpen(false)}
-        title="💎 Fonctionnalité Premium BTrade"
+        title="💎 Fonctionnalité Premium Behind The Trade"
         size="md"
       >
         <div className="flex flex-col items-center text-center p-2">
@@ -300,7 +300,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen = false, onMobileCl
           </h3>
           
           <p className="text-sm text-txt-2 max-w-sm mb-6 leading-relaxed">
-            Cette fonctionnalité exclusive fait partie du plan <b>BTrade Pro</b>. Améliorez votre expérience de trading avec nos outils professionnels avancés.
+            Cette fonctionnalité exclusive fait partie du plan <b>Behind The Trade Pro</b>. Améliorez votre expérience de trading avec nos outils professionnels avancés.
           </p>
 
           <div className="w-full bg-bg/50 border border-border rounded-2xl p-4 mb-6 text-left space-y-3">

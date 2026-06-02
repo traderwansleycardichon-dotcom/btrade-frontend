@@ -37,7 +37,7 @@ export const InviteStaffModal: React.FC<InviteStaffModalProps> = ({ isOpen, onCl
   };
 
   const copyToClipboard = () => {
-    const text = `Identifiants BTrade Staff:\nEmail: ${invitedUser.user.email}\nMot de passe temporaire: ${invitedUser.tempPassword}`;
+    const text = `Identifiants Behind The Trade Staff:\nEmail: ${invitedUser.user.email}\nMot de passe temporaire: ${invitedUser.tempPassword}`;
     navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);

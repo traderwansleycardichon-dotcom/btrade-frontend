@@ -25,7 +25,7 @@ export const ComparisonTable: React.FC = () => {
           </h2>
           <p className="text-white/55 mt-4 max-w-xl mx-auto">
             On a comparé ligne par ligne aux journaux les plus utilisés.
-            Voilà ce que vous gagnez en venant chez BTrade.
+            Voilà ce que vous gagnez en venant chez Behind The Trade.
           </p>
         </div>
 
@@ -37,7 +37,7 @@ export const ComparisonTable: React.FC = () => {
                   Fonctionnalité
                 </th>
                 <th className="px-6 py-6 text-center text-[11px] uppercase tracking-[0.22em] font-semibold text-accent">
-                  BTrade
+                  Behind The Trade
                 </th>
                 <th className="px-6 py-6 text-center text-[10px] uppercase tracking-[0.22em] text-white/40 font-medium">
                   Autres

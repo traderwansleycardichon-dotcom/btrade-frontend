@@ -55,13 +55,13 @@ const LegalPage: React.FC = () => {
         <div className="container mx-auto px-6 h-20 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-3 group">
             {settings?.platform_logo ? (
-              <img src={settings.platform_logo} alt="Logo BTrade" className="h-10 w-auto object-contain" />
+              <img src={settings.platform_logo} alt="Logo Behind The Trade" className="h-10 w-auto object-contain" />
             ) : (
               <>
                 <div className="w-10 h-10 bg-accent rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(243,108,0,0.3)] group-hover:scale-105 transition-transform">
                    <span className="font-black text-white text-xl">B</span>
                 </div>
-                <span className="font-black text-2xl tracking-tighter">BTrade</span>
+                <span className="font-black text-2xl tracking-tighter">Behind The Trade</span>
               </>
             )}
           </Link>
@@ -115,7 +115,7 @@ const LegalPage: React.FC = () => {
       <footer className="border-t border-border py-12 mt-20">
         <div className="container mx-auto px-6 text-center">
           <p className="text-txt-3 text-xs font-bold uppercase tracking-widest">
-            © {new Date().getFullYear()} BTrade. Tous droits réservés.
+            © {new Date().getFullYear()} Behind The Trade. Tous droits réservés.
           </p>
         </div>
       </footer>

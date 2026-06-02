@@ -39,7 +39,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchToLogin }) =
     <div className="w-full max-w-md space-y-8 animate-[fadeIn_0.5s_ease-out]">
       <div className="text-center">
         <h2 className="text-3xl font-black mb-2 tracking-tight">Créer un compte</h2>
-        <p className="text-txt-2 text-sm">Rejoignez la communauté BTrade dès aujourd'hui.</p>
+        <p className="text-txt-2 text-sm">Rejoignez la communauté Behind The Trade dès aujourd'hui.</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-5">

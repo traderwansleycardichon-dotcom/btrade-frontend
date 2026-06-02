@@ -169,7 +169,7 @@ const AiChatPage: React.FC = () => {
         {!eventId && messages.length === 0 && (
           <div className="text-center py-12">
             <MessageSquare size={28} className="mx-auto text-txt-3 mb-3" />
-            <p className="text-xs font-bold mb-1">BTrade Coach — Ton mentor trading IA</p>
+            <p className="text-xs font-bold mb-1">Behind The Trade Coach — Ton mentor trading IA</p>
             <p className="text-[10px] text-txt-3 max-w-xs mx-auto leading-relaxed">
               Setups, analyse technique, macro, risk management, prop firms, psychologie…
               <br />
