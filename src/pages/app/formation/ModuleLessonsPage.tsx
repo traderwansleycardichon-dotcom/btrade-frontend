@@ -12,12 +12,14 @@ interface ModuleInfo {
   description: string;
   ordre: number;
   icone: string;
+  coverImage?: string;
 }
 
 interface LessonListItem {
   id: string;
   titre: string;
   ordre: number;
+  thumbnail?: string;
   statut: 'locked' | 'available' | 'in_progress' | 'completed';
   lecture_done: boolean;
   quiz_passed: boolean;
@@ -84,9 +86,17 @@ const ModuleLessonsHub: React.FC = () => {
       <div className="relative overflow-hidden rounded-3xl glass-frost p-6 sm:p-10 border border-white/10 flex flex-col md:flex-row gap-8 items-start md:items-center shadow-2xl">
         <div className="absolute inset-0 bg-gradient-to-r from-accent/10 via-transparent to-transparent opacity-50 pointer-events-none" />
         
-        <div className="relative w-20 h-20 rounded-[2rem] bg-accent/10 border border-accent/20 flex items-center justify-center text-5xl shrink-0 shadow-[0_0_30px_rgba(243,108,0,0.2)]">
+        <div className="relative w-20 h-20 rounded-[2rem] bg-accent/10 border border-accent/20 flex items-center justify-center text-5xl shrink-0 shadow-[0_0_30px_rgba(243,108,0,0.2)] overflow-hidden">
           <div className="absolute inset-0 bg-accent/20 blur-xl rounded-full" />
-          <span className="relative z-10 drop-shadow-md">{module.icone || '📖'}</span>
+          {module.coverImage ? (
+            <img
+              src={module.coverImage}
+              alt={module.titre}
+              className="w-full h-full object-cover relative z-10 rounded-[2rem]"
+            />
+          ) : (
+            <span className="relative z-10 drop-shadow-md">{module.icone || '📖'}</span>
+          )}
         </div>
         
         <div className="relative z-10 space-y-2">
@@ -145,15 +155,21 @@ const ModuleLessonsHub: React.FC = () => {
                   <div className="relative z-10 flex items-start gap-4 min-w-0 w-full sm:w-auto">
                     {/* Index and Icon */}
                     <div className={`
-                      w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 font-bold font-mono text-sm transition-colors duration-300
-                      ${isLocked 
-                        ? 'bg-white/5 text-txt-3' 
-                        : isCompleted 
-                          ? 'bg-win/10 text-win shadow-[0_0_15px_rgba(16,185,129,0.2)]' 
+                      w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 font-bold font-mono text-sm transition-colors duration-300 overflow-hidden
+                      ${isLocked
+                        ? 'bg-white/5 text-txt-3'
+                        : isCompleted
+                          ? 'bg-win/10 text-win shadow-[0_0_15px_rgba(16,185,129,0.2)]'
                           : 'bg-accent/10 text-accent group-hover:bg-accent group-hover:text-white shadow-[0_0_15px_rgba(243,108,0,0.2)]'
                       }
                     `}>
-                      {isLocked ? (
+                      {lesson.thumbnail && !isLocked ? (
+                        <img
+                          src={lesson.thumbnail}
+                          alt={lesson.titre}
+                          className="w-full h-full object-cover rounded-2xl"
+                        />
+                      ) : isLocked ? (
                         <Lock size={16} />
                       ) : isCompleted ? (
                         <CheckCircle size={20} />
