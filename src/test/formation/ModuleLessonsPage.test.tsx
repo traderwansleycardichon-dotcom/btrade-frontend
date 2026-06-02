@@ -108,7 +108,7 @@ describe('ModuleLessonsPage (Academy)', () => {
     render(<ModuleLessonsPage />);
 
     await waitFor(() => {
-      expect(screen.getByText('Erreur ou module introuvable')).toBeInTheDocument();
+      expect(screen.getByText('Module introuvable')).toBeInTheDocument();
     });
   });
 });

@@ -65,7 +65,7 @@ describe('FormationPage (Academy)', () => {
     });
     
     render(<FormationPage />);
-    expect(screen.getByText("Chargement de l'Academy...")).toBeInTheDocument();
+    expect(screen.getByText("Chargement de l'Academy")).toBeInTheDocument();
   });
 
   it('affiche la liste des modules une fois chargés', async () => {
@@ -77,15 +77,14 @@ describe('FormationPage (Academy)', () => {
     render(<FormationPage />);
 
     // Attendre que le composant de base s'affiche
-    await screen.findByText(/BTrade Academy/i);
-    screen.debug();
+    await screen.findAllByText(/Bases du Trading/i);
 
     // Vérifie que les modules sont affichés
     expect(screen.getAllByText(/Bases du Trading/i).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/Price Action/i).length).toBeGreaterThan(0);
 
     // Vérifie les stats globales (certification)
-    expect(screen.getAllByText(/1 \/ 2 Certifiés/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/1\/2 certifiés/i).length).toBeGreaterThan(0);
   });
 
   it('permet de filtrer les modules via la barre de recherche', async () => {
@@ -99,7 +98,7 @@ describe('FormationPage (Academy)', () => {
 
     await screen.findAllByText(/Price Action/i);
 
-    const searchInput = screen.getByPlaceholderText('Rechercher un cours...');
+    const searchInput = screen.getByPlaceholderText('Rechercher un module...');
 
     // Tape 'bases' dans la barre de recherche
     await user.type(searchInput, 'bases');
