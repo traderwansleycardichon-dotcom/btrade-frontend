@@ -5,6 +5,7 @@ import { ArrowLeft, Plus, Edit2, Trash2, GripVertical, FileText, CheckCircle2 } 
 import api from '../../../../lib/api';
 import { useToast } from '../../../../hooks/useToast';
 import { ImageUpload } from '../../../../components/ui/ImageUpload';
+import { BulkQuizEditorModal } from '../../../../components/admin/BulkQuizEditorModal';
 
 interface Question {
   id: string;
@@ -36,9 +37,7 @@ export const AdminLessonsPage = () => {
   const [editingLesson, setEditingLesson] = useState<Lesson | null>(null);
   const [thumbnail, setThumbnail] = useState('');
 
-  const [isQuestionModalOpen, setIsQuestionModalOpen] = useState(false);
-  const [editingQuestion, setEditingQuestion] = useState<Question | null>(null);
-  const [currentLessonForQuestion, setCurrentLessonForQuestion] = useState<string | null>(null);
+  const [quizLessonTarget, setQuizLessonTarget] = useState<Lesson | null>(null);
 
   useEffect(() => {
     setThumbnail(editingLesson?.thumbnail || '');
@@ -81,23 +80,6 @@ export const AdminLessonsPage = () => {
     }
   });
 
-  const saveQuestion = useMutation({
-    mutationFn: async (questionData: any) => {
-      if (editingQuestion) {
-        return api.put(`/api/admin/formation/lessons/${currentLessonForQuestion}/questions/${editingQuestion.id}`, questionData);
-      }
-      return api.post(`/api/admin/formation/lessons/${currentLessonForQuestion}/questions`, questionData);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin-modules'] });
-      addToast('Question enregistrée.', 'success');
-      setIsQuestionModalOpen(false);
-      setEditingQuestion(null);
-    },
-    onError: (err: any) => {
-      addToast(err.response?.data?.error || 'Erreur', 'error');
-    }
-  });
 
   const deleteQuestion = useMutation({
     mutationFn: async ({ lessonId, questionId }: { lessonId: string, questionId: string }) => {
@@ -185,7 +167,7 @@ export const AdminLessonsPage = () => {
                   <Trash2 size={18} />
                 </button>
                 <button
-                  onClick={() => { setCurrentLessonForQuestion(lesson.id); setEditingQuestion(null); setIsQuestionModalOpen(true); }}
+                  onClick={() => setQuizLessonTarget(lesson)}
                   className="px-3 py-2 bg-loss/10 text-loss rounded-lg font-bold hover:bg-loss/20 transition-colors ml-2 flex items-center gap-2"
                 >
                   <Plus size={16} /> Quiz
@@ -216,7 +198,7 @@ export const AdminLessonsPage = () => {
                       {q.explication && <p className="text-xs text-txt-3 italic">Explication: {q.explication}</p>}
                     </div>
                     <div className="flex flex-col gap-1 shrink-0">
-                      <button onClick={() => { setCurrentLessonForQuestion(lesson.id); setEditingQuestion(q); setIsQuestionModalOpen(true); }} className="p-1.5 text-txt-3 hover:text-loss transition-colors">
+                      <button onClick={() => setQuizLessonTarget(lesson)} className="p-1.5 text-txt-3 hover:text-loss transition-colors">
                         <Edit2 size={14} />
                       </button>
                       <button onClick={() => { if(window.confirm('Supprimer cette question ?')) deleteQuestion.mutate({ lessonId: lesson.id, questionId: q.id })}} className="p-1.5 text-txt-3 hover:text-loss transition-colors">
@@ -300,66 +282,18 @@ export const AdminLessonsPage = () => {
         </div>
       )}
 
-      {/* Question Modal */}
-      {isQuestionModalOpen && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-[60] p-4">
-          <div className="bg-surface w-full max-w-lg rounded-2xl border border-border overflow-hidden">
-            <div className="p-6 border-b border-border">
-              <h2 className="text-xl font-bold">{editingQuestion ? 'Modifier la Question' : 'Nouvelle Question'}</h2>
-            </div>
-            
-            <form onSubmit={(e) => {
-              e.preventDefault();
-              const formData = new FormData(e.currentTarget);
-              
-              // Extraire les options
-              const options = [];
-              for(let i=0; i<4; i++) {
-                const opt = formData.get(`option_${i}`) as string;
-                if (opt && opt.trim()) options.push(opt);
-              }
-
-              saveQuestion.mutate({
-                question: formData.get('question') as string,
-                options,
-                reponse_correcte: Number(formData.get('reponse_correcte')),
-                explication: formData.get('explication') as string,
-                ordre: Number(formData.get('ordre'))
-              });
-            }} className="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
-              <div>
-                <label className="block text-sm font-bold text-txt-2 mb-1">Question</label>
-                <input name="question" defaultValue={editingQuestion?.question} required className="w-full bg-elevated border border-border rounded-xl px-4 py-2.5 text-txt focus:outline-none focus:border-loss transition-colors" />
-              </div>
-              
-              <div className="space-y-3">
-                <label className="block text-sm font-bold text-txt-2 mb-1">Options de réponse</label>
-                {[0, 1, 2, 3].map(i => (
-                  <div key={i} className="flex items-center gap-3">
-                    <input type="radio" name="reponse_correcte" value={i} defaultChecked={editingQuestion?.reponseCorrecte === i || (i === 0 && !editingQuestion)} required className="w-4 h-4 text-loss focus:ring-loss bg-elevated border-border" />
-                    <input name={`option_${i}`} defaultValue={editingQuestion?.options[i] || ''} placeholder={`Option ${i+1}`} className="flex-1 bg-elevated border border-border rounded-xl px-3 py-2 text-sm text-txt focus:outline-none focus:border-loss transition-colors" required={i < 2} />
-                  </div>
-                ))}
-                <p className="text-xs text-txt-3">Au moins 2 options sont requises. Sélectionnez le bouton radio pour la bonne réponse.</p>
-              </div>
-
-              <div>
-                <label className="block text-sm font-bold text-txt-2 mb-1">Explication (optionnel)</label>
-                <textarea name="explication" defaultValue={editingQuestion?.explication || ''} rows={2} className="w-full bg-elevated border border-border rounded-xl px-4 py-2.5 text-txt focus:outline-none focus:border-loss transition-colors resize-none" placeholder="Affiché après la réponse..." />
-              </div>
-
-              <div>
-                <label className="block text-sm font-bold text-txt-2 mb-1">Ordre</label>
-                <input name="ordre" type="number" min="1" defaultValue={editingQuestion?.ordre || 1} required className="w-full bg-elevated border border-border rounded-xl px-4 py-2.5 text-txt focus:outline-none focus:border-loss transition-colors" />
-              </div>
-
-              <div className="flex gap-3 pt-4">
-                <button type="button" onClick={() => setIsQuestionModalOpen(false)} className="flex-1 bg-elevated text-txt font-bold py-3 rounded-xl hover:bg-border transition-colors">Annuler</button>
-                <button type="submit" disabled={saveQuestion.isPending} className="flex-1 bg-loss text-white font-bold py-3 rounded-xl hover:bg-loss/90 transition-colors disabled:opacity-50">Enregistrer</button>
-              </div>
-            </form>
-          </div>
-        </div>
+      {/* Bulk Quiz Editor Modal */}
+      {quizLessonTarget && (
+        <BulkQuizEditorModal
+          lessonId={quizLessonTarget.id}
+          lessonTitle={quizLessonTarget.titre}
+          existingQuestions={quizLessonTarget.quizQuestions}
+          onClose={() => setQuizLessonTarget(null)}
+          onSaved={() => {
+            queryClient.invalidateQueries({ queryKey: ['admin-modules'] });
+            setQuizLessonTarget(null);
+          }}
+        />
       )}
     </div>
   );
