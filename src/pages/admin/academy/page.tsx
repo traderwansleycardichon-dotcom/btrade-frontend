@@ -1,15 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { BookOpen, Plus, Edit2, Trash2, ChevronRight, GripVertical, Users, CheckSquare, FileText, Check, X, Search, CheckCircle, AlertTriangle, Eye } from 'lucide-react';
 import api from '../../../lib/api';
 import { useToast } from '../../../hooks/useToast';
 import { useNavigate } from 'react-router-dom';
+import { ImageUpload } from '../../../components/ui/ImageUpload';
 
 interface Module {
   id: string;
   titre: string;
   description: string;
   icone: string;
+  coverImage?: string;
   ordre: number;
   actif: boolean;
   lessons: any[];
@@ -69,6 +71,7 @@ export const AdminAcademyPage = () => {
   const [activeTab, setActiveTab] = useState<'modules' | 'users' | 'devoirs'>('modules');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingModule, setEditingModule] = useState<Module | null>(null);
+  const [coverImage, setCoverImage] = useState('');
   const [selectedUser, setSelectedUser] = useState<UserProgress | null>(null);
   const [feedbackTexts, setFeedbackTexts] = useState<Record<string, string>>({});
   const [userSearchQuery, setUserSearchQuery] = useState('');
@@ -76,6 +79,10 @@ export const AdminAcademyPage = () => {
   const { addToast } = useToast();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    setCoverImage(editingModule?.coverImage || '');
+  }, [editingModule]);
 
   // Queries
   const { data: modules = [], isLoading: isLoadingModules } = useQuery<Module[]>({
@@ -162,10 +169,10 @@ export const AdminAcademyPage = () => {
     saveModule.mutate({
       titre: formData.get('titre') as string,
       description: formData.get('description') as string,
-      icone: formData.get('icone') as string,
+      cover_image: coverImage || null,
       ordre: Number(formData.get('ordre')),
       actif: formData.get('actif') === 'on'
-    });
+    } as any);
   };
 
   const handleHomeworkReviewSubmit = (id: string, statut: 'reviewed' | 'rejected') => {
@@ -683,28 +690,24 @@ export const AdminAcademyPage = () => {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-bold text-txt-2 mb-1">Icône (Emoji)</label>
-                  <input
-                    name="icone"
-                    defaultValue={editingModule?.icone}
-                    required
-                    className="w-full bg-elevated border border-border rounded-xl px-4 py-2.5 text-txt focus:outline-none focus:border-loss transition-colors"
-                    placeholder="Ex: 📈"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-bold text-txt-2 mb-1">Ordre</label>
-                  <input
-                    name="ordre"
-                    type="number"
-                    min="1"
-                    defaultValue={editingModule?.ordre || modules.length + 1}
-                    required
-                    className="w-full bg-elevated border border-border rounded-xl px-4 py-2.5 text-txt focus:outline-none focus:border-loss transition-colors"
-                  />
-                </div>
+              <div>
+                <label className="block text-sm font-bold text-txt-2 mb-1">Image Cover du Module</label>
+                <ImageUpload
+                  value={coverImage}
+                  onChange={setCoverImage}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold text-txt-2 mb-1">Ordre</label>
+                <input
+                  name="ordre"
+                  type="number"
+                  min="1"
+                  defaultValue={editingModule?.ordre || modules.length + 1}
+                  required
+                  className="w-full bg-elevated border border-border rounded-xl px-4 py-2.5 text-txt focus:outline-none focus:border-loss transition-colors"
+                />
               </div>
 
               <div className="flex items-center gap-3 pt-2">
