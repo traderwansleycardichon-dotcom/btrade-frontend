@@ -14,6 +14,7 @@ interface Module {
   description: string;
   ordre: number;
   icone: string;
+  coverImage?: string;
   progressionPct: number;
   certified: boolean;
   lessonsCount: number;
@@ -349,20 +350,32 @@ const FormationHub: React.FC = () => {
                 <div className="absolute inset-0 bg-gradient-to-br from-accent/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
                 
                 <div>
-                  {/* Card Header with Icon and Progress */}
-                  <div className="h-40 flex flex-col items-center justify-center relative border-b border-border/20 overflow-hidden">
-                    <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.05)_0%,transparent_70%)]" />
-                    
-                    <div className="relative flex items-center justify-center text-5xl group-hover:scale-110 transition-transform duration-500 drop-shadow-[0_0_15px_rgba(255,255,255,0.1)]">
-                      <span role="img" aria-label={mod.titre}>
-                        {mod.icone || '📖'}
-                      </span>
-                      
-                      {/* Circular Progress wrapping the icon */}
-                      <div className="absolute inset-0 flex items-center justify-center pointer-events-none scale-125 opacity-40 group-hover:opacity-100 transition-opacity">
-                         <CircularProgress progress={mod.progressionPct} size={84} strokeWidth={2} progressColor="var(--accent)" trackColor="rgba(255,255,255,0.05)" />
+                  {/* Card Header with Cover Image or Icon */}
+                  <div className="h-40 relative border-b border-border/20 overflow-hidden">
+                    {mod.coverImage ? (
+                      <>
+                        <img
+                          src={mod.coverImage}
+                          alt={mod.titre}
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-60">
+                          <CircularProgress progress={mod.progressionPct} size={84} strokeWidth={2} progressColor="var(--accent)" trackColor="rgba(255,255,255,0.2)" />
+                        </div>
+                      </>
+                    ) : (
+                      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.05)_0%,transparent_70%)] flex items-center justify-center">
+                        <div className="relative flex items-center justify-center text-5xl group-hover:scale-110 transition-transform duration-500 drop-shadow-[0_0_15px_rgba(255,255,255,0.1)]">
+                          <span role="img" aria-label={mod.titre}>
+                            {mod.icone || '📖'}
+                          </span>
+                          <div className="absolute inset-0 flex items-center justify-center pointer-events-none scale-125 opacity-40 group-hover:opacity-100 transition-opacity">
+                            <CircularProgress progress={mod.progressionPct} size={84} strokeWidth={2} progressColor="var(--accent)" trackColor="rgba(255,255,255,0.05)" />
+                          </div>
+                        </div>
                       </div>
-                    </div>
+                    )}
 
                     {isCompleted && (
                       <div className="absolute top-4 right-4 bg-win/20 text-win border border-win/30 rounded-full p-1.5 shadow-[0_0_15px_rgba(16,185,129,0.3)] animate-scale-in" title="Module complété">

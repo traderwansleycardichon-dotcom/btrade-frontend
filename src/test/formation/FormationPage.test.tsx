@@ -94,18 +94,74 @@ describe('FormationPage (Academy)', () => {
       return { data: mockFormationData };
     });
     const user = userEvent.setup();
-    
+
     render(<FormationPage />);
 
     await screen.findAllByText(/Price Action/i);
 
     const searchInput = screen.getByPlaceholderText('Rechercher un cours...');
-    
+
     // Tape 'bases' dans la barre de recherche
     await user.type(searchInput, 'bases');
 
     // 'Bases du Trading' devrait être là, mais 'Price Action' devrait disparaître
     expect(screen.getAllByText(/Bases du Trading/i).length).toBeGreaterThan(0);
     expect(screen.queryAllByText(/Price Action/i).length).toBe(0);
+  });
+
+  it('affiche coverImage comme bannière quand elle est définie', async () => {
+    const mockWithImage = {
+      data: {
+        modules: [
+          {
+            id: '1',
+            slug: 'module-1',
+            titre: 'Bases du Trading',
+            description: 'Apprendre les bases.',
+            ordre: 1,
+            icone: '📈',
+            coverImage: 'https://example.com/cover.jpg',
+            progressionPct: 50,
+            certified: false,
+            lessonsCount: 3,
+            lessonsCompleted: 1,
+            prochaineLessonId: 'lesson-1',
+          },
+        ],
+        progressionGlobale: 50,
+      },
+    };
+
+    vi.mocked(api.get).mockImplementation(async (url) => {
+      if (url.includes('/api/settings')) return { data: { data: {} } };
+      if (url.includes('/api/formation/modules')) return { data: mockWithImage };
+      return { data: {} };
+    });
+
+    render(<FormationPage />);
+
+    await waitFor(() => {
+      // Cherche spécifiquement un <img> element (pas un <span role="img">)
+      const img = document.querySelector('img[alt="Bases du Trading"]');
+      expect(img).toBeTruthy();
+      expect(img).toHaveAttribute('src', 'https://example.com/cover.jpg');
+    });
+  });
+
+  it('affiche le fallback emoji quand coverImage est absent', async () => {
+    vi.mocked(api.get).mockImplementation(async (url) => {
+      if (url.includes('/api/settings')) return { data: { data: {} } };
+      if (url.includes('/api/formation/modules')) return { data: mockFormationData };
+      return { data: {} };
+    });
+
+    render(<FormationPage />);
+
+    await waitFor(() => {
+      expect(screen.getAllByText(/Bases du Trading/i).length).toBeGreaterThan(0);
+    });
+    // Vérifie qu'aucun <img> element (pas span) n'est rendu pour le module
+    const imgElements = document.querySelectorAll('img[alt="Bases du Trading"]');
+    expect(imgElements).toHaveLength(0);
   });
 });
