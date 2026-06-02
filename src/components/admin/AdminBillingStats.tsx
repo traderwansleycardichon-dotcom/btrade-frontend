@@ -77,13 +77,13 @@ export const AdminBillingStats: React.FC<AdminBillingStatsProps> = ({
         {items.map((item, i) => (
           <div
             key={i}
-            className="p-4 rounded-2xl bg-bg/50 border border-border/50 group hover:border-accent/30 transition-all"
+            className="p-4 rounded-2xl bg-bg/50 border border-border/50 group hover:border-accent/30 transition-all overflow-hidden"
           >
-            <div className="flex items-center gap-3 mb-2">
-              <div className={cn("p-2 rounded-lg bg-surface", item.color)}>
+            <div className="flex items-start gap-2 mb-2 min-w-0">
+              <div className={cn("p-2 rounded-lg bg-surface shrink-0", item.color)}>
                 <item.icon size={16} />
               </div>
-              <span className="text-[10px] font-bold text-txt-3 uppercase tracking-widest">
+              <span className="text-[10px] font-bold text-txt-3 uppercase tracking-wide leading-tight min-w-0 break-words">
                 {item.label}
               </span>
             </div>

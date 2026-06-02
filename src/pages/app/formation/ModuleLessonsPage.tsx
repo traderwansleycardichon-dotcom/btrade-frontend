@@ -31,6 +31,17 @@ interface LessonsResponse {
   lessons: LessonListItem[];
 }
 
+function stripEmoji(text: string): string {
+  return text.replace(/\p{Extended_Pictographic}/gu, '').replace(/\s+/g, ' ').trim();
+}
+
+const Step: React.FC<{ done: boolean; label: string }> = ({ done, label }) => (
+  <span className={`flex items-center gap-1 text-[9px] font-mono uppercase tracking-wider ${done ? 'text-win' : 'text-txt-3'}`}>
+    <span className={`w-1 h-1 rounded-full shrink-0 ${done ? 'bg-win' : 'bg-border'}`} />
+    {label}
+  </span>
+);
+
 const ModuleLessonsHub: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
@@ -46,22 +57,25 @@ const ModuleLessonsHub: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 gap-4">
-        <div className="w-10 h-10 border-4 border-accent border-t-transparent rounded-full animate-spin" />
-        <span className="text-txt-2 text-xs font-medium">Chargement des leçons...</span>
+      <div className="flex flex-col items-center justify-center py-32 gap-5">
+        <div className="relative w-8 h-8">
+          <div className="absolute inset-0 border border-accent/20 rounded-full" />
+          <div className="absolute inset-0 border-t border-accent rounded-full animate-spin" />
+        </div>
+        <span className="text-[10px] font-mono text-txt-3 uppercase tracking-widest">Chargement des leçons</span>
       </div>
     );
   }
 
   if (error || !data) {
     return (
-      <div className="glass p-8 text-center rounded-3xl border border-loss/20 max-w-md mx-auto my-10">
-        <AlertCircle size={40} className="text-loss mx-auto mb-3" />
-        <p className="text-sm font-bold text-loss mb-2">Erreur ou module introuvable</p>
-        <p className="text-xs text-txt-2 mb-6">Impossible de charger le contenu de ce module.</p>
-        <button 
-          onClick={() => navigate('/app/formation')} 
-          className="btn-primary text-xs py-1.5 px-4"
+      <div className="border border-loss/20 rounded-xl p-10 text-center max-w-md mx-auto my-16">
+        <AlertCircle size={32} className="text-loss mx-auto mb-4" />
+        <p className="text-sm font-bold text-loss mb-2">Module introuvable</p>
+        <p className="text-xs text-txt-3 mb-6">Impossible de charger le contenu de ce module.</p>
+        <button
+          onClick={() => navigate('/app/formation')}
+          className="btn-primary text-xs py-2 px-5"
         >
           Retour à l'Academy
         </button>
@@ -70,156 +84,190 @@ const ModuleLessonsHub: React.FC = () => {
   }
 
   const { module, lessons } = data;
+  const completedCount = lessons.filter(l => l.statut === 'completed').length;
+  const progressPct = lessons.length > 0 ? Math.round((completedCount / lessons.length) * 100) : 0;
 
   return (
-    <div className="space-y-8 animate-[fadeIn_0.5s_ease-out]">
-      {/* Back Button */}
-      <button 
+    <div className="animate-[fadeIn_0.4s_ease-out]">
+
+      {/* ── BACK ─────────────────────────────────────────────── */}
+      <button
         onClick={() => navigate('/app/formation')}
-        className="flex items-center gap-1.5 text-xs text-txt-2 hover:text-txt transition-colors group"
+        className="flex items-center gap-1.5 text-[10px] font-mono font-bold text-txt-3 hover:text-txt transition-colors mb-8 group uppercase tracking-widest"
       >
-        <ChevronLeft size={16} className="group-hover:-translate-x-0.5 transition-transform" />
-        Retour à l'Academy
+        <ChevronLeft size={14} className="group-hover:-translate-x-0.5 transition-transform" />
+        Academy
       </button>
 
-      {/* Module Header card */}
-      <div className="relative overflow-hidden rounded-3xl glass-frost p-6 sm:p-10 border border-white/10 flex flex-col md:flex-row gap-8 items-start md:items-center shadow-2xl">
-        <div className="absolute inset-0 bg-gradient-to-r from-accent/10 via-transparent to-transparent opacity-50 pointer-events-none" />
-        
-        <div className="relative w-20 h-20 rounded-[2rem] bg-accent/10 border border-accent/20 flex items-center justify-center text-5xl shrink-0 shadow-[0_0_30px_rgba(243,108,0,0.2)] overflow-hidden">
-          <div className="absolute inset-0 bg-accent/20 blur-xl rounded-full" />
-          {module.coverImage ? (
+      {/* ── MODULE HEADER ─────────────────────────────────────── */}
+      <div className="relative rounded-xl overflow-hidden mb-8 border border-border">
+        {/* Cover image as background */}
+        {module.coverImage ? (
+          <>
             <img
               src={module.coverImage}
               alt={module.titre}
-              className="w-full h-full object-cover relative z-10 rounded-[2rem]"
+              className="absolute inset-0 w-full h-full object-cover opacity-20"
             />
-          ) : (
-            <span className="relative z-10 drop-shadow-md">{module.icone || '📖'}</span>
-          )}
-        </div>
-        
-        <div className="relative z-10 space-y-2">
-          <div className="flex flex-wrap items-center gap-3">
-            <span className="text-[11px] font-bold text-accent uppercase tracking-widest px-3 py-1 rounded-full bg-accent/10 border border-accent/20">
-              Module {module.ordre}
+            <div className="absolute inset-0 bg-gradient-to-r from-bg via-bg/80 to-transparent" />
+          </>
+        ) : (
+          <div className="absolute inset-0 bg-surface" />
+        )}
+
+        {/* Ghost number */}
+        <span
+          className="absolute right-0 top-1/2 -translate-y-1/2 text-[120px] md:text-[160px] font-black font-mono leading-none select-none pointer-events-none opacity-[0.04]"
+          aria-hidden="true"
+        >
+          {String(module.ordre).padStart(2, '0')}
+        </span>
+
+        <div className="relative z-10 p-7 md:p-10">
+          {/* Top row */}
+          <div className="flex items-center gap-3 mb-5">
+            <span className="text-[9px] font-mono font-bold text-accent uppercase tracking-[0.35em]">
+              Module {String(module.ordre).padStart(2, '0')}
             </span>
-            <span className="flex items-center gap-1.5 px-3 py-1 bg-surface/50 rounded-full border border-white/5">
-              <BookOpen size={12} className="text-txt-3" />
-              <span className="text-[11px] text-txt-3 font-mono font-bold">
-                {lessons.length} leçons
-              </span>
+            <span className="w-4 h-px bg-accent/40" />
+            <span className="text-[9px] font-mono font-bold text-txt-3 uppercase tracking-[0.3em]">
+              {lessons.length} leçon{lessons.length > 1 ? 's' : ''}
             </span>
           </div>
-          <h2 className="text-2xl sm:text-3xl font-black tracking-tight">{module.titre}</h2>
-          <p className="text-sm text-txt-2 leading-relaxed max-w-2xl font-medium">{module.description}</p>
+
+          <h1 className="text-3xl md:text-4xl font-black tracking-[-0.025em] leading-tight text-white mb-3">
+            {module.titre}
+          </h1>
+          <p className="text-sm text-txt-3 leading-relaxed max-w-2xl mb-6">
+            {stripEmoji(module.description)}
+          </p>
+
+          {/* Progress */}
+          <div className="flex items-center gap-4 max-w-xs">
+            <div className="flex-1 h-px bg-border relative">
+              <div
+                className="absolute top-[-0.5px] left-0 h-0.5 bg-accent transition-all duration-700"
+                style={{ width: `${progressPct}%` }}
+              />
+            </div>
+            <span className={`text-[9px] font-mono font-bold shrink-0 ${progressPct === 100 ? 'text-win' : 'text-accent'}`}>
+              {progressPct}%
+            </span>
+            <span className="text-[9px] font-mono text-txt-3 shrink-0">
+              {completedCount}/{lessons.length}
+            </span>
+          </div>
         </div>
       </div>
 
-      {/* Lessons List */}
-      <div className="space-y-4">
-        <h3 className="text-base font-bold px-1">Plan du cours</h3>
+      {/* ── LESSON LIST ───────────────────────────────────────── */}
+      <div>
+        <div className="flex items-center gap-4 mb-0 pb-4 border-b border-border">
+          <p className="text-[9px] font-mono font-bold text-txt-3 uppercase tracking-[0.32em]">
+            Plan du cours
+          </p>
+          <div className="flex-1 h-px bg-border" />
+          <p className="text-[9px] font-mono text-txt-3">
+            <BookOpen size={10} className="inline mr-1" />
+            {lessons.length} leçons
+          </p>
+        </div>
 
         {lessons.length === 0 ? (
-          <div className="p-6 text-center text-xs text-txt-3 border border-dashed border-border rounded-2xl">
-            Aucune leçon n'est disponible pour ce module pour le moment.
+          <div className="py-16 text-center border-b border-border">
+            <p className="text-xs text-txt-3">Aucune leçon disponible pour ce module.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-3">
+          <div className="divide-y divide-border">
             {lessons.map((lesson) => {
               const isLocked = lesson.statut === 'locked';
               const isCompleted = lesson.statut === 'completed';
               const isInProgress = lesson.statut === 'in_progress';
 
               return (
-                <div 
+                <div
                   key={lesson.id}
-                  onClick={() => {
-                    if (!isLocked) {
-                      navigate(`/app/formation/${slug}/${lesson.id}`);
-                    }
-                  }}
+                  onClick={() => !isLocked && navigate(`/app/formation/${slug}/${lesson.id}`)}
                   className={`
-                    group relative p-5 rounded-2xl border flex flex-col sm:flex-row justify-between items-start sm:items-center gap-5 transition-all duration-300
-                    ${isLocked 
-                      ? 'bg-surface/20 border-white/5 opacity-60 cursor-not-allowed' 
-                      : 'glass-subtle border-white/10 hover:border-accent/40 cursor-pointer hover:shadow-[0_8px_30px_rgba(243,108,0,0.12)] hover:-translate-y-0.5'
+                    relative group py-5 flex items-center gap-4 md:gap-6 transition-colors duration-150
+                    -mx-6 px-6
+                    ${isLocked
+                      ? 'opacity-50 cursor-not-allowed'
+                      : isInProgress
+                        ? 'cursor-pointer hover:bg-white/[0.016] border-l-2 border-accent'
+                        : 'cursor-pointer hover:bg-white/[0.016] border-l-2 border-transparent'
                     }
                   `}
                 >
-                  {/* Subtle hover gradient */}
-                  {!isLocked && (
-                    <div className="absolute inset-0 bg-gradient-to-r from-accent/0 via-accent/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl pointer-events-none" />
-                  )}
-
-                  <div className="relative z-10 flex items-start gap-4 min-w-0 w-full sm:w-auto">
-                    {/* Index and Icon */}
-                    <div className={`
-                      w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 font-bold font-mono text-sm transition-colors duration-300 overflow-hidden
-                      ${isLocked
-                        ? 'bg-white/5 text-txt-3'
-                        : isCompleted
-                          ? 'bg-win/10 text-win shadow-[0_0_15px_rgba(16,185,129,0.2)]'
-                          : 'bg-accent/10 text-accent group-hover:bg-accent group-hover:text-white shadow-[0_0_15px_rgba(243,108,0,0.2)]'
-                      }
-                    `}>
-                      {lesson.thumbnail && !isLocked ? (
-                        <img
-                          src={lesson.thumbnail}
-                          alt={lesson.titre}
-                          className="w-full h-full object-cover rounded-2xl"
-                        />
-                      ) : isLocked ? (
-                        <Lock size={16} />
-                      ) : isCompleted ? (
-                        <CheckCircle size={20} />
-                      ) : (
-                        <span>{lesson.ordre}</span>
-                      )}
-                    </div>
-
-                    {/* Lesson Title and steps */}
-                    <div className="min-w-0 space-y-1.5 flex-1 pt-0.5">
-                      <h4 className={`text-base font-bold truncate transition-colors ${isLocked ? 'text-txt-3' : 'text-txt group-hover:text-accent'}`}>
-                        {lesson.titre}
-                      </h4>
-                      
-                      {!isLocked && (
-                        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-[11px] font-medium text-txt-3">
-                          <div className={`flex items-center gap-1.5 ${lesson.lecture_done ? 'text-win' : ''}`}>
-                            <div className={`w-1.5 h-1.5 rounded-full ${lesson.lecture_done ? 'bg-win shadow-[0_0_5px_rgba(16,185,129,0.5)]' : 'bg-border'}`} />
-                            Lecture
-                          </div>
-                          <div className={`flex items-center gap-1.5 ${lesson.quiz_passed ? 'text-win' : ''}`}>
-                            <div className={`w-1.5 h-1.5 rounded-full ${lesson.quiz_passed ? 'bg-win shadow-[0_0_5px_rgba(16,185,129,0.5)]' : 'bg-border'}`} />
-                            Quiz
-                          </div>
-                          <div className={`flex items-center gap-1.5 ${lesson.devoir_done ? 'text-win' : ''}`}>
-                            <div className={`w-1.5 h-1.5 rounded-full ${lesson.devoir_done ? 'bg-win shadow-[0_0_5px_rgba(16,185,129,0.5)]' : 'bg-border'}`} />
-                            Devoir
-                          </div>
-                        </div>
-                      )}
-                    </div>
+                  {/* Lesson number */}
+                  <div className="shrink-0 w-8 text-right hidden sm:block">
+                    <span className={`text-sm font-black font-mono ${
+                      isLocked ? 'text-txt-3/50' : isCompleted ? 'text-win/60' : isInProgress ? 'text-accent' : 'text-txt-3'
+                    }`}>
+                      {String(lesson.ordre).padStart(2, '0')}
+                    </span>
                   </div>
 
-                  {/* Actions / Status badges */}
-                  <div className="relative z-10 w-full sm:w-auto flex items-center justify-end shrink-0 mt-2 sm:mt-0">
+                  {/* Thumbnail or status icon */}
+                  <div className={`
+                    shrink-0 w-11 h-11 rounded-lg overflow-hidden border transition-colors
+                    ${isLocked
+                      ? 'border-border bg-elevated flex items-center justify-center'
+                      : isCompleted
+                        ? 'border-win/20 bg-win/5 flex items-center justify-center'
+                        : 'border-white/10 group-hover:border-accent/30'
+                    }
+                  `}>
+                    {lesson.thumbnail && !isLocked ? (
+                      <img src={lesson.thumbnail} alt={lesson.titre} className="w-full h-full object-cover" />
+                    ) : isLocked ? (
+                      <Lock size={14} className="text-txt-3/60" />
+                    ) : isCompleted ? (
+                      <CheckCircle size={16} className="text-win" />
+                    ) : (
+                      <div className="w-full h-11 bg-elevated flex items-center justify-center">
+                        <span className="text-[10px] font-mono font-bold text-txt-3">{lesson.ordre}</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Info */}
+                  <div className="flex-1 min-w-0 relative z-10">
+                    <h4 className={`text-sm font-bold tracking-tight truncate mb-1.5 transition-colors duration-150 ${
+                      isLocked
+                        ? 'text-txt-3'
+                        : isInProgress
+                          ? 'text-white group-hover:text-accent'
+                          : 'text-white/90 group-hover:text-white'
+                    }`}>
+                      {lesson.titre}
+                    </h4>
+                    {!isLocked && (
+                      <div className="flex flex-wrap items-center gap-3">
+                        <Step done={lesson.lecture_done} label="Lecture" />
+                        <Step done={lesson.quiz_passed} label="Quiz" />
+                        <Step done={lesson.devoir_done} label="Devoir" />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Status / CTA */}
+                  <div className="shrink-0 relative z-10">
                     {isLocked ? (
-                      <span className="text-[11px] font-bold text-txt-3 bg-white/5 px-3 py-1.5 rounded-lg flex items-center gap-1.5 border border-white/5">
-                        <Lock size={12} /> Verrouillé
+                      <span className="text-[9px] font-mono font-bold text-txt-3/60 border border-border/50 px-2.5 py-1 rounded-lg flex items-center gap-1">
+                        <Lock size={10} /> Verrouillé
                       </span>
                     ) : isCompleted ? (
-                      <span className="text-[11px] font-bold text-win bg-win/10 px-3 py-1.5 rounded-lg flex items-center gap-1.5 border border-win/20">
-                        <CheckCircle size={12} /> Complété
+                      <span className="text-[9px] font-mono font-bold text-win border border-win/20 bg-win/5 px-2.5 py-1 rounded-lg flex items-center gap-1">
+                        <CheckCircle size={10} /> Complété
                       </span>
                     ) : isInProgress ? (
-                      <button className="px-5 py-2.5 text-[11px] font-bold text-white bg-accent hover:bg-accent-2 transition-all duration-300 rounded-xl flex items-center gap-2 shadow-[0_0_15px_rgba(243,108,0,0.3)]">
-                        <Play size={12} fill="currentColor" /> Reprendre
+                      <button className="flex items-center gap-1.5 text-[11px] font-bold text-white bg-accent hover:bg-accent-2 px-4 py-2 rounded-lg transition-all shadow-[0_0_16px_rgba(243,108,0,0.2)]">
+                        <Play size={10} fill="currentColor" /> Reprendre
                       </button>
                     ) : (
-                      <button className="px-5 py-2.5 text-[11px] font-bold text-txt hover:text-white bg-white/5 border border-white/10 hover:border-accent group-hover:bg-accent group-hover:border-accent transition-all duration-300 rounded-xl flex items-center gap-2">
-                        <Play size={12} className="group-hover:fill-current" /> Commencer
+                      <button className="flex items-center gap-1.5 text-[11px] font-bold text-txt-3 border border-border group-hover:border-white/20 group-hover:text-txt-2 px-4 py-2 rounded-lg transition-colors">
+                        <Play size={10} /> Commencer
                       </button>
                     )}
                   </div>
@@ -235,7 +283,7 @@ const ModuleLessonsHub: React.FC = () => {
 
 const ModuleLessonsPage: React.FC = () => {
   return (
-    <FeatureGate 
+    <FeatureGate
       feature="hasAcademy"
       fallbackTitle="Academy BTrade Réservée aux Membres Pro"
       fallbackDesc="Accédez à des cours exclusifs, des masterclass sur le price action, des modules sur la psychologie du trading et des quiz pour valider vos compétences."
