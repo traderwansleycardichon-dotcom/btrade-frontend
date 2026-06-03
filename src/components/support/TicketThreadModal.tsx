@@ -12,13 +12,17 @@ interface TicketThreadModalProps {
   onClose: () => void;
   ticketId: string | null;
   isAdminView?: boolean;
+  fetchEndpoint?: string;
+  replyEndpoint?: string;
 }
 
-export const TicketThreadModal: React.FC<TicketThreadModalProps> = ({ 
-  isOpen, 
-  onClose, 
+export const TicketThreadModal: React.FC<TicketThreadModalProps> = ({
+  isOpen,
+  onClose,
   ticketId,
-  isAdminView = false
+  isAdminView = false,
+  fetchEndpoint,
+  replyEndpoint,
 }) => {
   const [ticket, setTicket] = useState<any>(null);
   const [loading, setLoading] = useState(false);
@@ -46,9 +50,9 @@ export const TicketThreadModal: React.FC<TicketThreadModalProps> = ({
   const fetchTicket = async () => {
     setLoading(true);
     try {
-      const endpoint = isAdminView 
-        ? `/api/admin/support/${ticketId}` 
-        : `/api/support/${ticketId}`;
+      const endpoint = fetchEndpoint ?? (isAdminView
+        ? `/api/admin/support/${ticketId}`
+        : `/api/support/${ticketId}`);
       const res = await api.get(endpoint);
       setTicket(res.data.data);
     } catch (err) {
@@ -65,10 +69,10 @@ export const TicketThreadModal: React.FC<TicketThreadModalProps> = ({
 
     setSending(true);
     try {
-      const endpoint = isAdminView 
-        ? `/api/admin/support/${ticketId}/reply` 
-        : `/api/support/${ticketId}/reply`;
-      
+      const endpoint = replyEndpoint ?? (isAdminView
+        ? `/api/admin/support/${ticketId}/reply`
+        : `/api/support/${ticketId}/reply`);
+
       await api.post(endpoint, { message: replyMessage });
       setReplyMessage('');
       fetchTicket(); // Reload thread
