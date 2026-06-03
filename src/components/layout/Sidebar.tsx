@@ -26,7 +26,8 @@ import {
   Globe,
   FileText,
   Lock,
-  MessageSquare
+  MessageSquare,
+  Video
 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { useAccounts } from '../../hooks/useAccounts';
@@ -135,8 +136,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen = false, onMobileCl
     {
       title: 'Système',
       items: [
-        { label: 'Messages',   icon: MessageSquare, href: '/app/messages' },
-        { label: 'Support & Aide', icon: LifeBuoy, href: '/app/support' },
+        { label: 'Messages',        icon: MessageSquare, href: '/app/messages' },
+        { label: 'Coaching 1-on-1', icon: Video,         href: '/app/coaching' },
+        { label: 'Support & Aide',  icon: LifeBuoy,      href: '/app/support' },
         { label: 'Paramètres', icon: Settings,       href: '/app/settings' },
       ]
     }

@@ -14,7 +14,8 @@ import {
   Server,
   X,
   Ticket,
-  MessageSquare
+  MessageSquare,
+  Video
 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { useSettings } from '../../contexts/SettingsContext';
@@ -52,6 +53,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
     { label: 'Plans Tarifaires',icon: Ticket,         href: '/admin/pricing' },
     { label: 'Codes Promo',    icon: Ticket,          href: '/admin/promo-codes' },
     { label: 'Academy',        icon: BookOpen,        href: '/admin/academy' },
+    { label: 'Coaching',       icon: Video,           href: '/admin/coaching' },
     { label: 'Helpdesk',       icon: LifeBuoy,        href: '/admin/support' },
     { label: 'Broadcast',      icon: Megaphone,       href: '/admin/broadcast' },
     { label: 'Légal',          icon: Shield,          href: '/admin/legal' },
