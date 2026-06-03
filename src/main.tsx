@@ -27,6 +27,7 @@ import AnalysesPage from './pages/app/analyses/page';
 import AiChatPage from './pages/app/ai-chat/page';
 import SettingsPage from './pages/app/settings/page';
 import SupportPage from './pages/app/support/page';
+import CoachingPage from './pages/app/coaching/page';
 import './styles/globals.css';
 
 import { AdminLayout } from './components/layout/AdminLayout';
@@ -35,6 +36,7 @@ import AdminUsersPage from "./pages/admin/users/page";
 import AdminBillingPage from "./pages/admin/billing/page";
 import AdminPricingPage from "./pages/admin/pricing/AdminPricingPage";
 import AdminSupportPage from "./pages/admin/support/page";
+import AdminCoachingPage from './pages/admin/coaching/page';
 import AdminBroadcastPage from "./pages/admin/broadcast/page";
 import AdminCmsPage from "./pages/admin/cms/page";
 import AdminSystemPage from "./pages/admin/system/page";
@@ -97,6 +99,7 @@ const router = createBrowserRouter([
       { path: 'pricing', element: <AdminPricingPage /> },
       { path: 'promo-codes', element: <PromoCodesPage /> },
       { path: 'support', element: <AdminSupportPage /> },
+      { path: 'coaching', element: <AdminCoachingPage /> },
       { path: 'broadcast', element: <AdminBroadcastPage /> },
       { path: 'cms', element: <AdminCmsPage /> },
       { path: 'system', element: <AdminSystemPage /> },
@@ -133,6 +136,7 @@ const router = createBrowserRouter([
       { path: 'ai-chat', element: <AiChatPage /> },
       { path: 'messages', element: <MessagesPage /> },
       { path: 'support', element: <SupportPage /> },
+      { path: 'coaching', element: <CoachingPage /> },
     ],
   },
   // Catch-all fallback to redirect any unknown routes to the landing page
