@@ -5,7 +5,7 @@ import AdminCoachingPage from '../../pages/admin/coaching/page';
 import api from '../../lib/api';
 
 vi.mock('../../lib/api', () => ({
-  default: { get: vi.fn(), patch: vi.fn() },
+  default: { get: vi.fn(), patch: vi.fn(), post: vi.fn(), delete: vi.fn() },
 }));
 
 const mockRequests = [
@@ -16,7 +16,8 @@ const mockRequests = [
     userEmail: 'alice@example.com',
     subject: 'trades',
     sessionType: 'zoom',
-    proposedDates: ['2026-06-10T14:00:00.000Z', '2026-06-11T10:00:00.000Z'],
+    slotId: 'slot-1',
+    slot: { id: 'slot-1', datetime: '2026-06-10T14:00:00.000Z' },
     message: 'Analyse mes trades récents sur EUR/USD depuis un mois.',
     status: 'pending',
     createdAt: '2026-06-02T10:00:00.000Z',
@@ -28,10 +29,10 @@ const mockRequests = [
     userEmail: 'bob@example.com',
     subject: 'psychology',
     sessionType: 'meet',
-    proposedDates: ['2026-06-15T09:00:00.000Z'],
+    slotId: 'slot-2',
+    slot: { id: 'slot-2', datetime: '2026-06-15T09:00:00.000Z' },
     message: 'Travail sur discipline et gestion des émotions en live.',
     status: 'accepted',
-    confirmedDate: '2026-06-15T09:00:00.000Z',
     createdAt: '2026-06-01T10:00:00.000Z',
   },
 ];
@@ -42,15 +43,41 @@ describe('AdminCoachingPage', () => {
   it('affiche le titre de la page', async () => {
     vi.mocked(api.get).mockImplementation(async (url) => {
       if (url.includes('/api/settings')) return { data: { data: {} } };
+      if (url.includes('/api/admin/coaching/slots')) return { data: { data: [] } };
       return { data: { data: [] } };
     });
     render(<AdminCoachingPage />);
     await waitFor(() => expect(screen.getByText('Coaching 1-on-1')).toBeInTheDocument());
   });
 
+  it('affiche les onglets principaux Créneaux et Demandes', async () => {
+    vi.mocked(api.get).mockImplementation(async (url) => {
+      if (url.includes('/api/settings')) return { data: { data: {} } };
+      if (url.includes('/api/admin/coaching/slots')) return { data: { data: [] } };
+      return { data: { data: [] } };
+    });
+    render(<AdminCoachingPage />);
+    await waitFor(() => expect(screen.getByRole('button', { name: /Créneaux/i })).toBeInTheDocument());
+    expect(screen.getByRole('button', { name: /Demandes/i })).toBeInTheDocument();
+  });
+
+  it('affiche SlotManager en cliquant sur l\'onglet Créneaux', async () => {
+    vi.mocked(api.get).mockImplementation(async (url) => {
+      if (url.includes('/api/settings')) return { data: { data: {} } };
+      if (url.includes('/api/admin/coaching/slots')) return { data: { data: [] } };
+      return { data: { data: [] } };
+    });
+    const user = userEvent.setup();
+    render(<AdminCoachingPage />);
+    await waitFor(() => expect(screen.getByRole('button', { name: /Créneaux/i })).toBeInTheDocument());
+    await user.click(screen.getByRole('button', { name: /Créneaux/i }));
+    await waitFor(() => expect(screen.getByText('Ajouter un créneau')).toBeInTheDocument());
+  });
+
   it('affiche les demandes avec nom et email utilisateur', async () => {
     vi.mocked(api.get).mockImplementation(async (url) => {
       if (url.includes('/api/settings')) return { data: { data: {} } };
+      if (url.includes('/api/admin/coaching/slots')) return { data: { data: [] } };
       return { data: { data: mockRequests } };
     });
     render(<AdminCoachingPage />);
@@ -59,21 +86,23 @@ describe('AdminCoachingPage', () => {
     expect(screen.getByText('Bob Dupont')).toBeInTheDocument();
   });
 
-  it('affiche les onglets de filtre', async () => {
+  it('affiche les onglets de filtre dans l\'onglet Demandes', async () => {
     vi.mocked(api.get).mockImplementation(async (url) => {
       if (url.includes('/api/settings')) return { data: { data: {} } };
+      if (url.includes('/api/admin/coaching/slots')) return { data: { data: [] } };
       return { data: { data: mockRequests } };
     });
     render(<AdminCoachingPage />);
-    await waitFor(() => expect(screen.getByRole('button', { name: /Tout/i })).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByRole('button', { name: /^Tout$/i })).toBeInTheDocument());
     expect(screen.getByRole('button', { name: /En attente/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Accepté/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Refusé/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /^Accepté$/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /^Refusé$/i })).toBeInTheDocument();
   });
 
   it('filtre par onglet En attente — masque les acceptés', async () => {
     vi.mocked(api.get).mockImplementation(async (url) => {
       if (url.includes('/api/settings')) return { data: { data: {} } };
+      if (url.includes('/api/admin/coaching/slots')) return { data: { data: [] } };
       return { data: { data: mockRequests } };
     });
     const user = userEvent.setup();
@@ -87,6 +116,7 @@ describe('AdminCoachingPage', () => {
   it('affiche les boutons Accepter et Refuser sur une demande pending', async () => {
     vi.mocked(api.get).mockImplementation(async (url) => {
       if (url.includes('/api/settings')) return { data: { data: {} } };
+      if (url.includes('/api/admin/coaching/slots')) return { data: { data: [] } };
       return { data: { data: mockRequests } };
     });
     render(<AdminCoachingPage />);
@@ -94,9 +124,10 @@ describe('AdminCoachingPage', () => {
     expect(screen.getByText('Refuser')).toBeInTheDocument();
   });
 
-  it('ouvre le modal d\'acceptation avec les dates proposées', async () => {
+  it('ouvre le modal d\'acceptation', async () => {
     vi.mocked(api.get).mockImplementation(async (url) => {
       if (url.includes('/api/settings')) return { data: { data: {} } };
+      if (url.includes('/api/admin/coaching/slots')) return { data: { data: [] } };
       return { data: { data: mockRequests } };
     });
     const user = userEvent.setup();
@@ -104,11 +135,13 @@ describe('AdminCoachingPage', () => {
     await waitFor(() => expect(screen.getByText('Accepter')).toBeInTheDocument());
     await user.click(screen.getByText('Accepter'));
     expect(screen.getByText('Accepter la demande')).toBeInTheDocument();
+    expect(screen.getByText('Confirmer')).toBeInTheDocument();
   });
 
-  it('appelle PATCH avec status accepted sur confirmation', async () => {
+  it('appelle PATCH avec status accepted sans confirmedDate', async () => {
     vi.mocked(api.get).mockImplementation(async (url) => {
       if (url.includes('/api/settings')) return { data: { data: {} } };
+      if (url.includes('/api/admin/coaching/slots')) return { data: { data: [] } };
       return { data: { data: mockRequests } };
     });
     vi.mocked(api.patch).mockResolvedValue({ data: {} });
@@ -116,17 +149,21 @@ describe('AdminCoachingPage', () => {
     render(<AdminCoachingPage />);
     await waitFor(() => expect(screen.getByText('Accepter')).toBeInTheDocument());
     await user.click(screen.getByText('Accepter'));
-    // First proposed date is auto-selected; click Confirmer
     await user.click(screen.getByText('Confirmer'));
     await waitFor(() => expect(api.patch).toHaveBeenCalledWith(
       '/api/admin/coaching/req-1/status',
-      expect.objectContaining({ status: 'accepted', confirmedDate: expect.any(String) })
+      expect.objectContaining({ status: 'accepted' })
     ));
+    expect(api.patch).not.toHaveBeenCalledWith(
+      expect.any(String),
+      expect.objectContaining({ confirmedDate: expect.anything() })
+    );
   });
 
   it('ouvre le modal de refus et appelle PATCH avec status rejected', async () => {
     vi.mocked(api.get).mockImplementation(async (url) => {
       if (url.includes('/api/settings')) return { data: { data: {} } };
+      if (url.includes('/api/admin/coaching/slots')) return { data: { data: [] } };
       return { data: { data: mockRequests } };
     });
     vi.mocked(api.patch).mockResolvedValue({ data: {} });
@@ -135,7 +172,6 @@ describe('AdminCoachingPage', () => {
     await waitFor(() => expect(screen.getByText('Refuser')).toBeInTheDocument());
     await user.click(screen.getByText('Refuser'));
     expect(screen.getByText('Refuser la demande')).toBeInTheDocument();
-    // Type an optional rejection reason before confirming
     const reasonInput = screen.getByPlaceholderText(/Expliquez le motif/);
     await user.type(reasonInput, 'Créneaux non disponibles.');
     await user.click(screen.getByText('Confirmer le refus'));
@@ -148,6 +184,7 @@ describe('AdminCoachingPage', () => {
   it('affiche le bouton Ouvrir le chat pour une demande acceptée', async () => {
     vi.mocked(api.get).mockImplementation(async (url) => {
       if (url.includes('/api/settings')) return { data: { data: {} } };
+      if (url.includes('/api/admin/coaching/slots')) return { data: { data: [] } };
       return { data: { data: mockRequests } };
     });
     render(<AdminCoachingPage />);
