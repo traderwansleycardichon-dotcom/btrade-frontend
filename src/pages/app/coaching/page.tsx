@@ -5,6 +5,7 @@ import api from '../../../lib/api';
 import { useToast } from '../../../hooks/useToast';
 import { Modal } from '../../../components/ui/Modal';
 import { TicketThreadModal } from '../../../components/support/TicketThreadModal';
+import { SlotPicker, CoachingSlot } from '../../../components/coaching/SlotPicker';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
@@ -12,10 +13,10 @@ interface CoachingRequest {
   id: string;
   subject: 'trades' | 'psychology' | 'plan' | 'other';
   sessionType: 'zoom' | 'meet' | 'phone';
-  proposedDates: string[];
+  slotId: string;
+  slot: { id: string; datetime: string };
   message: string;
   status: 'pending' | 'accepted' | 'rejected';
-  confirmedDate?: string;
   rejectionReason?: string;
   createdAt: string;
 }
@@ -42,14 +43,14 @@ export default function CoachingPage() {
 
   const [subject, setSubject] = useState('trades');
   const [sessionType, setSessionType] = useState('zoom');
-  const [dates, setDates] = useState(['', '', '']);
+  const [slotId, setSlotId] = useState('');
   const [message, setMessage] = useState('');
+  const [availableSlots, setAvailableSlots] = useState<CoachingSlot[]>([]);
+  const [slotsLoading, setSlotsLoading] = useState(false);
 
   const { addToast } = useToast();
 
-  useEffect(() => {
-    fetchRequests();
-  }, []);
+  useEffect(() => { fetchRequests(); }, []);
 
   const fetchRequests = () => {
     setLoading(true);
@@ -59,11 +60,28 @@ export default function CoachingPage() {
       .finally(() => setLoading(false));
   };
 
+  const openForm = () => {
+    setSlotsLoading(true);
+    api.get('/api/coaching/slots')
+      .then((res: any) => setAvailableSlots(res.data.data))
+      .catch(() => addToast('Erreur lors du chargement des créneaux', 'error'))
+      .finally(() => setSlotsLoading(false));
+    setIsFormOpen(true);
+  };
+
+  const closeForm = () => {
+    setIsFormOpen(false);
+    setSubject('trades');
+    setSessionType('zoom');
+    setSlotId('');
+    setMessage('');
+    setAvailableSlots([]);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const proposedDates = dates.filter(Boolean);
-    if (proposedDates.length === 0) {
-      addToast('Veuillez renseigner au moins une disponibilité', 'error');
+    if (!slotId) {
+      addToast('Veuillez sélectionner un créneau', 'error');
       return;
     }
     if (message.trim().length < 20) {
@@ -72,13 +90,9 @@ export default function CoachingPage() {
     }
     setSubmitting(true);
     try {
-      await api.post('/api/coaching', { subject, sessionType, proposedDates, message });
+      await api.post('/api/coaching', { slotId, subject, sessionType, message });
       addToast('Demande envoyée avec succès', 'success');
-      setIsFormOpen(false);
-      setSubject('trades');
-      setSessionType('zoom');
-      setDates(['', '', '']);
-      setMessage('');
+      closeForm();
       fetchRequests();
     } catch {
       addToast("Erreur lors de l'envoi de la demande", 'error');
@@ -94,7 +108,7 @@ export default function CoachingPage() {
           <h1 className="text-2xl font-black mb-2">Coaching 1-on-1</h1>
           <p className="text-txt-2 text-sm">Demandez une session privée avec un coach.</p>
         </div>
-        <button onClick={() => setIsFormOpen(true)} className="btn-primary flex items-center gap-2">
+        <button onClick={openForm} className="btn-primary flex items-center gap-2">
           <Plus size={18} />
           <span className="hidden md:inline">Nouvelle demande</span>
         </button>
@@ -107,7 +121,7 @@ export default function CoachingPage() {
           <Video size={48} className="text-txt-3 mb-4" />
           <h3 className="text-lg font-bold mb-2">Aucune demande</h3>
           <p className="text-sm text-txt-2 mb-6">Soumettez votre première demande de coaching.</p>
-          <button onClick={() => setIsFormOpen(true)} className="btn-primary flex items-center gap-2">
+          <button onClick={openForm} className="btn-primary flex items-center gap-2">
             <Plus size={16} /> Nouvelle demande
           </button>
         </div>
@@ -132,10 +146,10 @@ export default function CoachingPage() {
                   <span className="text-[10px] font-bold px-2.5 py-1 rounded-md bg-loss/10 text-loss uppercase shrink-0">Refusé</span>
                 )}
               </div>
-              {req.status === 'accepted' && req.confirmedDate && (
-                <div className="flex items-center gap-2 text-sm text-win font-medium">
+              {req.slot && (
+                <div className={`flex items-center gap-2 text-sm font-medium ${req.status === 'accepted' ? 'text-win' : 'text-txt-2'}`}>
                   <Calendar size={14} />
-                  {format(new Date(req.confirmedDate), "dd MMMM yyyy 'à' HH:mm", { locale: fr })}
+                  {format(new Date(req.slot.datetime), "dd MMMM yyyy 'à' HH:mm", { locale: fr })}
                 </div>
               )}
               {req.status === 'rejected' && req.rejectionReason && (
@@ -154,7 +168,7 @@ export default function CoachingPage() {
         </div>
       )}
 
-      <Modal isOpen={isFormOpen} onClose={() => setIsFormOpen(false)} title="Nouvelle demande de coaching">
+      <Modal isOpen={isFormOpen} onClose={closeForm} title="Nouvelle demande de coaching">
         <form onSubmit={handleSubmit} className="space-y-5 mt-2">
           <div>
             <label className="block text-xs font-bold text-txt-2 mb-2">Sujet</label>
@@ -196,24 +210,13 @@ export default function CoachingPage() {
             </div>
           </div>
 
-          <div className="space-y-2">
-            <label className="block text-xs font-bold text-txt-2">Disponibilités</label>
-            {(['1ère disponibilité *', '2ème disponibilité', '3ème disponibilité'] as const).map((label, i) => (
-              <div key={i}>
-                <label className="block text-[10px] text-txt-3 mb-1">{label}</label>
-                <input
-                  type="datetime-local"
-                  value={dates[i]}
-                  onChange={e => {
-                    const d = [...dates];
-                    d[i] = e.target.value;
-                    setDates(d);
-                  }}
-                  required={i === 0}
-                  className="w-full px-4 py-2.5 rounded-xl bg-surface border border-border focus:border-accent outline-none text-sm"
-                />
-              </div>
-            ))}
+          <div>
+            <label className="block text-xs font-bold text-txt-2 mb-2">Créneau</label>
+            {slotsLoading ? (
+              <p className="text-sm text-txt-3 text-center py-4">Chargement des créneaux...</p>
+            ) : (
+              <SlotPicker slots={availableSlots} selectedSlotId={slotId} onChange={setSlotId} />
+            )}
           </div>
 
           <div>
@@ -234,7 +237,7 @@ export default function CoachingPage() {
           </div>
 
           <div className="flex gap-3 justify-end pt-2">
-            <button type="button" onClick={() => setIsFormOpen(false)} className="btn-ghost" disabled={submitting}>
+            <button type="button" onClick={closeForm} className="btn-ghost" disabled={submitting}>
               Annuler
             </button>
             <button type="submit" className="btn-primary" disabled={submitting}>

@@ -8,12 +8,18 @@ vi.mock('../../lib/api', () => ({
   default: { get: vi.fn(), post: vi.fn() },
 }));
 
+const mockSlots = [
+  { id: 'slot-10', datetime: '2026-06-15T10:00:00.000Z' },
+  { id: 'slot-11', datetime: '2026-06-16T14:00:00.000Z' },
+];
+
 const mockRequests = [
   {
     id: 'req-1',
     subject: 'trades',
     sessionType: 'zoom',
-    proposedDates: ['2026-06-10T14:00:00.000Z'],
+    slotId: 'slot-1',
+    slot: { id: 'slot-1', datetime: '2026-06-10T14:00:00.000Z' },
     message: 'Analyse de mes trades sur EUR/USD cette semaine.',
     status: 'pending',
     createdAt: '2026-06-02T10:00:00.000Z',
@@ -22,17 +28,18 @@ const mockRequests = [
     id: 'req-2',
     subject: 'psychology',
     sessionType: 'meet',
-    proposedDates: ['2026-06-12T10:00:00.000Z'],
+    slotId: 'slot-2',
+    slot: { id: 'slot-2', datetime: '2026-06-12T10:00:00.000Z' },
     message: 'Travail sur discipline et gestion émotionnelle.',
     status: 'accepted',
-    confirmedDate: '2026-06-12T10:00:00.000Z',
     createdAt: '2026-06-01T08:00:00.000Z',
   },
   {
     id: 'req-3',
     subject: 'plan',
     sessionType: 'phone',
-    proposedDates: ['2026-06-14T15:00:00.000Z'],
+    slotId: 'slot-3',
+    slot: { id: 'slot-3', datetime: '2026-06-14T15:00:00.000Z' },
     message: 'Révision complète de mon plan de trading mensuel.',
     status: 'rejected',
     rejectionReason: 'Créneaux indisponibles cette semaine.',
@@ -101,9 +108,10 @@ describe('CoachingPage', () => {
     expect(screen.getByText('Créneaux indisponibles cette semaine.')).toBeInTheDocument();
   });
 
-  it('ouvre le modal de nouvelle demande', async () => {
+  it('ouvre le modal de nouvelle demande et charge les créneaux', async () => {
     vi.mocked(api.get).mockImplementation(async (url) => {
       if (url.includes('/api/settings')) return { data: { data: {} } };
+      if (url.includes('/api/coaching/slots')) return { data: { data: mockSlots } };
       return { data: { data: [] } };
     });
     const user = userEvent.setup();
@@ -111,11 +119,26 @@ describe('CoachingPage', () => {
     await waitFor(() => expect(screen.getByText('Aucune demande')).toBeInTheDocument());
     await user.click(screen.getAllByText('Nouvelle demande')[0]);
     expect(screen.getByText('Nouvelle demande de coaching')).toBeInTheDocument();
+    await waitFor(() => expect(screen.getAllByRole('radio').length).toBeGreaterThanOrEqual(2));
   });
 
-  it('bloque la soumission si le message est trop court', async () => {
+  it('affiche le message vide si aucun créneau disponible', async () => {
     vi.mocked(api.get).mockImplementation(async (url) => {
       if (url.includes('/api/settings')) return { data: { data: {} } };
+      if (url.includes('/api/coaching/slots')) return { data: { data: [] } };
+      return { data: { data: [] } };
+    });
+    const user = userEvent.setup();
+    render(<CoachingPage />);
+    await waitFor(() => expect(screen.getByText('Aucune demande')).toBeInTheDocument());
+    await user.click(screen.getAllByText('Nouvelle demande')[0]);
+    await waitFor(() => expect(screen.getByText(/Aucun créneau disponible/)).toBeInTheDocument());
+  });
+
+  it('bloque la soumission si aucun créneau sélectionné', async () => {
+    vi.mocked(api.get).mockImplementation(async (url) => {
+      if (url.includes('/api/settings')) return { data: { data: {} } };
+      if (url.includes('/api/coaching/slots')) return { data: { data: mockSlots } };
       return { data: { data: [] } };
     });
     const user = userEvent.setup();
@@ -123,14 +146,34 @@ describe('CoachingPage', () => {
     await waitFor(() => expect(screen.getByText('Aucune demande')).toBeInTheDocument());
     await user.click(screen.getAllByText('Nouvelle demande')[0]);
     const textarea = screen.getByPlaceholderText(/Décrivez vos objectifs/);
+    await user.type(textarea, 'Message suffisamment long pour passer la validation minimale.');
+    await user.click(screen.getByText('Envoyer la demande'));
+    expect(api.post).not.toHaveBeenCalled();
+  });
+
+  it('bloque la soumission si le message est trop court', async () => {
+    vi.mocked(api.get).mockImplementation(async (url) => {
+      if (url.includes('/api/settings')) return { data: { data: {} } };
+      if (url.includes('/api/coaching/slots')) return { data: { data: mockSlots } };
+      return { data: { data: [] } };
+    });
+    const user = userEvent.setup();
+    render(<CoachingPage />);
+    await waitFor(() => expect(screen.getByText('Aucune demande')).toBeInTheDocument());
+    await user.click(screen.getAllByText('Nouvelle demande')[0]);
+    await waitFor(() => expect(screen.getAllByRole('radio').length).toBeGreaterThanOrEqual(2));
+    const slotRadios = screen.getAllByRole('radio').filter(r => r.getAttribute('name') === 'slot');
+    await user.click(slotRadios[0]);
+    const textarea = screen.getByPlaceholderText(/Décrivez vos objectifs/);
     await user.type(textarea, 'Court');
     await user.click(screen.getByText('Envoyer la demande'));
     expect(api.post).not.toHaveBeenCalled();
   });
 
-  it('soumet le formulaire avec données valides', async () => {
+  it('soumet le formulaire avec slotId et données valides', async () => {
     vi.mocked(api.get).mockImplementation(async (url) => {
       if (url.includes('/api/settings')) return { data: { data: {} } };
+      if (url.includes('/api/coaching/slots')) return { data: { data: mockSlots } };
       return { data: { data: [] } };
     });
     vi.mocked(api.post).mockResolvedValue({ data: { data: {} } });
@@ -138,13 +181,14 @@ describe('CoachingPage', () => {
     render(<CoachingPage />);
     await waitFor(() => expect(screen.getByText('Aucune demande')).toBeInTheDocument());
     await user.click(screen.getAllByText('Nouvelle demande')[0]);
+    await waitFor(() => expect(screen.getAllByRole('radio').length).toBeGreaterThanOrEqual(2));
+    const slotRadios = screen.getAllByRole('radio').filter(r => r.getAttribute('name') === 'slot');
+    await user.click(slotRadios[0]);
     const textarea = screen.getByPlaceholderText(/Décrivez vos objectifs/);
     await user.type(textarea, 'Message suffisamment long pour passer la validation minimale.');
-    // Fill first date
-    const dateInput = document.querySelector('input[type="datetime-local"]') as HTMLInputElement;
-    await user.type(dateInput, '2026-06-15T10:00');
     await user.click(screen.getByText('Envoyer la demande'));
     await waitFor(() => expect(api.post).toHaveBeenCalledWith('/api/coaching', expect.objectContaining({
+      slotId: 'slot-10',
       subject: 'trades',
       sessionType: 'zoom',
       message: expect.stringContaining('Message suffisamment long'),
