@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Search, Upload, Bell, Command, Menu } from 'lucide-react';
+import { Search, Upload, Bell, Command, Menu, Volume2, VolumeX } from 'lucide-react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { NotificationsDropdown } from './NotificationsDropdown';
 import { useNotifications } from '../../hooks/useNotifications';
+import { useSound } from '../../context/SoundContext';
 import { ImportTradesModal } from '../trading/ImportTradesModal';
 
 interface TopBarProps {
@@ -17,6 +18,7 @@ export const TopBar: React.FC<TopBarProps> = ({ onOpenMenu }) => {
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [isImportOpen, setIsImportOpen] = useState(false);
   const { unreadCount } = useNotifications();
+  const { muted, toggleMute } = useSound();
 
   useEffect(() => {
     const timer = setInterval(() => setNow(new Date()), 60000);
@@ -108,7 +110,15 @@ export const TopBar: React.FC<TopBarProps> = ({ onOpenMenu }) => {
           <NotificationsDropdown isOpen={isNotifOpen} onClose={() => setIsNotifOpen(false)} />
         </div>
 
-        <button 
+        <button
+          onClick={toggleMute}
+          className="p-2 text-txt-2 hover:text-txt hover:bg-elevated rounded-xl transition-colors"
+          title={muted ? 'Activer le son' : 'Désactiver le son'}
+        >
+          {muted ? <VolumeX size={18} /> : <Volume2 size={18} />}
+        </button>
+
+        <button
           onClick={() => setIsImportOpen(true)}
           className="hidden md:flex items-center gap-2 px-3 py-2 text-xs font-bold text-txt-2 hover:text-txt hover:bg-elevated rounded-xl transition-colors"
         >

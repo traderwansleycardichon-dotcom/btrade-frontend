@@ -1,8 +1,8 @@
 import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { 
-  LayoutDashboard, 
-  Users, 
+import {
+  LayoutDashboard,
+  Users,
   Settings,
   LogOut,
   Shield,
@@ -15,11 +15,14 @@ import {
   X,
   Ticket,
   MessageSquare,
-  Video
+  Video,
+  Volume2,
+  VolumeX,
 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { useSettings } from '../../contexts/SettingsContext';
 import { useQueryClient } from '@tanstack/react-query';
+import { useSound } from '../../context/SoundContext';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -34,6 +37,7 @@ interface AdminSidebarProps {
 
 export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) => {
   const { user, logout } = useAuth();
+  const { muted, toggleMute } = useSound();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const { settings } = useSettings();
@@ -150,7 +154,14 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
               <div className="text-sm font-bold truncate">{user?.fullName || 'Administrateur'}</div>
               <div className="text-[10px] font-bold text-loss uppercase tracking-tighter">Super Admin</div>
             </div>
-            <button 
+            <button
+              onClick={toggleMute}
+              className="p-2 text-txt-2 hover:text-txt transition-colors"
+              title={muted ? 'Activer le son' : 'Désactiver le son'}
+            >
+              {muted ? <VolumeX size={18} /> : <Volume2 size={18} />}
+            </button>
+            <button
               onClick={logout}
               className="p-2 text-txt-2 hover:text-loss transition-colors"
               title="Déconnexion"

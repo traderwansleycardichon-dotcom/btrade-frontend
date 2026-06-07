@@ -6,6 +6,7 @@ import api from '../../lib/api';
 import { useToast } from '../../hooks/useToast';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { useSound } from '../../context/SoundContext';
 
 interface TicketThreadModalProps {
   isOpen: boolean;
@@ -29,15 +30,25 @@ export const TicketThreadModal: React.FC<TicketThreadModalProps> = ({
   const [replyMessage, setReplyMessage] = useState('');
   const [sending, setSending] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const prevReplyCountRef = useRef<number | null>(null);
   const { addToast } = useToast();
+  const { playSound } = useSound();
 
   useEffect(() => {
     if (isOpen && ticketId) {
+      prevReplyCountRef.current = null;
       fetchTicket();
     } else {
       setTicket(null);
       setReplyMessage('');
+      prevReplyCountRef.current = null;
     }
+  }, [isOpen, ticketId]);
+
+  useEffect(() => {
+    if (!isOpen || !ticketId) return;
+    const interval = setInterval(fetchTicket, 15000);
+    return () => clearInterval(interval);
   }, [isOpen, ticketId]);
 
   useEffect(() => {
@@ -54,7 +65,13 @@ export const TicketThreadModal: React.FC<TicketThreadModalProps> = ({
         ? `/api/admin/support/${ticketId}`
         : `/api/support/${ticketId}`);
       const res = await api.get(endpoint);
-      setTicket(res.data.data);
+      const data = res.data.data;
+      const count = data.replies?.length ?? 0;
+      if (prevReplyCountRef.current !== null && count > prevReplyCountRef.current) {
+        playSound();
+      }
+      prevReplyCountRef.current = count;
+      setTicket(data);
     } catch (err) {
       addToast('Erreur lors du chargement du ticket', 'error');
       onClose();

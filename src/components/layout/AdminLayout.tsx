@@ -4,10 +4,12 @@ import { AdminSidebar } from './AdminSidebar';
 import { useAuth } from '../../hooks/useAuth';
 import { ToastContainer } from '../ui/Toast';
 import { UnreadMessagePopup } from '../messaging/UnreadMessagePopup';
-import { ShieldAlert, Menu } from 'lucide-react';
+import { ShieldAlert, Menu, Volume2, VolumeX } from 'lucide-react';
+import { useSound } from '../../context/SoundContext';
 
 export const AdminLayout: React.FC = () => {
   const { isAuthenticated, isLoading, user, refreshUser } = useAuth();
+  const { muted, toggleMute } = useSound();
   const location = useLocation();
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
 
@@ -57,13 +59,20 @@ export const AdminLayout: React.FC = () => {
       <div className="flex-1 flex flex-col min-w-0">
         {/* Mobile Header for Admin */}
         <header className="h-16 border-b border-border bg-surface/50 backdrop-blur-xl lg:hidden flex items-center px-4 sticky top-0 z-50">
-          <button 
+          <button
             onClick={() => setIsSidebarOpen(true)}
             className="p-2 text-txt-2 hover:bg-elevated rounded-lg transition-colors"
           >
             <Menu size={20} />
           </button>
-          <span className="ml-4 font-bold">Admin Panel</span>
+          <span className="ml-4 font-bold flex-1">Admin Panel</span>
+          <button
+            onClick={toggleMute}
+            className="p-2 text-txt-2 hover:bg-elevated rounded-lg transition-colors"
+            title={muted ? 'Activer le son' : 'Désactiver le son'}
+          >
+            {muted ? <VolumeX size={18} /> : <Volume2 size={18} />}
+          </button>
         </header>
 
         <main className="flex-1 p-4 lg:p-8 overflow-y-auto custom-scrollbar overflow-x-hidden">

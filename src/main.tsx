@@ -47,6 +47,7 @@ import AdminAcademyPage from './pages/admin/academy/page';
 import AdminLessonsPage from './pages/admin/academy/[moduleId]/page';
 import LegalPage from './pages/legal/LegalPage';
 import { SettingsProvider } from './contexts/SettingsContext';
+import { SoundProvider } from './context/SoundContext';
 
 import UpgradePage from './pages/app/upgrade/page';
 import MessagesPage from './pages/app/messages/page';
@@ -153,9 +154,11 @@ const router = createBrowserRouter([
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
-      <SettingsProvider>
-        <RouterProvider router={router} future={{ v7_startTransition: true }} />
-      </SettingsProvider>
+      <SoundProvider>
+        <SettingsProvider>
+          <RouterProvider router={router} future={{ v7_startTransition: true }} />
+        </SettingsProvider>
+      </SoundProvider>
     </QueryClientProvider>
   </React.StrictMode>
 );

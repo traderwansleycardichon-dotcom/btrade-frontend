@@ -1,9 +1,13 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useEffect, useRef } from 'react';
 import api from '../lib/api';
+import { useSound } from '../context/SoundContext';
 
 export const useNotifications = () => {
   const queryClient = useQueryClient();
   const hasToken = typeof window !== 'undefined' && !!localStorage.getItem('btt_access_token');
+  const { playSound } = useSound();
+  const prevUnreadRef = useRef<number | null>(null);
 
   const notificationsQuery = useQuery({
     queryKey: ['notifications'],
@@ -14,9 +18,18 @@ export const useNotifications = () => {
         unreadCount: data.data?.unreadCount || 0
       };
     },
-    refetchInterval: 60000, // Refresh every minute
+    refetchInterval: 60000,
     enabled: hasToken,
   });
+
+  const unreadCount = notificationsQuery.data?.unreadCount || 0;
+
+  useEffect(() => {
+    if (prevUnreadRef.current !== null && unreadCount > prevUnreadRef.current) {
+      playSound();
+    }
+    prevUnreadRef.current = unreadCount;
+  }, [unreadCount, playSound]);
 
   const markAsRead = useMutation({
     mutationFn: async (id: string) => {
@@ -38,7 +51,7 @@ export const useNotifications = () => {
 
   return {
     notifications: notificationsQuery.data?.list || [],
-    unreadCount: notificationsQuery.data?.unreadCount || 0,
+    unreadCount,
     isLoading: notificationsQuery.isLoading,
     markAsRead,
     markAllAsRead,
