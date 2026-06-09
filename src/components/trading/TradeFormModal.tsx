@@ -3,6 +3,7 @@ import DatePicker, { registerLocale } from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { fr } from 'date-fns/locale';
 import { ImageUpload } from '../ui/ImageUpload';
+import { MultiImageUpload } from '../ui/MultiImageUpload';
 import { Modal } from '../ui/Modal';
 import chartUpIcon from '../../assets/animations/1f4c8.json';
 import { useTrades } from '../../hooks/useTrades';
@@ -334,13 +335,15 @@ export const TradeFormModal: React.FC<Props> = ({ accountId, isOpen, onClose, in
     setup: trade?.setup || '',
     note: trade?.note || '',
     screenshot_url: trade?.screenshotUrl || '',
-    // Analyse technique optionnelle (uniquement à la création)
-    analyse_titre: '',
-    analyse_contenu: '',
-    analyse_type: 'pre-trade' as 'pre-trade' | 'in-trade' | 'post-trade',
-    analyse_timeframe: '',
+    // Analyses techniques structurées (uniquement à la création)
+    // BEFORE : 3 timeframes successifs avec multi-images chacun
+    before_htf: { contenu: '', timeframe: 'HTF (D1/H4)', image_urls: [] as string[] },
+    before_mtf: { contenu: '', timeframe: 'Mid (H1/M15)', image_urls: [] as string[] },
+    before_entry: { contenu: '', timeframe: 'Entry (M5/M1)', image_urls: [] as string[] },
+    // AFTER : analyse post-trade, 1 image finale
+    after_post: { contenu: '', image_url: '' },
+    // Biais global (commun aux analyses before)
     analyse_biais: '' as '' | 'haussier' | 'baissier' | 'neutre',
-    analyse_image_url: '',
   });
 
   const [form, setForm] = useState(buildInitialForm());
@@ -441,14 +444,30 @@ export const TradeFormModal: React.FC<Props> = ({ accountId, isOpen, onClose, in
       payload.commission = Number(form.commission);
     }
 
-    // Analyse technique inline si présente
-    if (showAnalyse && (form.analyse_titre.trim() || form.analyse_contenu.trim())) {
-      payload.analyse_titre = form.analyse_titre.trim() || null;
-      payload.analyse_contenu = form.analyse_contenu.trim() || null;
-      payload.analyse_type = form.analyse_type;
-      payload.analyse_timeframe = form.analyse_timeframe.trim() || null;
-      payload.analyse_biais = form.analyse_biais || null;
-      payload.analyse_image_url = form.analyse_image_url.trim() || null;
+    // Analyses techniques structurées BEFORE / AFTER
+    if (showAnalyse) {
+      const analyses: any[] = [];
+      const pushPhase = (phase: 'htf' | 'mtf' | 'entry' | 'post', data: any) => {
+        const imgs = (data.image_urls || []).filter((u: string) => !!u);
+        const hasContent = (data.contenu || '').trim() || imgs.length > 0 || data.image_url;
+        if (!hasContent) return;
+        analyses.push({
+          phase,
+          type_analyse: phase === 'post' ? 'post-trade' : 'pre-trade',
+          contenu: (data.contenu || '').trim() || null,
+          image_urls: imgs.length > 0 ? imgs : (data.image_url ? [data.image_url] : []),
+          timeframe: data.timeframe || null,
+          biais: phase !== 'post' ? (form.analyse_biais || null) : null,
+        });
+      };
+      pushPhase('htf', form.before_htf);
+      pushPhase('mtf', form.before_mtf);
+      pushPhase('entry', form.before_entry);
+      pushPhase('post', form.after_post);
+
+      if (analyses.length > 0) {
+        payload.analyses = analyses;
+      }
     }
 
     try {
@@ -670,7 +689,7 @@ export const TradeFormModal: React.FC<Props> = ({ accountId, isOpen, onClose, in
           />
         </FormField>
 
-        {/* ANALYSE TECHNIQUE OPTIONNELLE — uniquement en mode création */}
+        {/* ANALYSE TECHNIQUE STRUCTURÉE — uniquement en mode création */}
         {!isEditMode && (
           <div className="pt-3 border-t border-border">
             <button
@@ -683,75 +702,142 @@ export const TradeFormModal: React.FC<Props> = ({ accountId, isOpen, onClose, in
             </button>
 
             {showAnalyse && (
-              <div className="mt-3 space-y-3 p-3 bg-bg/40 rounded-lg border border-border">
-                <div className="grid grid-cols-2 gap-3">
-                  <FormField label="Titre de l'analyse" optional>
-                    <input
-                      value={form.analyse_titre}
-                      onChange={e => setForm({ ...form, analyse_titre: e.target.value })}
-                      placeholder="Setup London Breakout EURUSD"
-                      className="w-full bg-bg border border-border rounded-lg py-2 px-3 text-xs focus:border-accent/50 outline-none"
-                    />
-                  </FormField>
-                  <FormField label="Type" optional>
-                    <select
-                      value={form.analyse_type}
-                      onChange={e => setForm({ ...form, analyse_type: e.target.value as any })}
-                      className="w-full bg-bg border border-border rounded-lg py-2 px-3 text-xs focus:border-accent/50 outline-none"
-                    >
-                      <option value="pre-trade">Pré-trade</option>
-                      <option value="in-trade">En cours</option>
-                      <option value="post-trade">Post-trade</option>
-                    </select>
-                  </FormField>
-                </div>
+              <div className="mt-3 space-y-4 p-3 bg-bg/40 rounded-lg border border-border">
 
-                <div className="grid grid-cols-2 gap-3">
-                  <FormField label="Timeframe" optional>
-                    <input
-                      value={form.analyse_timeframe}
-                      onChange={e => setForm({ ...form, analyse_timeframe: e.target.value })}
-                      placeholder="H1, M15, D1…"
-                      className="w-full bg-bg border border-border rounded-lg py-2 px-3 text-xs mono focus:border-accent/50 outline-none"
-                    />
-                  </FormField>
-                  <FormField label="Biais" optional>
-                    <div className="grid grid-cols-3 gap-1">
-                      {(['haussier', 'neutre', 'baissier'] as const).map(b => (
-                        <button
-                          key={b}
-                          type="button"
-                          onClick={() => setForm({ ...form, analyse_biais: form.analyse_biais === b ? '' : b })}
-                          className={`py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider border transition-colors ${
-                            form.analyse_biais === b
-                              ? b === 'haussier' ? 'border-win/40 bg-win/10 text-win'
-                                : b === 'baissier' ? 'border-loss/40 bg-loss/10 text-loss'
-                                : 'border-accent/40 bg-accent/10 text-accent'
-                              : 'border-border bg-bg text-txt-2 hover:text-txt'
-                          }`}
-                        >
-                          {b === 'haussier' ? '↑' : b === 'baissier' ? '↓' : '→'} {b.charAt(0).toUpperCase()}
-                        </button>
-                      ))}
-                    </div>
-                  </FormField>
-                </div>
-
-                <FormField label="Contenu / Plan de trade" optional>
-                  <textarea
-                    rows={4}
-                    value={form.analyse_contenu}
-                    onChange={e => setForm({ ...form, analyse_contenu: e.target.value })}
-                    placeholder="Niveaux clés, zone d'entrée, SL/TP, scénarios…"
-                    className="w-full bg-bg border border-border rounded-lg py-2 px-3 text-xs focus:border-accent/50 outline-none resize-none leading-relaxed"
-                  />
+                {/* Biais global (s'applique aux phases BEFORE) */}
+                <FormField label="Biais global">
+                  <div className="grid grid-cols-3 gap-1.5">
+                    {(['haussier', 'neutre', 'baissier'] as const).map(b => (
+                      <button
+                        key={b}
+                        type="button"
+                        onClick={() => setForm({ ...form, analyse_biais: form.analyse_biais === b ? '' : b })}
+                        className={`py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider border transition-colors ${
+                          form.analyse_biais === b
+                            ? b === 'haussier' ? 'border-win/40 bg-win/10 text-win'
+                              : b === 'baissier' ? 'border-loss/40 bg-loss/10 text-loss'
+                              : 'border-accent/40 bg-accent/10 text-accent'
+                            : 'border-border bg-bg text-txt-2 hover:text-txt'
+                        }`}
+                      >
+                        {b === 'haussier' ? '↑ Long' : b === 'baissier' ? '↓ Short' : '→ Neutre'}
+                      </button>
+                    ))}
+                  </div>
                 </FormField>
 
-                <ImageUpload 
-                  label="Screenshot de l'analyse (optionnel)"
-                  value={form.analyse_image_url || ''}
-                  onChange={url => setForm({ ...form, analyse_image_url: url })}
-                />
+                {/* ─── BEFORE — Analyses pré-trade par timeframe ─── */}
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <span className="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-widest bg-accent/15 text-accent">
+                      ▶ Before
+                    </span>
+                    <div className="flex-1 h-px bg-border" />
+                    <span className="text-[9px] text-txt-3 uppercase tracking-widest">Pré-trade</span>
+                  </div>
+
+                  {/* HTF */}
+                  <div className="p-3 rounded-lg bg-surface/60 border border-border space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] font-bold">Higher Timeframe</span>
+                      <input
+                        value={form.before_htf.timeframe}
+                        onChange={e => setForm({ ...form, before_htf: { ...form.before_htf, timeframe: e.target.value } })}
+                        placeholder="HTF (D1/H4)"
+                        className="bg-bg border border-border rounded py-1 px-2 text-[10px] mono w-32 focus:border-accent/50 outline-none"
+                      />
+                    </div>
+                    <textarea
+                      rows={2}
+                      value={form.before_htf.contenu}
+                      onChange={e => setForm({ ...form, before_htf: { ...form.before_htf, contenu: e.target.value } })}
+                      placeholder="Tendance, niveaux majeurs, contexte macro…"
+                      className="w-full bg-bg border border-border rounded-lg py-2 px-3 text-xs focus:border-accent/50 outline-none resize-none"
+                    />
+                    <MultiImageUpload
+                      values={form.before_htf.image_urls}
+                      onChange={urls => setForm({ ...form, before_htf: { ...form.before_htf, image_urls: urls } })}
+                      max={6}
+                    />
+                  </div>
+
+                  {/* Mid */}
+                  <div className="p-3 rounded-lg bg-surface/60 border border-border space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] font-bold">Mid Timeframe</span>
+                      <input
+                        value={form.before_mtf.timeframe}
+                        onChange={e => setForm({ ...form, before_mtf: { ...form.before_mtf, timeframe: e.target.value } })}
+                        placeholder="Mid (H1/M15)"
+                        className="bg-bg border border-border rounded py-1 px-2 text-[10px] mono w-32 focus:border-accent/50 outline-none"
+                      />
+                    </div>
+                    <textarea
+                      rows={2}
+                      value={form.before_mtf.contenu}
+                      onChange={e => setForm({ ...form, before_mtf: { ...form.before_mtf, contenu: e.target.value } })}
+                      placeholder="Structure, POI, déclencheur…"
+                      className="w-full bg-bg border border-border rounded-lg py-2 px-3 text-xs focus:border-accent/50 outline-none resize-none"
+                    />
+                    <MultiImageUpload
+                      values={form.before_mtf.image_urls}
+                      onChange={urls => setForm({ ...form, before_mtf: { ...form.before_mtf, image_urls: urls } })}
+                      max={6}
+                    />
+                  </div>
+
+                  {/* Entry */}
+                  <div className="p-3 rounded-lg bg-surface/60 border border-border space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] font-bold">Entrée</span>
+                      <input
+                        value={form.before_entry.timeframe}
+                        onChange={e => setForm({ ...form, before_entry: { ...form.before_entry, timeframe: e.target.value } })}
+                        placeholder="Entry (M5/M1)"
+                        className="bg-bg border border-border rounded py-1 px-2 text-[10px] mono w-32 focus:border-accent/50 outline-none"
+                      />
+                    </div>
+                    <textarea
+                      rows={2}
+                      value={form.before_entry.contenu}
+                      onChange={e => setForm({ ...form, before_entry: { ...form.before_entry, contenu: e.target.value } })}
+                      placeholder="Trigger précis, SL/TP, R:R, taille…"
+                      className="w-full bg-bg border border-border rounded-lg py-2 px-3 text-xs focus:border-accent/50 outline-none resize-none"
+                    />
+                    <MultiImageUpload
+                      values={form.before_entry.image_urls}
+                      onChange={urls => setForm({ ...form, before_entry: { ...form.before_entry, image_urls: urls } })}
+                      max={6}
+                    />
+                  </div>
+                </div>
+
+                {/* ─── AFTER — Analyse post-trade (1 image finalisée) ─── */}
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <span className="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-widest bg-win/15 text-win">
+                      ◀ After
+                    </span>
+                    <div className="flex-1 h-px bg-border" />
+                    <span className="text-[9px] text-txt-3 uppercase tracking-widest">Post-trade · Finalisé</span>
+                  </div>
+
+                  <div className="p-3 rounded-lg bg-surface/60 border border-border space-y-2">
+                    <textarea
+                      rows={3}
+                      value={form.after_post.contenu}
+                      onChange={e => setForm({ ...form, after_post: { ...form.after_post, contenu: e.target.value } })}
+                      placeholder="Debrief : qu'est-ce qui s'est passé, leçons, ce qu'il fallait faire…"
+                      className="w-full bg-bg border border-border rounded-lg py-2 px-3 text-xs focus:border-accent/50 outline-none resize-none leading-relaxed"
+                    />
+                    <ImageUpload
+                      label="Screenshot final"
+                      value={form.after_post.image_url}
+                      onChange={url => setForm({ ...form, after_post: { ...form.after_post, image_url: url } })}
+                    />
+                  </div>
+                </div>
+
               </div>
             )}
           </div>
