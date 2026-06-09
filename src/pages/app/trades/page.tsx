@@ -13,7 +13,14 @@ const fmt = (v: any) =>
 const fmtDate = (s: string | null | undefined) => {
   if (!s) return '—';
   const d = new Date(s);
-  return `${d.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' })} · ${d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`;
+  if (isNaN(d.getTime())) return '—';
+  // Affiche l'année si différente de l'année courante (trades historiques)
+  const now = new Date();
+  const sameYear = d.getFullYear() === now.getFullYear();
+  const dateOpts: Intl.DateTimeFormatOptions = sameYear
+    ? { day: '2-digit', month: 'short' }
+    : { day: '2-digit', month: 'short', year: 'numeric' };
+  return `${d.toLocaleDateString('fr-FR', dateOpts)} · ${d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`;
 };
 
 const TradesPage: React.FC = () => {
@@ -231,7 +238,7 @@ const TradesPage: React.FC = () => {
 
                   return (
                     <tr key={t.id} className="table-row border-t border-border">
-                      <td className="px-3 py-2 mono text-txt-2 text-[11px]">{fmtDate(t.dateEntree)}</td>
+                      <td className="px-3 py-2 mono text-txt-2 text-[11px]">{fmtDate(t.dateEntree || t.createdAt)}</td>
                       <td className="px-3 py-2">
                         <div className="flex items-center gap-1.5">
                           <span className="font-bold mono text-[11px]">{t.instrument}</span>

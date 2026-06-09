@@ -320,7 +320,10 @@ export const TradeFormModal: React.FC<Props> = ({ accountId, isOpen, onClose, in
   const buildInitialForm = (trade?: any) => ({
     instrument: trade?.instrument || '',
     direction: (trade?.direction === 'sell' ? 'short' : trade?.direction === 'buy' ? 'long' : trade?.direction) || 'long' as 'long' | 'short',
-    datetimeEntree: (trade ? isoToDate(trade.dateEntree) : new Date()) as Date | null,
+    // Pas de pré-remplissage à `new Date()` en création : sinon tous les trades
+    // créés sans modifier le champ reçoivent la même date (aujourd'hui).
+    // L'utilisateur doit explicitement choisir la date d'entrée du trade.
+    datetimeEntree: (trade ? isoToDate(trade.dateEntree) : null) as Date | null,
     datetimeSortie: (trade ? isoToDate(trade.dateSortie) : null) as Date | null,
     prix_entree: trade?.prixEntree !== null && trade?.prixEntree !== undefined ? String(trade.prixEntree) : '' as string,
     prix_sortie: trade?.prixSortie !== null && trade?.prixSortie !== undefined ? String(trade.prixSortie) : '' as string,
@@ -533,10 +536,16 @@ export const TradeFormModal: React.FC<Props> = ({ accountId, isOpen, onClose, in
             locale="fr"
             timeCaption="Heure"
             required
+            placeholderText="Choisir la date d'entrée du trade…"
             className="legacy-datepicker-input"
             popperPlacement="bottom-start"
             showPopperArrow={false}
           />
+          {!form.datetimeEntree && !isEditMode && (
+            <p className="text-[10px] text-txt-3 mt-1">
+              Sélectionne la <strong>vraie</strong> date du trade — pas celle d'aujourd'hui par défaut.
+            </p>
+          )}
         </FormField>
 
         {/* DATE & HEURE DE SORTIE */}
