@@ -138,13 +138,22 @@ const CalendarPage: React.FC = () => {
     return { letter: 'D', color: 'text-loss' };
   }, [monthStats]);
 
-  // Couleur cellule : palette sobre, max 60% d'opacité
+  // Couleur cellule : palette sobre, win = vert (#10B981), loss = rouge (#EF4444)
+  // Off-days = surface élevée à peine teintée. Intensité ∝ |P&L| capé à 500$.
   const cellBg = (pl: number) => {
-    if (pl === 0) return 'rgba(24,28,37,0.4)';
+    if (pl === 0) return 'rgba(24,28,37,0.35)';
     const intensity = Math.min(Math.abs(pl) / 500, 1);
     return pl > 0
-      ? `rgba(243,108,0,${0.15 + intensity * 0.45})`
-      : `rgba(239,68,68,${0.12 + intensity * 0.35})`;
+      ? `rgba(16,185,129,${0.12 + intensity * 0.38})`
+      : `rgba(239,68,68,${0.10 + intensity * 0.36})`;
+  };
+
+  // Bordure cellule : trace fine de la couleur dominante (1px) pour lisibilité
+  const cellBorder = (pl: number) => {
+    if (pl === 0) return '1px solid rgba(31,37,48,0.6)';
+    return pl > 0
+      ? '1px solid rgba(16,185,129,0.35)'
+      : '1px solid rgba(239,68,68,0.32)';
   };
 
   const prev = () => setCursor(c => (c.m === 0 ? { y: c.y - 1, m: 11 } : { y: c.y, m: c.m - 1 }));
@@ -185,18 +194,26 @@ const CalendarPage: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-1">
-          <button onClick={prev} className="p-1.5 rounded bg-bg border border-border text-txt-2 hover:text-txt">
+          <button
+            onClick={prev}
+            className="p-1.5 rounded bg-bg border border-border text-txt-2 hover:text-accent hover:border-accent/40 transition-colors"
+            title="Mois précédent"
+          >
             <ChevronLeft size={12} />
           </button>
-          <span className="text-[11px] font-bold capitalize min-w-[120px] text-center">
+          <span className="text-[11px] font-bold capitalize min-w-[120px] text-center tracking-wide">
             {MONTHS[cursor.m]} {cursor.y}
           </span>
-          <button onClick={next} className="p-1.5 rounded bg-bg border border-border text-txt-2 hover:text-txt">
+          <button
+            onClick={next}
+            className="p-1.5 rounded bg-bg border border-border text-txt-2 hover:text-accent hover:border-accent/40 transition-colors"
+            title="Mois suivant"
+          >
             <ChevronRight size={12} />
           </button>
           <button
             onClick={today}
-            className="text-[10px] px-2 py-1 rounded mono bg-bg border border-border text-txt-2 hover:text-txt"
+            className="text-[10px] px-2 py-1 rounded mono bg-bg border border-border text-txt-2 hover:text-accent hover:border-accent/40 transition-colors ml-1"
           >
             Aujourd'hui
           </button>
@@ -231,7 +248,16 @@ const CalendarPage: React.FC = () => {
           >
             {grid.map((cell, i) => {
               if (!cell.date || !cell.key) {
-                return <div key={i} className="rounded opacity-25" style={{ background: 'rgba(24,28,37,0.2)' }} />;
+                return (
+                  <div
+                    key={i}
+                    className="rounded"
+                    style={{
+                      background: 'transparent',
+                      border: '1px dashed rgba(31,37,48,0.35)',
+                    }}
+                  />
+                );
               }
               const day = dailyPnL.get(cell.key);
               const pl = day?.pl ?? 0;
@@ -254,16 +280,25 @@ const CalendarPage: React.FC = () => {
               return (
                 <div
                   key={i}
-                  className={`relative flex flex-col p-1.5 rounded transition-colors ${
-                    isToday ? 'ring-1 ring-accent ring-inset' : ''
-                  } ${isWeekend && count === 0 ? 'opacity-50' : ''}`}
-                  style={{ background: cellBg(pl) }}
+                  className={`group relative flex flex-col p-1.5 rounded transition-all duration-200 hover:scale-[1.015] hover:z-10 ${
+                    isToday ? 'ring-2 ring-accent ring-offset-0 shadow-[0_0_18px_rgba(243,108,0,0.25)]' : ''
+                  } ${isWeekend && count === 0 ? 'opacity-70' : ''}`}
+                  style={{
+                    background: cellBg(pl),
+                    border: cellBorder(pl),
+                  }}
                   title={titleParts.join(' · ')}
                 >
                   <div className="flex items-center justify-between gap-1">
                     <span
-                      className={`text-[11px] mono ${
-                        isToday ? 'text-accent font-bold' : count > 0 ? 'text-txt font-bold' : 'text-txt-3'
+                      className={`text-[11px] mono leading-none ${
+                        isToday
+                          ? 'text-accent font-black'
+                          : count > 0
+                          ? 'text-txt font-bold'
+                          : isWeekend
+                          ? 'text-txt-3/70'
+                          : 'text-txt-2/80'
                       }`}
                     >
                       {dayNum}
@@ -279,14 +314,14 @@ const CalendarPage: React.FC = () => {
                   {count > 0 && (
                     <div className="mt-auto">
                       <p
-                        className={`text-xs mono font-bold leading-tight ${
+                        className={`text-xs mono font-bold leading-tight tracking-tight ${
                           pl > 0 ? 'text-win' : pl < 0 ? 'text-loss' : 'text-txt-2'
                         }`}
                       >
                         {pl >= 0 ? '+' : '-'}${fmt(Math.abs(pl))}
                       </p>
-                      <p className="text-[9px] mono text-txt-3">
-                        {count}t
+                      <p className="text-[9px] mono text-txt-3 mt-0.5">
+                        {count} trade{count > 1 ? 's' : ''}
                       </p>
                     </div>
                   )}
@@ -297,49 +332,76 @@ const CalendarPage: React.FC = () => {
           {/* Légende */}
           <div className="px-3 py-1.5 border-t border-border flex items-center justify-center gap-4 text-[10px] text-txt-3">
             <span className="flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-sm bg-accent" /> Win
+              <span
+                className="w-2.5 h-2.5 rounded-sm"
+                style={{ background: 'rgba(16,185,129,.4)', border: '1px solid rgba(16,185,129,.55)' }}
+              /> Win
             </span>
             <span className="flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-sm" style={{ background: 'rgba(239,68,68,.4)' }} /> Loss
+              <span
+                className="w-2.5 h-2.5 rounded-sm"
+                style={{ background: 'rgba(239,68,68,.4)', border: '1px solid rgba(239,68,68,.5)' }}
+              /> Loss
             </span>
             <span className="flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-sm" style={{ background: 'rgba(24,28,37,0.5)' }} /> Off
+              <span
+                className="w-2.5 h-2.5 rounded-sm"
+                style={{ background: 'rgba(24,28,37,0.5)', border: '1px solid rgba(31,37,48,.6)' }}
+              /> Off
             </span>
-            <span>·</span>
+            <span className="text-txt-3/50">·</span>
             <span className="flex items-center gap-1">
               <NotebookPen size={10} className="text-accent" /> Journalisé
             </span>
-            <span>·</span>
-            <span>Intensité ∝ taille du P&amp;L</span>
+            <span className="text-txt-3/50">·</span>
+            <span>Intensité ∝ |P&amp;L|</span>
           </div>
         </div>
 
         {/* SIDEBAR */}
         <div className="col-span-12 lg:col-span-4 flex flex-col gap-3 overflow-hidden">
           {/* Score sobre */}
-          <div className="surface rounded-lg p-4 flex-shrink-0">
-            <div className="flex items-start justify-between gap-3">
+          <div className="surface rounded-lg p-4 flex-shrink-0 relative overflow-hidden">
+            {monthScore.letter !== '—' && (
+              <div
+                className="absolute -top-10 -left-10 w-32 h-32 rounded-full pointer-events-none opacity-60"
+                style={{
+                  background:
+                    monthScore.letter.startsWith('A')
+                      ? 'radial-gradient(circle, rgba(16,185,129,.18), transparent 70%)'
+                      : monthScore.letter === 'B'
+                      ? 'radial-gradient(circle, rgba(16,185,129,.10), transparent 70%)'
+                      : monthScore.letter === 'D'
+                      ? 'radial-gradient(circle, rgba(239,68,68,.16), transparent 70%)'
+                      : 'radial-gradient(circle, rgba(107,114,128,.10), transparent 70%)',
+                }}
+              />
+            )}
+            <div className="relative flex items-start justify-between gap-3">
               <div>
                 <p className="text-[10px] uppercase tracking-widest text-txt-3 mb-1">Score du mois</p>
-                <p className={`text-4xl font-black mono leading-none ${monthScore.color}`}>
+                <p className={`text-5xl font-black mono leading-none ${monthScore.color} drop-shadow-[0_0_12px_currentColor]`}>
                   {monthScore.letter}
                 </p>
-                <p className="text-[10px] mono text-txt-3 mt-1.5">
-                  Win rate {monthStats.tradedDays > 0
-                    ? `${((monthStats.wins / monthStats.tradedDays) * 100).toFixed(0)}%`
-                    : '—'}
+                <p className="text-[10px] mono text-txt-3 mt-2">
+                  Win rate{' '}
+                  <span className="text-txt-2 font-bold">
+                    {monthStats.tradedDays > 0
+                      ? `${((monthStats.wins / monthStats.tradedDays) * 100).toFixed(0)}%`
+                      : '—'}
+                  </span>
                 </p>
               </div>
-              <div className="text-right space-y-1">
+              <div className="text-right space-y-2">
                 <div>
-                  <p className="text-[9px] uppercase tracking-widest text-txt-3">Best day</p>
-                  <p className="text-xs mono font-bold text-win">
+                  <p className="text-[9px] uppercase tracking-widest text-txt-3 mb-0.5">Best day</p>
+                  <p className="text-xs mono font-black text-win">
                     {monthStats.bestDay > 0 ? `+$${fmt(monthStats.bestDay)}` : '—'}
                   </p>
                 </div>
                 <div>
-                  <p className="text-[9px] uppercase tracking-widest text-txt-3">Worst day</p>
-                  <p className="text-xs mono font-bold text-loss">
+                  <p className="text-[9px] uppercase tracking-widest text-txt-3 mb-0.5">Worst day</p>
+                  <p className="text-xs mono font-black text-loss">
                     {monthStats.worstDay < 0 ? `-$${fmt(Math.abs(monthStats.worstDay))}` : '—'}
                   </p>
                 </div>
@@ -359,13 +421,21 @@ const CalendarPage: React.FC = () => {
                 const fromStr = `${w.start.getDate().toString().padStart(2, '0')}`;
                 const toStr = `${w.end.getDate().toString().padStart(2, '0')}`;
                 const isCurrentWeek = w.start <= new Date() && w.end >= new Date();
+                const hasPL = w.tradedDays > 0;
+                const accentBar = w.pl > 0 ? 'bg-win' : w.pl < 0 ? 'bg-loss' : 'bg-txt-3/30';
                 return (
                   <div
                     key={w.weekNum}
-                    className={`p-2.5 hover:bg-bg/40 transition-colors ${
+                    className={`relative p-2.5 pl-3 hover:bg-bg/40 transition-colors ${
                       isCurrentWeek ? 'bg-bg/30' : ''
                     }`}
                   >
+                    {/* Liseré vertical coloré selon résultat de la semaine */}
+                    <span
+                      className={`absolute left-0 top-2 bottom-2 w-0.5 rounded-r ${
+                        hasPL ? accentBar : 'bg-transparent'
+                      }`}
+                    />
                     <div className="flex items-center justify-between mb-1">
                       <div className="flex items-center gap-2">
                         <span className="text-[10px] font-bold text-txt-3 uppercase tracking-widest">
@@ -375,36 +445,41 @@ const CalendarPage: React.FC = () => {
                           {fromStr}–{toStr}
                         </span>
                         {isCurrentWeek && (
-                          <span className="text-[9px] text-accent uppercase tracking-wider">● en cours</span>
+                          <span className="inline-flex items-center gap-1 text-[9px] text-accent uppercase tracking-wider font-bold">
+                            <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
+                            en cours
+                          </span>
                         )}
                       </div>
                       <span
-                        className={`text-xs mono font-bold ${
+                        className={`text-xs mono font-black ${
                           w.pl > 0 ? 'text-win' : w.pl < 0 ? 'text-loss' : 'text-txt-3'
                         }`}
                       >
                         {w.pl === 0 ? '—' : `${w.pl >= 0 ? '+' : '-'}$${fmt(Math.abs(w.pl))}`}
                       </span>
                     </div>
-                    {w.tradedDays > 0 ? (
+                    {hasPL ? (
                       <div className="flex items-center justify-between text-[10px] text-txt-3 mono">
                         <div className="flex items-center gap-2">
                           <span>{w.tradedDays}j</span>
-                          <span>·</span>
+                          <span className="text-txt-3/40">·</span>
                           <span>{w.tradeCount}t</span>
-                          <span>·</span>
+                          <span className="text-txt-3/40">·</span>
                           <span>
-                            <span className="text-win">{w.wins}W</span>/<span className="text-loss">{w.losses}L</span>
+                            <span className="text-win font-bold">{w.wins}W</span>
+                            <span className="text-txt-3/60">/</span>
+                            <span className="text-loss font-bold">{w.losses}L</span>
                           </span>
                         </div>
-                        <span className={
+                        <span className={`font-bold ${
                           winRate >= 60 ? 'text-win' : winRate >= 40 ? 'text-accent' : 'text-loss'
-                        }>
+                        }`}>
                           WR {winRate.toFixed(0)}%
                         </span>
                       </div>
                     ) : (
-                      <p className="text-[10px] text-txt-3">Aucun trade</p>
+                      <p className="text-[10px] text-txt-3/70 italic">Aucun trade</p>
                     )}
                   </div>
                 );
