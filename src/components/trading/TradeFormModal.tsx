@@ -334,7 +334,6 @@ export const TradeFormModal: React.FC<Props> = ({ accountId, isOpen, onClose, in
     resultat: trade?.resultat || 'win' as 'win' | 'loss' | 'breakeven',
     setup: trade?.setup || '',
     note: trade?.note || '',
-    screenshot_url: trade?.screenshotUrl || '',
     // Analyses techniques structurées (uniquement à la création)
     // BEFORE : 3 timeframes successifs avec multi-images chacun
     before_htf: { contenu: '', timeframe: 'HTF (D1/H4)', image_urls: [] as string[] },
@@ -383,7 +382,6 @@ export const TradeFormModal: React.FC<Props> = ({ accountId, isOpen, onClose, in
         resultat: form.resultat,
         setup: form.setup.trim() || null,
         note: form.note.trim() || null,
-        screenshot_url: form.screenshot_url.trim() || null,
       };
       if (form.prix_entree !== '' && !isNaN(Number(form.prix_entree))) {
         patch.prix_entree = Number(form.prix_entree);
@@ -423,7 +421,6 @@ export const TradeFormModal: React.FC<Props> = ({ accountId, isOpen, onClose, in
       resultat: form.resultat,
       setup: form.setup.trim() || null,
       note: form.note.trim() || null,
-      screenshot_url: form.screenshot_url.trim() || null,
     };
 
     // Champs numériques optionnels — n'envoyer que si renseignés
@@ -678,14 +675,6 @@ export const TradeFormModal: React.FC<Props> = ({ accountId, isOpen, onClose, in
             onChange={e => setForm({ ...form, note: e.target.value })}
             placeholder="Contexte, raisonnement, leçons…"
             className="w-full bg-bg border border-border rounded-lg py-2 px-3 text-xs focus:border-accent/50 outline-none resize-none"
-          />
-        </FormField>
-
-        {/* SCREENSHOT DU TRADE */}
-        <FormField label="Screenshot du trade" optional>
-          <ImageUpload
-            value={form.screenshot_url || ''}
-            onChange={url => setForm({ ...form, screenshot_url: url })}
           />
         </FormField>
 
