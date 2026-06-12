@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { 
   DndContext, 
   closestCenter,
@@ -16,11 +16,12 @@ import {
   useSortable
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { Plus, GripVertical, Trash2, CheckCircle2, Circle, Lock } from 'lucide-react';
+import { Plus, GripVertical, Trash2, CheckCircle2, Circle, Lock, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../../hooks/useAuth';
 import api from '../../../lib/api';
-import { format } from 'date-fns';
+import { format, startOfWeek, endOfWeek, addDays, isSameDay, subWeeks, addWeeks, parseISO } from 'date-fns';
+import { fr } from 'date-fns/locale';
 import Lottie from 'lottie-react';
 import confettiData from '../../../assets/confetti.json';
 
@@ -29,6 +30,7 @@ interface Task {
   title: string;
   isCompleted: boolean;
   position: number;
+  date: string;
 }
 
 // Composant pour un élément de liste drag-and-drop
@@ -92,7 +94,7 @@ function SortableTaskItem({
 
 export default function TodoPage() {
   const { user } = useAuth();
-  const [tasks, setTasks] = useState<Task[]>([]);
+  const [weekTasks, setWeekTasks] = useState<Task[]>([]);
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const [loading, setLoading] = useState(true);
   const [isTrialLocked, setIsTrialLocked] = useState(false);
@@ -111,32 +113,55 @@ export default function TodoPage() {
     })
   );
 
-  const progress = tasks.length > 0 
-    ? Math.round((tasks.filter(t => t.isCompleted).length / tasks.length) * 100)
+  // Date boundaries for the week
+  const weekStart = startOfWeek(selectedDate, { weekStartsOn: 1 });
+  const weekEnd = endOfWeek(selectedDate, { weekStartsOn: 1 });
+
+  // Generate the 7 days of the currently selected week
+  const daysOfWeek = useMemo(() => {
+    return Array.from({ length: 7 }).map((_, i) => addDays(weekStart, i));
+  }, [weekStart]);
+
+  // Tasks for the selected day only
+  const dailyTasks = useMemo(() => {
+    return weekTasks
+      .filter(t => isSameDay(parseISO(t.date), selectedDate))
+      .sort((a, b) => a.position - b.position);
+  }, [weekTasks, selectedDate]);
+
+  // Weekly and Daily progress
+  const weeklyProgress = weekTasks.length > 0 
+    ? Math.round((weekTasks.filter(t => t.isCompleted).length / weekTasks.length) * 100)
+    : 0;
+
+  const dailyProgress = dailyTasks.length > 0
+    ? Math.round((dailyTasks.filter(t => t.isCompleted).length / dailyTasks.length) * 100)
     : 0;
 
   useEffect(() => {
-    if (progress === 100 && tasks.length > 0) {
+    // Show animation if the entire week is completed OR the day is completed
+    if ((weeklyProgress === 100 && weekTasks.length > 0) || (dailyProgress === 100 && dailyTasks.length > 0)) {
       setShowAnimation(true);
       const timer = setTimeout(() => setShowAnimation(false), 6000);
       return () => clearTimeout(timer);
     } else {
       setShowAnimation(false);
     }
-  }, [progress, tasks.length]);
+  }, [weeklyProgress, dailyProgress, weekTasks.length, dailyTasks.length]);
 
   useEffect(() => {
-    fetchTasks();
-  }, [selectedDate]);
+    fetchWeekTasks();
+  }, [weekStart]); // Fetch whenever the week changes
 
-  const fetchTasks = async () => {
+  const fetchWeekTasks = async () => {
     try {
       setLoading(true);
-      const dateStr = format(selectedDate, 'yyyy-MM-dd');
-      const res = await api.get(`/api/todo?startDate=${dateStr}&endDate=${dateStr}`);
+      const startDateStr = format(weekStart, 'yyyy-MM-dd');
+      const endDateStr = format(weekEnd, 'yyyy-MM-dd');
+      const res = await api.get(`/api/todo?startDate=${startDateStr}&endDate=${endDateStr}`);
       const data = res.data;
       if (data.success) {
-        setTasks(data.data);
+        setWeekTasks(data.data);
         setIsTrialLocked(data.isTrialLocked);
       }
     } catch (err) {
@@ -155,7 +180,7 @@ export default function TodoPage() {
       const res = await api.post('/api/todo', { title: newTaskTitle, date: dateStr });
       const data = res.data;
       if (data.success) {
-        setTasks([...tasks, data.data]);
+        setWeekTasks([...weekTasks, data.data]);
         setNewTaskTitle('');
       } else if (data.error?.includes('Trial expired')) {
         setIsTrialLocked(true);
@@ -170,23 +195,23 @@ export default function TodoPage() {
 
   const toggleTask = async (id: string, isCompleted: boolean) => {
     // Optimistic update
-    setTasks(tasks.map(t => t.id === id ? { ...t, isCompleted } : t));
+    setWeekTasks(weekTasks.map(t => t.id === id ? { ...t, isCompleted } : t));
     try {
       await api.put(`/api/todo/${id}`, { isCompleted });
     } catch (err) {
       console.error('Error updating task', err);
       // Revert optimistic update on error
-      fetchTasks();
+      fetchWeekTasks();
     }
   };
 
   const deleteTask = async (id: string) => {
-    setTasks(tasks.filter(t => t.id !== id));
+    setWeekTasks(weekTasks.filter(t => t.id !== id));
     try {
       await api.delete(`/api/todo/${id}`);
     } catch (err) {
       console.error('Error deleting task', err);
-      fetchTasks();
+      fetchWeekTasks();
     }
   };
 
@@ -194,23 +219,29 @@ export default function TodoPage() {
     const { active, over } = event;
     
     if (over && active.id !== over.id) {
-      const oldIndex = tasks.findIndex(t => t.id === active.id);
-      const newIndex = tasks.findIndex(t => t.id === over.id);
+      const oldIndex = dailyTasks.findIndex(t => t.id === active.id);
+      const newIndex = dailyTasks.findIndex(t => t.id === over.id);
       
-      const newTasks = arrayMove(tasks, oldIndex, newIndex);
+      const newDailyTasks = arrayMove(dailyTasks, oldIndex, newIndex);
       
       // Update positions
-      const updatedTasks = newTasks.map((t, index) => ({
+      const updatedDailyTasks = newDailyTasks.map((t, index) => ({
         ...t,
         position: index
       }));
       
-      setTasks(updatedTasks);
+      // Merge back into weekTasks
+      const newWeekTasks = weekTasks.map(wt => {
+        const updated = updatedDailyTasks.find(udt => udt.id === wt.id);
+        return updated ? updated : wt;
+      });
+
+      setWeekTasks(newWeekTasks);
 
       // Save to backend
       try {
         await api.put('/api/todo/reorder', {
-          tasks: newTasks.map((t, index) => ({ id: t.id, order: index }))
+          items: updatedDailyTasks.map((t, index) => ({ id: t.id, position: index }))
         });
       } catch (err) {
         console.error('Error reordering', err);
@@ -230,7 +261,7 @@ export default function TodoPage() {
             className="w-full h-full absolute inset-0"
           />
           <div className="absolute top-20 bg-accent text-white px-6 py-3 rounded-full font-bold shadow-lg animate-bounce z-50">
-            Jounen Reyisi ! 🎯
+            Objectif Atteint ! 🎯
           </div>
         </div>
       )}
@@ -244,7 +275,7 @@ export default function TodoPage() {
           <h2 className="text-2xl font-bold text-white mb-2">Période d'essai terminée</h2>
           <p className="text-white/60 max-w-md mb-6">
             Votre essai gratuit de 3 jours pour la To-Do List intelligente est expiré. 
-            Passez au plan PRO pour continuer à planifier vos journées et recevoir les conseils de l'IA.
+            Passez au plan PRO pour continuer à planifier vos semaines et recevoir les conseils de l'IA.
           </p>
           <Link to="/app/upgrade" className="px-6 py-3 bg-accent text-white rounded-lg font-medium hover:bg-accent-hover transition-colors">
             Passer à PRO
@@ -252,48 +283,121 @@ export default function TodoPage() {
         </div>
       )}
 
-      <div>
-        <h1 className="text-3xl font-bold text-white mb-2">Ma To-Do List</h1>
-        <p className="text-white/60">
-          Planifiez votre journée. L'IA calculera votre taux de réussite chaque soir.
-        </p>
-      </div>
-
-      {/* Date Navigation & Progress */}
-      <div className="flex items-center justify-between bg-white/5 border border-white/10 rounded-2xl p-6">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <h2 className="text-xl font-medium text-white">
-            {format(selectedDate, 'EEEE, d MMMM')}
-          </h2>
-          <p className="text-white/40 text-sm mt-1">
-            {tasks.filter(t => t.isCompleted).length} sur {tasks.length} tâches complétées
+          <h1 className="text-3xl font-bold text-white mb-2">Ma Semaine</h1>
+          <p className="text-white/60">
+            Planifiez vos tâches pour toute la semaine. Les rappels sont automatiques !
           </p>
         </div>
-        <div className="flex items-center gap-4">
-          <div className="text-right">
-            <div className="text-2xl font-bold text-accent">{progress}%</div>
-            <div className="text-xs text-white/40">Progression</div>
+        
+        <div className="flex items-center gap-3">
+          <button 
+            onClick={() => setSelectedDate(subWeeks(selectedDate, 1))}
+            className="p-2 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition-colors"
+          >
+            <ChevronLeft size={20} className="text-white/70" />
+          </button>
+          <span className="text-sm font-medium text-white/80 min-w-[120px] text-center">
+            {format(weekStart, 'd MMM')} - {format(weekEnd, 'd MMM')}
+          </span>
+          <button 
+            onClick={() => setSelectedDate(addWeeks(selectedDate, 1))}
+            className="p-2 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition-colors"
+          >
+            <ChevronRight size={20} className="text-white/70" />
+          </button>
+        </div>
+      </div>
+
+      {/* Week Days Tabs */}
+      <div className="flex overflow-x-auto gap-2 pb-2 hide-scrollbar">
+        {daysOfWeek.map(day => {
+          const isSelected = isSameDay(day, selectedDate);
+          const isToday = isSameDay(day, new Date());
+          const tasksForDay = weekTasks.filter(t => isSameDay(parseISO(t.date), day));
+          const completedTasks = tasksForDay.filter(t => t.isCompleted).length;
+          
+          return (
+            <button
+              key={day.toISOString()}
+              onClick={() => setSelectedDate(day)}
+              className={`flex-1 min-w-[100px] p-3 rounded-2xl border transition-all ${
+                isSelected 
+                  ? 'bg-accent/10 border-accent/50 text-white shadow-[0_0_15px_rgba(var(--accent-rgb),0.2)]' 
+                  : 'bg-white/5 border-white/5 text-white/60 hover:bg-white/10 hover:border-white/20'
+              }`}
+            >
+              <div className="text-xs font-medium uppercase tracking-wider mb-1">
+                {format(day, 'EEEE', { locale: fr })}
+              </div>
+              <div className="text-xl font-bold mb-2">
+                {format(day, 'd')}
+              </div>
+              
+              {/* Indicator badges */}
+              <div className="flex items-center justify-center gap-1.5">
+                {tasksForDay.length > 0 ? (
+                  <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
+                    completedTasks === tasksForDay.length 
+                      ? 'bg-win/20 text-win' 
+                      : 'bg-accent/20 text-accent'
+                  }`}>
+                    {completedTasks}/{tasksForDay.length}
+                  </span>
+                ) : (
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/5 text-white/30 font-medium">
+                    Vide
+                  </span>
+                )}
+                {isToday && (
+                  <span className="w-1.5 h-1.5 rounded-full bg-accent"></span>
+                )}
+              </div>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Daily Progress Info */}
+      <div className="flex items-center justify-between bg-white/5 border border-white/10 rounded-2xl p-6">
+        <div>
+          <h2 className="text-xl font-medium text-white capitalize">
+            {format(selectedDate, 'EEEE, d MMMM', { locale: fr })}
+          </h2>
+          <p className="text-white/40 text-sm mt-1">
+            {dailyTasks.filter(t => t.isCompleted).length} sur {dailyTasks.length} tâches complétées aujourd'hui
+          </p>
+        </div>
+        <div className="flex items-center gap-6">
+          <div className="hidden md:block text-right border-r border-white/10 pr-6">
+            <div className="text-lg font-bold text-white">{weeklyProgress}%</div>
+            <div className="text-[10px] text-white/40 uppercase tracking-widest">Semaine</div>
           </div>
-          <div className="w-16 h-16 relative flex items-center justify-center">
-            <svg viewBox="0 0 64 64" className="absolute inset-0 w-full h-full transform -rotate-90">
-              {/* Background circle */}
-              <circle
-                cx="32" cy="32" r="28"
-                fill="none"
-                stroke="currentColor"
-                className="text-white/10"
-                strokeWidth="4"
-              />
-              {/* Progress circle */}
-              <circle
-                cx="32" cy="32" r="28"
-                fill="none"
-                stroke="currentColor"
-                className="text-accent transition-all duration-1000 ease-out"
-                strokeWidth="4"
-                strokeDasharray={`${(progress / 100) * 175} 175`}
-              />
-            </svg>
+          <div className="flex items-center gap-4">
+            <div className="text-right">
+              <div className="text-2xl font-bold text-accent">{dailyProgress}%</div>
+              <div className="text-xs text-white/40">Ce jour</div>
+            </div>
+            <div className="w-16 h-16 relative flex items-center justify-center">
+              <svg viewBox="0 0 64 64" className="absolute inset-0 w-full h-full transform -rotate-90">
+                <circle
+                  cx="32" cy="32" r="28"
+                  fill="none"
+                  stroke="currentColor"
+                  className="text-white/10"
+                  strokeWidth="4"
+                />
+                <circle
+                  cx="32" cy="32" r="28"
+                  fill="none"
+                  stroke="currentColor"
+                  className="text-accent transition-all duration-1000 ease-out"
+                  strokeWidth="4"
+                  strokeDasharray={`${(dailyProgress / 100) * 175} 175`}
+                />
+              </svg>
+            </div>
           </div>
         </div>
       </div>
@@ -304,7 +408,7 @@ export default function TodoPage() {
           type="text"
           value={newTaskTitle}
           onChange={(e) => setNewTaskTitle(e.target.value)}
-          placeholder="Ajouter une nouvelle tâche..."
+          placeholder={`Ajouter une tâche pour ${format(selectedDate, 'EEEE', { locale: fr })}...`}
           className="flex-1 px-4 py-4 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-accent transition-colors"
           disabled={isTrialLocked}
         />
@@ -318,10 +422,10 @@ export default function TodoPage() {
         </button>
       </form>
 
-      {/* Task List */}
-      {!loading && tasks.length === 0 ? (
+      {/* Task List (for selected day) */}
+      {!loading && dailyTasks.length === 0 ? (
         <div className="text-center py-12 text-white/40 border border-dashed border-white/10 rounded-2xl">
-          Aucune tâche pour aujourd'hui. Commencez par en ajouter une !
+          Aucune tâche prévue pour ce jour. Ajoutez-en une !
         </div>
       ) : (
         <DndContext 
@@ -330,11 +434,11 @@ export default function TodoPage() {
           onDragEnd={handleDragEnd}
         >
           <SortableContext 
-            items={tasks.map(t => t.id)}
+            items={dailyTasks.map(t => t.id)}
             strategy={verticalListSortingStrategy}
           >
             <div className="space-y-3">
-              {tasks.map(task => (
+              {dailyTasks.map(task => (
                 <SortableTaskItem 
                   key={task.id} 
                   task={task} 

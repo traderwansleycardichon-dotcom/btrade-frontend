@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Settings, User, Lock, Bell, Shield, Save, CheckCircle, AlertTriangle } from 'lucide-react';
+import { Settings, User, Lock, Bell, Shield, Save, CheckCircle, AlertTriangle, CreditCard } from 'lucide-react';
 import { useAuth } from '../../../hooks/useAuth';
 import { useToast } from '../../../hooks/useToast';
 import api from '../../../lib/api';
@@ -11,7 +11,7 @@ export default function AdminSettingsPage() {
   const { addToast } = useToast();
   const { settings, refreshSettings } = useSettings();
   const [loading, setLoading] = useState(false);
-  const [currentTab, setCurrentTab] = useState<'profile' | 'security' | 'permissions' | 'apparence'>('profile');
+  const [currentTab, setCurrentTab] = useState<'profile' | 'security' | 'permissions' | 'apparence' | 'facturation'>('profile');
   
   const [formData, setFormData] = useState({
     fullName: user?.fullName || '',
@@ -106,6 +106,12 @@ export default function AdminSettingsPage() {
               className={`w-full px-4 py-3 text-left text-sm font-bold flex items-center gap-3 transition-all ${currentTab === 'apparence' ? 'bg-loss/10 text-loss border-l-4 border-loss' : 'text-txt-2 hover:bg-elevated'}`}
             >
               <Settings size={18} /> Apparence
+            </button>
+            <button 
+              onClick={() => setCurrentTab('facturation')}
+              className={`w-full px-4 py-3 text-left text-sm font-bold flex items-center gap-3 transition-all ${currentTab === 'facturation' ? 'bg-loss/10 text-loss border-l-4 border-loss' : 'text-txt-2 hover:bg-elevated'}`}
+            >
+              <CreditCard size={18} /> Facturation
             </button>
           </nav>
         </div>
@@ -357,6 +363,48 @@ export default function AdminSettingsPage() {
                         Enregistrer
                       </button>
                     </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {currentTab === 'facturation' && (
+            <div className="glass p-8 rounded-3xl border border-border space-y-8 animate-[slideUp_0.3s_ease-out]">
+              <h3 className="font-bold text-lg mb-6 flex items-center gap-2">
+                <CreditCard size={20} className="text-loss" />
+                Paramètres de facturation et paiements
+              </h3>
+
+              <div className="space-y-6">
+                <div>
+                  <label className="block text-[10px] font-bold text-txt-3 uppercase tracking-widest mb-2">Taux de change (USD vers HTG)</label>
+                  <p className="text-xs text-txt-2 mb-2">Le taux de conversion utilisé pour facturer les clients qui paient avec MonCash (ex: 131).</p>
+                  
+                  <div className="flex gap-3 max-w-md">
+                    <input 
+                      type="number" 
+                      step="0.01"
+                      defaultValue={settings?.USD_TO_HTG_RATE || ''}
+                      id="usd_to_htg_rate_input"
+                      placeholder="Ex: 131"
+                      className="flex-1 bg-elevated border border-border rounded-xl px-4 py-2.5 text-xs focus:border-loss/50 outline-none transition-all text-txt"
+                    />
+                    <button
+                      onClick={async () => {
+                        const val = (document.getElementById('usd_to_htg_rate_input') as HTMLInputElement)?.value;
+                        try {
+                          await api.patch('/api/settings', { USD_TO_HTG_RATE: val });
+                          await refreshSettings();
+                          addToast('Taux de change enregistré', 'success');
+                        } catch (err) {
+                          addToast('Erreur lors de l\'enregistrement', 'error');
+                        }
+                      }}
+                      className="px-4 py-2 text-xs font-bold text-white bg-loss hover:bg-loss/80 rounded-xl transition-all flex items-center justify-center gap-1.5"
+                    >
+                      Enregistrer
+                    </button>
                   </div>
                 </div>
               </div>

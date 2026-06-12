@@ -2,11 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { CreditCard, Edit2, Zap, Sparkles } from 'lucide-react';
 import api from '../../../lib/api';
 import { useToast } from '../../../hooks/useToast';
+import { useSettings } from '../../../contexts/SettingsContext';
 
 interface PricingPlan {
   id: string;
   name: string;
   price: string;
+  originalPrice?: string | null;
   description: string;
   features: string[];
   recommended: boolean;
@@ -20,8 +22,10 @@ export default function AdminPricingPage() {
   const [loading, setLoading] = useState(true);
   const [editingPlan, setEditingPlan] = useState<PricingPlan | null>(null);
   const [newPrice, setNewPrice] = useState<string>('');
+  const [newOriginalPrice, setNewOriginalPrice] = useState<string>('');
   const [saving, setSaving] = useState(false);
   const { addToast } = useToast();
+  const { settings } = useSettings();
 
   useEffect(() => {
     fetchPlans();
@@ -41,6 +45,7 @@ export default function AdminPricingPage() {
   const handleEdit = (plan: PricingPlan) => {
     setEditingPlan(plan);
     setNewPrice(plan.price);
+    setNewOriginalPrice(plan.originalPrice || '');
   };
 
   const handleSave = async () => {
@@ -52,7 +57,8 @@ export default function AdminPricingPage() {
     setSaving(true);
     try {
       await api.put(`/api/admin/pricing/${editingPlan?.id}/price`, {
-        newPrice: Number(newPrice)
+        newPrice: Number(newPrice),
+        originalPrice: newOriginalPrice ? Number(newOriginalPrice) : null
       });
       addToast('Prix mis à jour avec succès (synchronisé avec Stripe)');
       setEditingPlan(null);
@@ -95,9 +101,21 @@ export default function AdminPricingPage() {
                 </div>
               </div>
 
-              <div className="mb-6 flex items-end gap-1">
-                <span className="text-4xl font-black">${plan.price}</span>
-                <span className="text-sm font-bold text-txt-3 mb-1">/mois</span>
+              <div className="mb-6">
+                {plan.originalPrice && (
+                  <div className="text-sm font-bold text-txt-3 line-through mb-1">
+                    ${plan.originalPrice}
+                  </div>
+                )}
+                <div className="flex items-end gap-1">
+                  <span className="text-4xl font-black">${plan.price}</span>
+                  <span className="text-sm font-bold text-txt-3 mb-1">/mois</span>
+                </div>
+                {plan.price && settings?.USD_TO_HTG_RATE && (
+                  <div className="text-xs font-bold text-[#FF0000] mt-1">
+                    ≈ {Math.ceil(Number(plan.price) * Number(settings.USD_TO_HTG_RATE))} HTG / mois
+                  </div>
+                )}
               </div>
 
               <ul className="space-y-3 mb-8">
@@ -130,7 +148,7 @@ export default function AdminPricingPage() {
           <div className="bg-surface border border-border rounded-3xl p-6 w-full max-w-md animate-[scaleIn_0.2s_ease-out]">
             <h3 className="text-xl font-bold mb-2">Modifier le prix : {editingPlan.name}</h3>
             <p className="text-sm text-txt-2 mb-6">
-              Attention : Cela créera un nouveau prix sur Stripe et mettra à jour <strong>tous les abonnés actuels</strong>. Ils paieront ce nouveau montant à partir de leur prochain cycle de facturation.
+              L'Ancien Prix Barré est purement visuel (marketing). Si vous modifiez le <strong>vrai prix</strong>, cela créera un nouveau prix sur Stripe et mettra à jour tous les abonnés actuels.
             </p>
             
             <div className="space-y-4 mb-8">
@@ -148,6 +166,24 @@ export default function AdminPricingPage() {
                     placeholder="49.99"
                     step="0.01"
                     min="1"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-txt-2 uppercase tracking-widest mb-2">Ancien Prix Barré ($) - Optionnel</label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <span className="text-txt-2">$</span>
+                  </div>
+                  <input
+                    type="number"
+                    value={newOriginalPrice}
+                    onChange={(e) => setNewOriginalPrice(e.target.value)}
+                    className="w-full bg-bg border border-border rounded-xl pl-8 pr-4 py-3 text-sm focus:outline-none focus:border-accent transition-colors"
+                    placeholder="99.99"
+                    step="0.01"
+                    min="0"
                   />
                 </div>
               </div>
