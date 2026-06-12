@@ -7,14 +7,17 @@ import { useToast } from '../../hooks/useToast';
 
 interface RegisterFormProps {
   onSwitchToLogin: () => void;
+  initialPlan?: string | null;
+  initialGateway?: string | null;
 }
 
-export const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchToLogin }) => {
+export const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchToLogin, initialPlan, initialGateway }) => {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
     full_name: '',
-    plan: 'free'
+    plan: initialPlan || 'free',
+    gateway: initialGateway || 'stripe'
   });
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
@@ -26,6 +29,16 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchToLogin }) =
 
     try {
       const { data } = await api.post('/api/auth/register', formData);
+      
+      // Si l'API retourne un checkoutUrl, cela signifie que c'est une inscription payante en attente.
+      // On redirige immédiatement vers la passerelle de paiement (Moncash ou Stripe).
+      if (data.checkoutUrl) {
+        addToast('Redirection vers le paiement...', 'success');
+        window.location.href = data.checkoutUrl;
+        return;
+      }
+
+      // Inscription gratuite ou sans paiement requis
       addToast('Inscription réussie !');
       login(data.data.accessToken, data.data.refreshToken, data.data.user);
     } catch (err: any) {

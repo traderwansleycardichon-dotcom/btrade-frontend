@@ -4,6 +4,7 @@ import { Loader2, Check, ArrowRight, Sparkles } from 'lucide-react';
 import api from '../../lib/api';
 import { useAuth } from '../../hooks/useAuth';
 import { useToast } from '../../hooks/useToast';
+import { useSettings } from '../../contexts/SettingsContext';
 
 const BG_CTA = 'https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?auto=format&fit=crop&w=2400&q=80';
 
@@ -14,6 +15,7 @@ interface Plan {
   description: string;
   features: string[];
   recommended?: boolean;
+  originalPrice?: string | null;
 }
 
 // Plans affichés tant que le backend ne répond pas (ou si /api/billing/plans renvoie vide).
@@ -56,8 +58,11 @@ export const PricingSection: React.FC = () => {
   const [plans, setPlans] = useState<Plan[]>(FALLBACK_PLANS);
   const [loading, setLoading] = useState(false);
   const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [selectedPaidPlan, setSelectedPaidPlan] = useState<Plan | null>(null);
   const { user, isAuthenticated } = useAuth();
   const { addToast } = useToast();
+  const { settings } = useSettings();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -86,40 +91,45 @@ export const PricingSection: React.FC = () => {
       return;
     }
 
-    // Pas connecté → on garde le plan choisi et on redirige vers register
+    // Pas connecté (ou connecté mais on veut un nouvel abonnement)
+    // Au lieu de l'inscrire au hasard, on demande la passerelle de paiement
+    setSelectedPaidPlan(plan);
+    setShowPaymentModal(true);
+  };
+
+  const proceedWithGateway = (gateway: 'stripe' | 'moncash') => {
+    if (!selectedPaidPlan) return;
+    
     if (!isAuthenticated) {
       try {
-        sessionStorage.setItem('btt_pending_plan', plan.id);
+        sessionStorage.setItem('btt_pending_plan', selectedPaidPlan.id);
+        sessionStorage.setItem('btt_pending_gateway', gateway);
       } catch {}
-      navigate(`/register?plan=${encodeURIComponent(plan.id)}`);
+      navigate(`/register?plan=${encodeURIComponent(selectedPaidPlan.id)}&gateway=${gateway}`);
       return;
     }
 
-    // Déjà sur ce plan
-    if (user?.plan === plan.id) {
-      addToast('Vous êtes déjà sur ce plan.');
-      return;
-    }
+    // Déjà connecté -> va faire le checkout classique
+    setCheckoutLoading(selectedPaidPlan.id);
+    setShowPaymentModal(false);
+    
+    const url = gateway === 'moncash' 
+      ? '/api/billing/create-moncash-session' 
+      : '/api/billing/create-checkout-session';
 
-    // Lance le checkout Stripe
-    setCheckoutLoading(plan.id);
-    try {
-      const res = await api.post('/api/billing/create-checkout-session', {
-        planId: plan.id,
+    api.post(url, { planId: selectedPaidPlan.id })
+      .then((res) => {
+        if (res.data?.url) {
+          window.location.href = res.data.url;
+        } else {
+          addToast('Réponse de paiement invalide.', 'error');
+          setCheckoutLoading(null);
+        }
+      })
+      .catch((err) => {
+        addToast(err?.response?.data?.error || 'Impossible de lancer le paiement.', 'error');
+        setCheckoutLoading(null);
       });
-      if (res.data?.url) {
-        window.location.href = res.data.url;
-      } else {
-        addToast('Réponse de paiement invalide.', 'error');
-      }
-    } catch (err: any) {
-      addToast(
-        err?.response?.data?.error || 'Impossible de lancer le paiement.',
-        'error',
-      );
-    } finally {
-      setCheckoutLoading(null);
-    }
   };
 
   return (
@@ -183,15 +193,27 @@ export const PricingSection: React.FC = () => {
                       {plan.description}
                     </p>
 
-                    <div className="flex items-baseline gap-1 mb-8">
-                      <span
-                        className={`text-5xl font-semibold tracking-tight tabular-nums ${
-                          featured ? 'text-accent' : 'text-white'
-                        }`}
-                      >
-                        ${plan.price}
-                      </span>
-                      <span className="text-white/45 text-sm">/ mois</span>
+                    <div className="flex flex-col mb-8">
+                      {plan.originalPrice && (
+                        <div className="text-[13px] font-bold text-white/40 line-through mb-1">
+                          ${plan.originalPrice}
+                        </div>
+                      )}
+                      <div className="flex items-baseline gap-1">
+                        <span
+                          className={`text-5xl font-semibold tracking-tight tabular-nums ${
+                            featured ? 'text-accent' : 'text-white'
+                          }`}
+                        >
+                          ${plan.price}
+                        </span>
+                        <span className="text-white/45 text-sm">/ mois</span>
+                      </div>
+                      {!isFree && settings?.USD_TO_HTG_RATE && plan.price && (
+                        <div className="text-xs font-bold text-accent mt-1">
+                          ≈ {Math.ceil(Number(plan.price) * Number(settings.USD_TO_HTG_RATE))} HTG / mois
+                        </div>
+                      )}
                     </div>
 
                     <ul className="space-y-3 mb-10 flex-1">
@@ -278,6 +300,65 @@ export const PricingSection: React.FC = () => {
           </div>
         </div>
       </section>
+
+      {/* PAYMENT MODAL */}
+      {showPaymentModal && selectedPaidPlan && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div 
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            onClick={() => setShowPaymentModal(false)}
+          />
+          <div className="relative w-full max-w-md rounded-2xl glass-frost glass-rim p-8 shadow-2xl animate-[scaleIn_0.2s_ease-out]">
+            <h3 className="text-2xl font-semibold text-white mb-2 text-center">
+              Mode de paiement
+            </h3>
+            <p className="text-sm text-white/60 text-center mb-8">
+              Choisissez comment vous souhaitez payer pour le plan {selectedPaidPlan.name}.
+            </p>
+
+            <div className="space-y-3">
+              <button
+                onClick={() => proceedWithGateway('stripe')}
+                className="w-full flex items-center justify-between p-4 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.05] hover:border-accent/30 transition-all group"
+              >
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-400">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><rect x="2" y="5" width="20" height="14" rx="2" ry="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
+                  </div>
+                  <div className="text-left">
+                    <div className="font-semibold text-white group-hover:text-accent transition-colors">Carte Bancaire</div>
+                    <div className="text-xs text-white/50">Paiement sécurisé via Stripe en USD</div>
+                  </div>
+                </div>
+                <ArrowRight size={16} className="text-white/20 group-hover:text-accent transition-colors" />
+              </button>
+
+              <button
+                onClick={() => proceedWithGateway('moncash')}
+                className="w-full flex items-center justify-between p-4 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.05] hover:border-[#FF0000]/30 transition-all group"
+              >
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-lg bg-[#FF0000]/10 flex items-center justify-center text-[#FF0000]">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                  </div>
+                  <div className="text-left">
+                    <div className="font-semibold text-white group-hover:text-[#FF0000] transition-colors">MonCash</div>
+                    <div className="text-xs text-white/50">Paiement mobile en HTG</div>
+                  </div>
+                </div>
+                <ArrowRight size={16} className="text-white/20 group-hover:text-[#FF0000] transition-colors" />
+              </button>
+            </div>
+
+            <button
+              onClick={() => setShowPaymentModal(false)}
+              className="mt-6 w-full py-3 rounded-xl text-sm font-medium text-white/40 hover:text-white transition-colors"
+            >
+              Annuler
+            </button>
+          </div>
+        </div>
+      )}
     </>
   );
 };

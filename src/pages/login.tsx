@@ -7,13 +7,29 @@ import { HeroPane } from '../components/auth/HeroPane';
 import { useSettings } from '../contexts/SettingsContext';
 import api from '../lib/api';
 
+import { useToast } from '../hooks/useToast';
+
 const LoginPage: React.FC<{ defaultRegister?: boolean }> = ({ defaultRegister = false }) => {
   const { isAuthenticated, isLoading, refreshUser, user } = useAuth();
+  const { addToast } = useToast();
   const { settings } = useSettings();
   const navigate = useNavigate();
   const [params] = useSearchParams();
   const queryPlan = params.get('plan');
+  const queryGateway = params.get('gateway');
+  const queryCheckout = params.get('checkout');
   const [isRegister, setIsRegister] = React.useState(defaultRegister || queryPlan !== null);
+
+  React.useEffect(() => {
+    if (queryCheckout === 'success') {
+      addToast('Paiement réussi ! Votre compte a été créé. Connectez-vous.', 'success');
+      // Nettoyer l'URL
+      window.history.replaceState({}, document.title, '/login');
+    } else if (queryCheckout === 'cancelled') {
+      addToast('Paiement annulé. Votre inscription n\'a pas été finalisée.', 'error');
+      window.history.replaceState({}, document.title, '/login');
+    }
+  }, [queryCheckout, addToast]);
 
   React.useEffect(() => {
     // Si on a un token mais pas de données user, on refresh
@@ -80,7 +96,11 @@ const LoginPage: React.FC<{ defaultRegister?: boolean }> = ({ defaultRegister = 
         </div>
 
         {isRegister ? (
-          <RegisterForm onSwitchToLogin={() => setIsRegister(false)} />
+          <RegisterForm 
+            onSwitchToLogin={() => setIsRegister(false)} 
+            initialPlan={queryPlan}
+            initialGateway={queryGateway}
+          />
         ) : (
           <LoginForm onSwitchToRegister={() => setIsRegister(true)} />
         )}
