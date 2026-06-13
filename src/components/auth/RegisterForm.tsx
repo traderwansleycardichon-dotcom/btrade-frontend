@@ -34,6 +34,9 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchToLogin, ini
       // On redirige immédiatement vers la passerelle de paiement (Moncash ou Stripe).
       if (data.checkoutUrl) {
         addToast('Redirection vers le paiement...', 'success');
+        if (data.pendingId) {
+          sessionStorage.setItem(`btt_pending_${formData.gateway}`, data.pendingId);
+        }
         window.location.href = data.checkoutUrl;
         return;
       }

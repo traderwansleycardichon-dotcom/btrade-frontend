@@ -10,7 +10,7 @@ import api from '../lib/api';
 import { useToast } from '../hooks/useToast';
 
 const LoginPage: React.FC<{ defaultRegister?: boolean }> = ({ defaultRegister = false }) => {
-  const { isAuthenticated, isLoading, refreshUser, user } = useAuth();
+  const { isAuthenticated, isLoading, refreshUser, user, login } = useAuth();
   const { addToast } = useToast();
   const { settings } = useSettings();
   const navigate = useNavigate();
@@ -22,14 +22,49 @@ const LoginPage: React.FC<{ defaultRegister?: boolean }> = ({ defaultRegister = 
 
   React.useEffect(() => {
     if (queryCheckout === 'success') {
-      addToast('Paiement réussi ! Votre compte a été créé. Connectez-vous.', 'success');
-      // Nettoyer l'URL
       window.history.replaceState({}, document.title, '/login');
+
+      const moncashPendingId = sessionStorage.getItem('btt_pending_moncash');
+      const stripePendingId  = sessionStorage.getItem('btt_pending_stripe');
+      const stripeSessionId  = params.get('session_id');
+
+      const handleVerifyResult = (res: any) => {
+        if (res.data?.success) {
+          const { accessToken, refreshToken, user: newUser } = res.data.data;
+          login(accessToken, refreshToken, newUser);
+          addToast('Paiement confirmé ! Bienvenue.', 'success');
+        }
+      };
+
+      const handleVerifyError = (err: any) => {
+        const code = err.response?.data?.error;
+        if (code === 'already_processed') {
+          addToast('Votre compte est prêt. Connectez-vous.', 'success');
+        } else if (code === 'payment_not_confirmed') {
+          addToast('Paiement non confirmé. Contactez le support si vous avez été débité.', 'error');
+        } else {
+          addToast('Paiement réussi ! Votre compte a été créé. Connectez-vous.', 'success');
+        }
+      };
+
+      if (moncashPendingId) {
+        sessionStorage.removeItem('btt_pending_moncash');
+        api.post('/api/auth/verify-moncash-payment', { pendingId: moncashPendingId })
+          .then(handleVerifyResult)
+          .catch(handleVerifyError);
+      } else if (stripePendingId && stripeSessionId) {
+        sessionStorage.removeItem('btt_pending_stripe');
+        api.post('/api/auth/verify-stripe-payment', { pendingId: stripePendingId, sessionId: stripeSessionId })
+          .then(handleVerifyResult)
+          .catch(handleVerifyError);
+      } else {
+        addToast('Paiement réussi ! Votre compte a été créé. Connectez-vous.', 'success');
+      }
     } else if (queryCheckout === 'cancelled') {
       addToast('Paiement annulé. Votre inscription n\'a pas été finalisée.', 'error');
       window.history.replaceState({}, document.title, '/login');
     }
-  }, [queryCheckout, addToast]);
+  }, [queryCheckout, addToast, login]);
 
   React.useEffect(() => {
     // Si on a un token mais pas de données user, on refresh
