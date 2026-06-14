@@ -19,6 +19,7 @@ import {
   Volume2,
   VolumeX,
   Wallet,
+  Mail,
 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { useSettings } from '../../contexts/SettingsContext';
@@ -56,6 +57,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
     { label: 'Messagerie',     icon: MessageSquare,   href: '/admin/messaging' },
     { label: 'Finance',        icon: CreditCard,      href: '/admin/billing' },
     { label: 'Wallet',         icon: Wallet,          href: '/admin/wallet' },
+    { label: 'Emails',         icon: Mail,            href: '/admin/emails' },
     { label: 'Plans Tarifaires',icon: Ticket,         href: '/admin/pricing' },
     { label: 'Codes Promo',    icon: Ticket,          href: '/admin/promo-codes' },
     { label: 'Academy',        icon: BookOpen,        href: '/admin/academy' },

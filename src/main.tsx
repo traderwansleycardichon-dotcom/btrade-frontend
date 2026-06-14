@@ -53,6 +53,7 @@ import UpgradePage from './pages/app/upgrade/page';
 import MessagesPage from './pages/app/messages/page';
 import AdminMessagingPage from './pages/admin/messaging/page';
 import AdminWalletPage from './pages/admin/wallet/page';
+import AdminEmailsPage from './pages/admin/emails/page';
 import ForgotPasswordPage from './pages/forgot-password/page';
 import ResetPasswordPage from './pages/reset-password/page';
 
@@ -109,6 +110,7 @@ const router = createBrowserRouter([
       { path: 'messaging', element: <AdminMessagingPage /> },
       { path: 'billing', element: <AdminBillingPage /> },
       { path: 'wallet', element: <AdminWalletPage /> },
+      { path: 'emails', element: <AdminEmailsPage /> },
       { path: 'pricing', element: <AdminPricingPage /> },
       { path: 'promo-codes', element: <PromoCodesPage /> },
       { path: 'support', element: <AdminSupportPage /> },
