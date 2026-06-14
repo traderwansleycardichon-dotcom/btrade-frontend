@@ -6,6 +6,7 @@ import api from '../../../lib/api';
 import { useToast } from '../../../hooks/useToast';
 import { EditPlanModal } from '../../../components/admin/EditPlanModal';
 import { InviteStaffModal } from '../../../components/admin/InviteStaffModal';
+import { InviteCTOModal } from '../../../components/admin/InviteCTOModal';
 import { DeleteConfirmModal } from '../../../components/admin/DeleteConfirmModal';
 
 export default function AdminUsersPage() {
@@ -20,6 +21,7 @@ export default function AdminUsersPage() {
   const [selectedUser, setSelectedUser] = useState<any>(null);
   const [isPlanModalOpen, setIsPlanModalOpen] = useState(false);
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
+  const [isInviteCTOModalOpen, setIsInviteCTOModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState<any>(null);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -91,7 +93,14 @@ export default function AdminUsersPage() {
             />
           </div>
           
-          <button 
+          <button
+            onClick={() => setIsInviteCTOModalOpen(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-purple-600/20 text-purple-400 border border-purple-600/30 rounded-xl text-sm font-bold hover:bg-purple-600/30 transition-colors"
+          >
+            <Shield size={16} />
+            <span className="hidden md:inline">Inviter CTO</span>
+          </button>
+          <button
             onClick={() => setIsInviteModalOpen(true)}
             className="btn-primary bg-loss hover:bg-loss/80 text-white flex items-center gap-2"
           >
@@ -146,6 +155,10 @@ export default function AdminUsersPage() {
                           <span className="text-[10px] font-bold px-2 py-0.5 rounded uppercase bg-loss/10 text-loss flex items-center gap-1">
                             <ShieldAlert size={10} /> Super Admin
                           </span>
+                        ) : user.role === 'cto' ? (
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded uppercase bg-purple-500/20 text-purple-400 border border-purple-500/30 flex items-center gap-1">
+                            <Shield size={10} /> CTO
+                          </span>
                         ) : user.role === 'staff' ? (
                           <span className="text-[10px] font-bold px-2 py-0.5 rounded uppercase bg-accent/10 text-accent flex items-center gap-1">
                             <Shield size={10} /> Staff Support
@@ -184,12 +197,14 @@ export default function AdminUsersPage() {
                               <Edit size={14} /> Modifier l'abonnement
                             </button>
                           )}
-                          <button 
-                            onClick={() => openDeleteModal(user)}
-                            className="w-full px-4 py-3 text-sm flex items-center gap-2 hover:bg-loss/10 transition-colors text-loss"
-                          >
-                            <Trash2 size={14} /> Supprimer
-                          </button>
+                          {user.role !== 'admin' && user.role !== 'cto' && (
+                            <button
+                              onClick={() => openDeleteModal(user)}
+                              className="w-full px-4 py-3 text-sm flex items-center gap-2 hover:bg-loss/10 transition-colors text-loss"
+                            >
+                              <Trash2 size={14} /> Supprimer
+                            </button>
+                          )}
                         </div>
                       )}
                     </td>
@@ -201,9 +216,15 @@ export default function AdminUsersPage() {
         </div>
       </div>
 
-      <InviteStaffModal 
-        isOpen={isInviteModalOpen} 
-        onClose={() => setIsInviteModalOpen(false)} 
+      <InviteStaffModal
+        isOpen={isInviteModalOpen}
+        onClose={() => setIsInviteModalOpen(false)}
+        onSuccess={fetchUsers}
+      />
+
+      <InviteCTOModal
+        isOpen={isInviteCTOModalOpen}
+        onClose={() => setIsInviteCTOModalOpen(false)}
         onSuccess={fetchUsers}
       />
 
