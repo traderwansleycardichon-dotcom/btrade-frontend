@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { CreditCard, Edit2, Zap, Sparkles } from 'lucide-react';
+import { CreditCard, Edit2, Zap, Sparkles, Copy, CheckCircle, AlertTriangle } from 'lucide-react';
 import api from '../../../lib/api';
 import { useToast } from '../../../hooks/useToast';
 import { useSettings } from '../../../contexts/SettingsContext';
@@ -24,6 +24,7 @@ export default function AdminPricingPage() {
   const [newPrice, setNewPrice] = useState<string>('');
   const [newOriginalPrice, setNewOriginalPrice] = useState<string>('');
   const [saving, setSaving] = useState(false);
+  const [newPriceAlert, setNewPriceAlert] = useState<{ priceId: string; copied: boolean } | null>(null);
   const { addToast } = useToast();
   const { settings } = useSettings();
 
@@ -56,13 +57,17 @@ export default function AdminPricingPage() {
 
     setSaving(true);
     try {
-      await api.put(`/api/admin/pricing/${editingPlan?.id}/price`, {
+      const res = await api.put(`/api/admin/pricing/${editingPlan?.id}/price`, {
         newPrice: Number(newPrice),
         originalPrice: newOriginalPrice ? Number(newOriginalPrice) : null
       });
-      addToast('Prix mis à jour avec succès (synchronisé avec Stripe)');
       setEditingPlan(null);
       fetchPlans();
+      if (res.data.newStripePriceId) {
+        setNewPriceAlert({ priceId: res.data.newStripePriceId, copied: false });
+      } else {
+        addToast('Prix mis à jour avec succès');
+      }
     } catch (err: any) {
       addToast(err.response?.data?.error || 'Erreur lors de la mise à jour du prix', 'error');
     } finally {
@@ -76,6 +81,40 @@ export default function AdminPricingPage() {
         <h1 className="text-2xl font-black mb-2">Plans Tarifaires</h1>
         <p className="text-txt-2 text-sm">Gérez le prix des abonnements. Les changements sont automatiquement synchronisés avec Stripe.</p>
       </div>
+
+      {newPriceAlert && (
+        <div className="glass p-5 rounded-2xl border border-accent/40 bg-accent/5">
+          <div className="flex items-start gap-3 mb-3">
+            <AlertTriangle size={20} className="text-accent shrink-0 mt-0.5" />
+            <div>
+              <p className="font-black text-accent text-sm">Action requise — Mettez à jour votre variable d'environnement</p>
+              <p className="text-txt-2 text-xs mt-1">
+                Un nouveau Stripe Price ID a été créé. Vous devez mettre à jour <code className="bg-elevated px-1 rounded text-accent font-mono">STRIPE_PRO_PLAN_ID</code> dans Railway (ou votre serveur) avec cette valeur, puis redémarrer le serveur.
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3 bg-elevated rounded-xl px-4 py-3">
+            <code className="font-mono text-sm text-win flex-1 select-all">{newPriceAlert.priceId}</code>
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText(newPriceAlert.priceId);
+                setNewPriceAlert(prev => prev ? { ...prev, copied: true } : null);
+                setTimeout(() => setNewPriceAlert(prev => prev ? { ...prev, copied: false } : null), 2000);
+              }}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-accent text-white rounded-lg text-xs font-bold hover:bg-accent-hover transition-colors shrink-0"
+            >
+              {newPriceAlert.copied ? <CheckCircle size={13} /> : <Copy size={13} />}
+              {newPriceAlert.copied ? 'Copié !' : 'Copier'}
+            </button>
+            <button
+              onClick={() => setNewPriceAlert(null)}
+              className="text-txt-3 hover:text-txt text-xs font-bold shrink-0"
+            >
+              Fermer
+            </button>
+          </div>
+        </div>
+      )}
 
       {loading ? (
         <div className="text-center text-txt-3 py-10">Chargement...</div>
