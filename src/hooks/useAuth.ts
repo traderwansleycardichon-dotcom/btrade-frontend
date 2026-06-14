@@ -22,6 +22,7 @@ interface Subscription {
   currentPeriodEnd: string;
   stripeSubId?: string;
   stripeCustomerId?: string;
+  paymentMethod?: string;
 }
 
 interface AuthState {

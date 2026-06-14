@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Check,
   Sparkles,
@@ -8,24 +8,31 @@ import {
   ArrowRight,
   Loader2,
   ArrowLeft,
+  CheckCircle,
+  XCircle,
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import api from "../../../lib/api";
 import { useAuth } from "../../../hooks/useAuth";
 import { useSettings } from "../../../contexts/SettingsContext";
 
 export default function UpgradePage() {
-  const { user } = useAuth();
+  const { user, refreshUser } = useAuth();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [loading, setLoading] = useState<string | null>(null);
   const [plans, setPlans] = useState<any[]>([]);
   const [isFetching, setIsFetching] = useState(true);
   const { settings } = useSettings();
-  
+  const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
   // MonCash Modal state
   const [showMoncashModal, setShowMoncashModal] = useState(false);
   const [selectedPlanForMoncash, setSelectedPlanForMoncash] = useState<any>(null);
 
-  React.useEffect(() => {
+  const paymentStatus = searchParams.get("payment"); // 'success' | 'canceled' | null
+
+  useEffect(() => {
     const fetchPlans = async () => {
       try {
         const { data } = await api.get("/api/billing/plans");
@@ -38,6 +45,37 @@ export default function UpgradePage() {
     };
     fetchPlans();
   }, []);
+
+  // After a successful payment redirect, poll until webhook unlocks the account
+  useEffect(() => {
+    if (paymentStatus !== "success") return;
+
+    // Immediate refresh
+    refreshUser();
+
+    // Poll every 2s for up to 20s to detect when webhook has processed
+    let attempts = 0;
+    pollingRef.current = setInterval(async () => {
+      attempts++;
+      await refreshUser();
+      if (attempts >= 10) {
+        clearInterval(pollingRef.current!);
+      }
+    }, 2000);
+
+    return () => {
+      if (pollingRef.current) clearInterval(pollingRef.current);
+    };
+  }, [paymentStatus]);
+
+  // Auto-redirect to dashboard once account is unlocked
+  useEffect(() => {
+    if (paymentStatus === "success" && user?.plan === "pro") {
+      if (pollingRef.current) clearInterval(pollingRef.current);
+      const timer = setTimeout(() => navigate("/app/dashboard"), 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [user?.plan, paymentStatus, navigate]);
 
   const handleUpgrade = async (planId: "pro") => {
     setLoading(planId);
@@ -92,6 +130,43 @@ export default function UpgradePage() {
 
   return (
     <div className="max-w-5xl mx-auto py-12 px-4 animate-[fadeIn_0.5s_ease-out] relative">
+
+      {/* Payment success banner */}
+      {paymentStatus === "success" && (
+        <div className="mb-8 p-6 rounded-2xl border border-win/30 bg-win/10 flex flex-col sm:flex-row items-center gap-4">
+          <CheckCircle size={32} className="text-win shrink-0" />
+          <div className="flex-1 text-center sm:text-left">
+            <p className="font-black text-win text-lg">Paiement reçu !</p>
+            <p className="text-txt-2 text-sm mt-1">
+              {user?.plan === "pro"
+                ? "Votre compte est déjà actif. Redirection vers le dashboard..."
+                : "Votre paiement est en cours de traitement. Votre compte sera déverrouillé dans quelques instants..."}
+            </p>
+          </div>
+          {user?.plan === "pro" ? (
+            <button
+              onClick={() => navigate("/app/dashboard")}
+              className="px-5 py-2.5 bg-win text-white rounded-xl font-bold text-sm flex items-center gap-2 hover:bg-win/80 transition-all"
+            >
+              Accéder au Dashboard <ArrowRight size={16} />
+            </button>
+          ) : (
+            <Loader2 size={20} className="animate-spin text-win shrink-0" />
+          )}
+        </div>
+      )}
+
+      {/* Payment canceled banner */}
+      {paymentStatus === "canceled" && (
+        <div className="mb-8 p-5 rounded-2xl border border-loss/30 bg-loss/10 flex items-center gap-4">
+          <XCircle size={28} className="text-loss shrink-0" />
+          <p className="text-txt-2 text-sm">
+            <span className="font-bold text-loss">Paiement annulé.</span>{" "}
+            Vous pouvez réessayer ci-dessous.
+          </p>
+        </div>
+      )}
+
       <div className="flex justify-start mb-6">
         <Link
           to="/app/dashboard"

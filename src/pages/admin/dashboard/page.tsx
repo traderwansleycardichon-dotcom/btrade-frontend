@@ -6,6 +6,7 @@ import api from '../../../lib/api';
 import { AdminActivityChart } from '../../../components/admin/AdminActivityChart';
 import { AdminBillingStats } from '../../../components/admin/AdminBillingStats';
 import { AdminQuickPricing } from '../../../components/admin/AdminQuickPricing';
+import { BazikWalletCard } from '../../../components/admin/BazikWalletCard';
 
 export default function AdminDashboardPage() {
   const [stats, setStats] = useState<any>(null);
@@ -63,6 +64,7 @@ export default function AdminDashboardPage() {
         </div>
         <div className="space-y-8">
           <AdminBillingStats data={stats?.billing} loading={loading} />
+          <BazikWalletCard />
         </div>
       </div>
     </div>
