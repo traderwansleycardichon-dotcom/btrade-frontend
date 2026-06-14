@@ -29,9 +29,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchToLogin, ini
 
     try {
       const { data } = await api.post('/api/auth/register', formData);
-      
-      // Si l'API retourne un checkoutUrl, cela signifie que c'est une inscription payante en attente.
-      // On redirige immédiatement vers la passerelle de paiement (Moncash ou Stripe).
+
       if (data.checkoutUrl) {
         addToast('Redirection vers le paiement...', 'success');
         if (data.pendingId) {
@@ -41,11 +39,20 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchToLogin, ini
         return;
       }
 
-      // Inscription gratuite ou sans paiement requis
+      // Plan payant mais checkoutUrl manquant — cas anormal
+      if (formData.plan !== 'free') {
+        addToast('Erreur : URL de paiement non reçue. Vérifiez la configuration Stripe.', 'error');
+        setLoading(false);
+        return;
+      }
+
+      // Inscription gratuite
       addToast('Inscription réussie !');
       login(data.data.accessToken, data.data.refreshToken, data.data.user);
     } catch (err: any) {
-      addToast(err.response?.data?.error || "Erreur lors de l'inscription", 'error');
+      const msg = err.response?.data?.error || err.message || "Erreur lors de l'inscription";
+      addToast(msg, 'error');
+      console.error('[register] erreur:', err.response?.data || err.message);
     } finally {
       setLoading(false);
     }
