@@ -11,7 +11,7 @@ export default function AdminSettingsPage() {
   const { addToast } = useToast();
   const { settings, refreshSettings } = useSettings();
   const [loading, setLoading] = useState(false);
-  const [currentTab, setCurrentTab] = useState<'profile' | 'security' | 'permissions' | 'apparence' | 'facturation'>('profile');
+  const [currentTab, setCurrentTab] = useState<'profile' | 'security' | 'permissions' | 'apparence' | 'facturation' | 'social'>('profile');
   
   const [formData, setFormData] = useState({
     fullName: user?.fullName || '',
@@ -23,6 +23,35 @@ export default function AdminSettingsPage() {
     new: '',
     confirm: ''
   });
+
+  const [socialLinks, setSocialLinks] = useState({
+    discord_link: settings.discord_link || '',
+    telegram_link: settings.telegram_link || '',
+  });
+
+  React.useEffect(() => {
+    setSocialLinks({
+      discord_link: settings.discord_link || '',
+      telegram_link: settings.telegram_link || '',
+    });
+  }, [settings.discord_link, settings.telegram_link]);
+
+  const handleSaveSocialLinks = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      await api.patch('/api/settings', {
+        discord_link: socialLinks.discord_link.trim(),
+        telegram_link: socialLinks.telegram_link.trim(),
+      });
+      await refreshSettings();
+      addToast('Liens sociaux mis à jour', 'success');
+    } catch (err) {
+      addToast('Erreur lors de la sauvegarde', 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -107,11 +136,17 @@ export default function AdminSettingsPage() {
             >
               <Settings size={18} /> Apparence
             </button>
-            <button 
+            <button
               onClick={() => setCurrentTab('facturation')}
               className={`w-full px-4 py-3 text-left text-sm font-bold flex items-center gap-3 transition-all ${currentTab === 'facturation' ? 'bg-loss/10 text-loss border-l-4 border-loss' : 'text-txt-2 hover:bg-elevated'}`}
             >
               <CreditCard size={18} /> Facturation
+            </button>
+            <button
+              onClick={() => setCurrentTab('social')}
+              className={`w-full px-4 py-3 text-left text-sm font-bold flex items-center gap-3 transition-all ${currentTab === 'social' ? 'bg-loss/10 text-loss border-l-4 border-loss' : 'text-txt-2 hover:bg-elevated'}`}
+            >
+              <Bell size={18} /> Réseaux sociaux
             </button>
           </nav>
         </div>
@@ -367,6 +402,47 @@ export default function AdminSettingsPage() {
                 </div>
               </div>
             </div>
+          )}
+
+          {currentTab === 'social' && (
+            <form onSubmit={handleSaveSocialLinks} className="glass p-8 rounded-3xl border border-border space-y-8 animate-[slideUp_0.3s_ease-out]">
+              <h3 className="font-bold text-lg mb-6 flex items-center gap-2">
+                <Bell size={20} className="text-loss" />
+                Réseaux sociaux
+              </h3>
+              <div className="space-y-6">
+                <div>
+                  <label className="block text-[10px] font-bold text-txt-3 uppercase tracking-widest mb-2">Lien Discord (PRO uniquement)</label>
+                  <p className="text-xs text-txt-2 mb-3">Seuls les membres PRO pourront accéder à ce lien depuis l'en-tête de la plateforme.</p>
+                  <input
+                    type="url"
+                    value={socialLinks.discord_link}
+                    onChange={e => setSocialLinks(p => ({ ...p, discord_link: e.target.value }))}
+                    placeholder="https://discord.gg/..."
+                    className="w-full bg-elevated border border-border rounded-xl px-4 py-3 text-sm focus:border-loss/50 outline-none transition-all"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold text-txt-3 uppercase tracking-widest mb-2">Lien Telegram (tout le monde)</label>
+                  <p className="text-xs text-txt-2 mb-3">Tous les utilisateurs connectés pourront cliquer sur ce lien depuis l'en-tête.</p>
+                  <input
+                    type="url"
+                    value={socialLinks.telegram_link}
+                    onChange={e => setSocialLinks(p => ({ ...p, telegram_link: e.target.value }))}
+                    placeholder="https://t.me/..."
+                    className="w-full bg-elevated border border-border rounded-xl px-4 py-3 text-sm focus:border-loss/50 outline-none transition-all"
+                  />
+                </div>
+              </div>
+              <button
+                type="submit"
+                disabled={loading}
+                className="btn-primary bg-loss hover:bg-loss/80 text-white flex items-center gap-2"
+              >
+                <Save size={18} />
+                {loading ? 'Sauvegarde...' : 'Enregistrer les liens'}
+              </button>
+            </form>
           )}
 
           {currentTab === 'facturation' && (
