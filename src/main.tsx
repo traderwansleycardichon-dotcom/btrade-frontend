@@ -52,6 +52,7 @@ import { SoundProvider } from './context/SoundContext';
 import UpgradePage from './pages/app/upgrade/page';
 import MessagesPage from './pages/app/messages/page';
 import AdminMessagingPage from './pages/admin/messaging/page';
+import AdminWalletPage from './pages/admin/wallet/page';
 
 export const queryClient = new QueryClient();
 
@@ -97,6 +98,7 @@ const router = createBrowserRouter([
       { path: 'users', element: <AdminUsersPage /> },
       { path: 'messaging', element: <AdminMessagingPage /> },
       { path: 'billing', element: <AdminBillingPage /> },
+      { path: 'wallet', element: <AdminWalletPage /> },
       { path: 'pricing', element: <AdminPricingPage /> },
       { path: 'promo-codes', element: <PromoCodesPage /> },
       { path: 'support', element: <AdminSupportPage /> },
