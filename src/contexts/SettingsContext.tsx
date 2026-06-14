@@ -3,6 +3,8 @@ import api from '../lib/api';
 
 interface SystemSettings {
   platform_logo?: string;
+  discord_link?: string;
+  telegram_link?: string;
   [key: string]: any;
 }
 

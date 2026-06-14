@@ -12,6 +12,7 @@ interface User {
   avatarUrl?: string;
   timezone?: string;
   currency?: string;
+  phone?: string;
   createdAt?: string;
 }
 
