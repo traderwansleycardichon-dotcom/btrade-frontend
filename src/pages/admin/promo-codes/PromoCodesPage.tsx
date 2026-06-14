@@ -29,6 +29,20 @@ export const PromoCodesPage: React.FC = () => {
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  const handleDeletePromoCode = async (id: string) => {
+    if (!window.confirm('Désactiver ce code promo ?')) return;
+    setDeletingId(id);
+    try {
+      await api.delete(`/api/admin/billing/promo-codes/${id}`);
+      setPromoCodes(prev => prev.filter(pc => pc.id !== id));
+    } catch (err: any) {
+      setError(err.response?.data?.error || 'Erreur lors de la désactivation');
+    } finally {
+      setDeletingId(null);
+    }
+  };
 
   // Form State
   const [code, setCode] = useState('');
@@ -141,6 +155,7 @@ export const PromoCodesPage: React.FC = () => {
                   <th className="px-6 py-4 font-bold">Utilisations</th>
                   <th className="px-6 py-4 font-bold">Créé le</th>
                   <th className="px-6 py-4 font-bold">Expire le</th>
+                  <th className="px-6 py-4 font-bold"></th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
@@ -163,6 +178,18 @@ export const PromoCodesPage: React.FC = () => {
                       ) : (
                         <span className="text-txt-3">Jamais</span>
                       )}
+                    </td>
+                    <td className="px-6 py-4">
+                      <button
+                        onClick={() => handleDeletePromoCode(pc.id)}
+                        disabled={deletingId === pc.id}
+                        className="p-2 text-txt-3 hover:text-loss transition-colors disabled:opacity-40"
+                        title="Désactiver"
+                      >
+                        {deletingId === pc.id
+                          ? <RefreshCw size={15} className="animate-spin" />
+                          : <Trash2 size={15} />}
+                      </button>
                     </td>
                   </tr>
                 ))}
