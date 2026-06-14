@@ -12,6 +12,15 @@ interface EmailTemplate {
   updatedAt: string;
 }
 
+interface EmailCampaign {
+  id: string;
+  templateId: string;
+  subject: string;
+  segment: string;
+  sentCount: number;
+  sentAt: string;
+}
+
 const TEMPLATE_LABELS: Record<string, { label: string; desc: string }> = {
   welcome: { label: 'Bienvenue', desc: 'Envoyé à tout nouveau compte créé' },
   payment_success: { label: 'Paiement confirmé', desc: 'Envoyé après un premier paiement réussi' },
@@ -27,6 +36,15 @@ export default function AdminEmailsPage() {
   const [testEmail, setTestEmail] = useState('');
   const [sendingTest, setSendingTest] = useState<string | null>(null);
   const { addToast } = useToast();
+  const [activeTab, setActiveTab] = useState<'templates' | 'campaigns'>('templates');
+  const [campaigns, setCampaigns] = useState<EmailCampaign[]>([]);
+  const [campaignLoading, setCampaignLoading] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [campaignForm, setCampaignForm] = useState({
+    templateId: '',
+    subjectOverride: '',
+    segment: 'all' as 'all' | 'pro' | 'free',
+  });
 
   const fetchTemplates = async () => {
     setLoading(true);
@@ -37,7 +55,36 @@ export default function AdminEmailsPage() {
     finally { setLoading(false); }
   };
 
-  useEffect(() => { fetchTemplates(); }, []);
+  const fetchCampaigns = async () => {
+    setCampaignLoading(true);
+    try {
+      const res = await api.get('/api/admin/emails/campaigns');
+      setCampaigns(res.data.data);
+    } catch { addToast('Erreur chargement campagnes', 'error'); }
+    finally { setCampaignLoading(false); }
+  };
+
+  useEffect(() => { fetchTemplates(); fetchCampaigns(); }, []);
+
+  const handleSendCampaign = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!campaignForm.templateId) return addToast('Sélectionne un template', 'error');
+    const segmentLabel = { all: 'tous les utilisateurs', pro: 'utilisateurs PRO', free: 'utilisateurs FREE' }[campaignForm.segment];
+    if (!window.confirm(`Envoyer cette campagne à ${segmentLabel} ?`)) return;
+    setSending(true);
+    try {
+      const res = await api.post('/api/admin/emails/campaign', {
+        templateId: campaignForm.templateId,
+        subjectOverride: campaignForm.subjectOverride.trim() || undefined,
+        segment: campaignForm.segment,
+      });
+      addToast(`Campagne envoyée à ${res.data.data.sentCount} destinataires`);
+      setCampaignForm({ templateId: '', subjectOverride: '', segment: 'all' });
+      fetchCampaigns();
+    } catch (err: any) {
+      addToast(err.response?.data?.error || 'Erreur envoi campagne', 'error');
+    } finally { setSending(false); }
+  };
 
   const handleSave = async () => {
     if (!editing) return;
@@ -92,7 +139,23 @@ export default function AdminEmailsPage() {
         </div>
       </div>
 
-      {loading ? (
+      {/* Tab navigation */}
+      <div className="flex gap-1 border-b border-border">
+        <button
+          onClick={() => setActiveTab('templates')}
+          className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${activeTab === 'templates' ? 'border-accent text-accent' : 'border-transparent text-txt-2 hover:text-txt'}`}
+        >
+          Templates
+        </button>
+        <button
+          onClick={() => setActiveTab('campaigns')}
+          className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${activeTab === 'campaigns' ? 'border-accent text-accent' : 'border-transparent text-txt-2 hover:text-txt'}`}
+        >
+          Campagnes
+        </button>
+      </div>
+
+      {activeTab === 'templates' && (loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {[0,1,2,3].map(i => <div key={i} className="glass rounded-3xl border border-border p-6 h-40 animate-pulse" />)}
         </div>
@@ -149,6 +212,90 @@ export default function AdminEmailsPage() {
               </div>
             );
           })}
+        </div>
+      ))}
+
+      {activeTab === 'campaigns' && (
+        <div className="space-y-8">
+          <div className="glass p-6 rounded-3xl border border-border">
+            <h3 className="font-semibold text-txt mb-5">Nouvelle campagne</h3>
+            <form onSubmit={handleSendCampaign} className="space-y-4">
+              <div>
+                <label className="block text-txt-2 text-xs font-bold uppercase tracking-widest mb-1.5">Template</label>
+                <select
+                  value={campaignForm.templateId}
+                  onChange={e => setCampaignForm(p => ({ ...p, templateId: e.target.value }))}
+                  className="w-full bg-elevated border border-border rounded-xl px-4 py-3 text-txt text-sm focus:outline-none focus:border-accent transition-colors"
+                >
+                  <option value="">— Sélectionner un template —</option>
+                  {templates.filter(t => t.isActive).map(t => (
+                    <option key={t.id} value={t.id}>
+                      {TEMPLATE_LABELS[t.id]?.label || t.id} — {t.subject}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-txt-2 text-xs font-bold uppercase tracking-widest mb-1.5">Sujet personnalisé (optionnel)</label>
+                <input
+                  type="text"
+                  value={campaignForm.subjectOverride}
+                  onChange={e => setCampaignForm(p => ({ ...p, subjectOverride: e.target.value }))}
+                  placeholder="Laisse vide pour utiliser le sujet du template"
+                  className="w-full bg-elevated border border-border rounded-xl px-4 py-3 text-txt text-sm focus:outline-none focus:border-accent transition-colors"
+                />
+              </div>
+              <div>
+                <label className="block text-txt-2 text-xs font-bold uppercase tracking-widest mb-1.5">Segment</label>
+                <div className="flex gap-2">
+                  {(['all', 'pro', 'free'] as const).map(seg => (
+                    <button
+                      key={seg}
+                      type="button"
+                      onClick={() => setCampaignForm(p => ({ ...p, segment: seg }))}
+                      className={`flex-1 py-2 rounded-xl text-sm font-bold border transition-colors ${campaignForm.segment === seg ? 'bg-accent text-white border-accent' : 'border-border text-txt-2 hover:bg-elevated'}`}
+                    >
+                      {seg === 'all' ? 'Tout le monde' : seg === 'pro' ? 'PRO' : 'FREE'}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <button
+                type="submit"
+                disabled={sending || !campaignForm.templateId}
+                className="w-full py-3 bg-accent text-white rounded-xl font-bold text-sm hover:bg-accent/90 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                <Send size={16} />
+                {sending ? 'Envoi en cours...' : 'Envoyer la campagne'}
+              </button>
+            </form>
+          </div>
+
+          <div>
+            <h3 className="font-semibold text-txt mb-4">Historique des campagnes</h3>
+            {campaignLoading ? (
+              <div className="text-txt-2 text-sm">Chargement...</div>
+            ) : campaigns.length === 0 ? (
+              <div className="text-txt-2 text-sm text-center py-8">Aucune campagne envoyée</div>
+            ) : (
+              <div className="space-y-2">
+                {campaigns.map(c => (
+                  <div key={c.id} className="glass border border-border rounded-2xl px-5 py-3 flex items-center justify-between">
+                    <div>
+                      <p className="text-txt text-sm font-semibold">{c.subject}</p>
+                      <p className="text-txt-2 text-xs mt-0.5">
+                        {TEMPLATE_LABELS[c.templateId]?.label || c.templateId} · {c.segment === 'all' ? 'Tout le monde' : c.segment.toUpperCase()}
+                      </p>
+                    </div>
+                    <div className="text-right shrink-0 ml-4">
+                      <p className="text-accent text-sm font-black">{c.sentCount} envoyés</p>
+                      <p className="text-txt-3 text-xs">{new Date(c.sentAt).toLocaleDateString('fr-FR')}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       )}
 
