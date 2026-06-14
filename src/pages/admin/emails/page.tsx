@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Mail, Edit2, Send, CheckCircle, XCircle, RefreshCw, X } from 'lucide-react';
+import { Mail, Edit2, Send, CheckCircle, XCircle, RefreshCw, X, Plus, Trash2 } from 'lucide-react';
 import api from '../../../lib/api';
 import { useToast } from '../../../hooks/useToast';
 
@@ -37,6 +37,9 @@ export default function AdminEmailsPage() {
   const [sendingTest, setSendingTest] = useState<string | null>(null);
   const { addToast } = useToast();
   const [activeTab, setActiveTab] = useState<'templates' | 'campaigns'>('templates');
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [creating, setCreating] = useState(false);
+  const [createForm, setCreateForm] = useState({ id: '', name: '', subject: '', body: '' });
   const [campaigns, setCampaigns] = useState<EmailCampaign[]>([]);
   const [campaignLoading, setCampaignLoading] = useState(false);
   const [sending, setSending] = useState(false);
@@ -121,6 +124,31 @@ export default function AdminEmailsPage() {
     } finally { setSendingTest(null); }
   };
 
+  const handleCreate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setCreating(true);
+    try {
+      await api.post('/api/admin/emails', createForm);
+      addToast('Template créé avec succès !');
+      setIsCreateOpen(false);
+      setCreateForm({ id: '', name: '', subject: '', body: '' });
+      fetchTemplates();
+    } catch (err: any) {
+      addToast(err.response?.data?.error || 'Erreur création', 'error');
+    } finally { setCreating(false); }
+  };
+
+  const handleDelete = async (id: string, name: string) => {
+    if (!window.confirm(`Supprimer le template "${name}" ?`)) return;
+    try {
+      await api.delete(`/api/admin/emails/${id}`);
+      addToast('Template supprimé');
+      fetchTemplates();
+    } catch (err: any) {
+      addToast(err.response?.data?.error || 'Erreur suppression', 'error');
+    }
+  };
+
   return (
     <div className="space-y-6 animate-[fadeIn_0.5s_ease-out]">
       <div className="flex items-center justify-between">
@@ -129,6 +157,12 @@ export default function AdminEmailsPage() {
           <p className="text-txt-2 text-sm">Gérez les templates d'emails envoyés automatiquement aux utilisateurs.</p>
         </div>
         <div className="flex items-center gap-2">
+          <button
+            onClick={() => setIsCreateOpen(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-accent text-white rounded-xl text-sm font-bold hover:bg-accent/90 transition-colors"
+          >
+            <Plus size={16} /> Nouveau template
+          </button>
           <input
             type="email"
             placeholder="Email de test..."
@@ -208,6 +242,14 @@ export default function AdminEmailsPage() {
                       : <Send size={12} />}
                     Tester
                   </button>
+                  {!['welcome','payment_success','renewal_success','gift_subscription','new_course'].includes(tpl.id) && (
+                    <button
+                      onClick={() => handleDelete(tpl.id, meta.label)}
+                      className="flex items-center gap-1.5 px-3 py-1.5 bg-loss/10 text-loss border border-loss/20 rounded-xl text-xs font-bold hover:bg-loss/20 transition-all"
+                    >
+                      <Trash2 size={12} /> Supprimer
+                    </button>
+                  )}
                 </div>
               </div>
             );
@@ -295,6 +337,83 @@ export default function AdminEmailsPage() {
                 ))}
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Create Template Modal */}
+      {isCreateOpen && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-start justify-center p-4 pt-16 overflow-y-auto">
+          <div className="bg-surface border border-border rounded-3xl w-full max-w-2xl shadow-2xl">
+            <div className="flex items-center justify-between p-6 border-b border-border">
+              <h3 className="font-black text-lg flex items-center gap-2"><Plus size={18} className="text-accent" /> Nouveau template email</h3>
+              <button onClick={() => setIsCreateOpen(false)} className="p-2 hover:bg-elevated rounded-xl transition-colors"><X size={18} /></button>
+            </div>
+            <form onSubmit={handleCreate} className="p-6 space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-txt-2 uppercase tracking-widest mb-2">ID (slug unique)</label>
+                  <input
+                    type="text"
+                    value={createForm.id}
+                    onChange={e => setCreateForm(p => ({ ...p, id: e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, '_') }))}
+                    placeholder="ex: promo_black_friday"
+                    required
+                    className="w-full bg-elevated border border-border rounded-xl px-4 py-3 text-sm font-mono focus:outline-none focus:border-accent transition-all"
+                  />
+                  <p className="text-txt-3 text-[10px] mt-1">Minuscules, chiffres et _ uniquement</p>
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-txt-2 uppercase tracking-widest mb-2">Nom affiché</label>
+                  <input
+                    type="text"
+                    value={createForm.name}
+                    onChange={e => setCreateForm(p => ({ ...p, name: e.target.value }))}
+                    placeholder="ex: Promo Black Friday"
+                    required
+                    className="w-full bg-elevated border border-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-accent transition-all"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-txt-2 uppercase tracking-widest mb-2">Sujet</label>
+                <input
+                  type="text"
+                  value={createForm.subject}
+                  onChange={e => setCreateForm(p => ({ ...p, subject: e.target.value }))}
+                  placeholder="Sujet de l'email..."
+                  required
+                  className="w-full bg-elevated border border-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-accent transition-all"
+                />
+              </div>
+              <div className="p-3 rounded-xl bg-accent/5 border border-accent/20 text-[11px] text-txt-2">
+                Variables disponibles dans le corps :
+                <span className="font-mono text-accent ml-1">{'{{fullName}}'}</span>
+                <span className="font-mono text-accent ml-2">{'{{loginUrl}}'}</span>
+                <span className="font-mono text-accent ml-2">{'{{amount}}'}</span>
+                <span className="font-mono text-accent ml-2">{'{{periodEnd}}'}</span>
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-txt-2 uppercase tracking-widest mb-2">Corps (HTML)</label>
+                <textarea
+                  value={createForm.body}
+                  onChange={e => setCreateForm(p => ({ ...p, body: e.target.value }))}
+                  rows={14}
+                  placeholder="<div>Votre contenu HTML ici...</div>"
+                  required
+                  className="w-full bg-elevated border border-border rounded-xl px-4 py-3 text-xs font-mono focus:outline-none focus:border-accent transition-all resize-y"
+                />
+              </div>
+              <div className="flex gap-3 pt-2">
+                <button type="button" onClick={() => setIsCreateOpen(false)} className="flex-1 py-3 bg-elevated border border-border rounded-xl font-bold hover:bg-border transition-all text-sm">
+                  Annuler
+                </button>
+                <button type="submit" disabled={creating} className="flex-1 py-3 bg-accent text-white rounded-xl font-bold hover:bg-accent/90 transition-all text-sm flex items-center justify-center gap-2">
+                  {creating ? <RefreshCw size={16} className="animate-spin" /> : <Plus size={16} />}
+                  {creating ? 'Création...' : 'Créer le template'}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
