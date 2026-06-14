@@ -7,6 +7,7 @@ import { useToast } from '../../../hooks/useToast';
 import { EditPlanModal } from '../../../components/admin/EditPlanModal';
 import { InviteStaffModal } from '../../../components/admin/InviteStaffModal';
 import { InviteCTOModal } from '../../../components/admin/InviteCTOModal';
+import { ChangeRoleModal } from '../../../components/admin/ChangeRoleModal';
 import { DeleteConfirmModal } from '../../../components/admin/DeleteConfirmModal';
 
 export default function AdminUsersPage() {
@@ -22,6 +23,8 @@ export default function AdminUsersPage() {
   const [isPlanModalOpen, setIsPlanModalOpen] = useState(false);
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [isInviteCTOModalOpen, setIsInviteCTOModalOpen] = useState(false);
+  const [isChangeRoleModalOpen, setIsChangeRoleModalOpen] = useState(false);
+  const [userForRoleChange, setUserForRoleChange] = useState<any>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState<any>(null);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -190,7 +193,15 @@ export default function AdminUsersPage() {
                       {openMenuId === user.id && (
                         <div className="absolute right-6 top-10 w-48 bg-surface border border-border shadow-2xl rounded-xl overflow-hidden z-[100]">
                           {user.role !== 'admin' && (
-                            <button 
+                            <button
+                              onClick={() => { setUserForRoleChange(user); setIsChangeRoleModalOpen(true); setOpenMenuId(null); }}
+                              className="w-full px-4 py-3 text-sm flex items-center gap-2 hover:bg-elevated transition-colors text-txt-2 hover:text-txt"
+                            >
+                              <Shield size={14} /> Changer le rôle
+                            </button>
+                          )}
+                          {user.role !== 'admin' && (
+                            <button
                               onClick={() => openPlanModal(user)}
                               className="w-full px-4 py-3 text-sm flex items-center gap-2 hover:bg-elevated transition-colors text-txt-2 hover:text-txt"
                             >
@@ -225,6 +236,13 @@ export default function AdminUsersPage() {
       <InviteCTOModal
         isOpen={isInviteCTOModalOpen}
         onClose={() => setIsInviteCTOModalOpen(false)}
+        onSuccess={fetchUsers}
+      />
+
+      <ChangeRoleModal
+        isOpen={isChangeRoleModalOpen}
+        user={userForRoleChange}
+        onClose={() => { setIsChangeRoleModalOpen(false); setUserForRoleChange(null); }}
         onSuccess={fetchUsers}
       />
 
