@@ -53,6 +53,8 @@ import UpgradePage from './pages/app/upgrade/page';
 import MessagesPage from './pages/app/messages/page';
 import AdminMessagingPage from './pages/admin/messaging/page';
 import AdminWalletPage from './pages/admin/wallet/page';
+import ForgotPasswordPage from './pages/forgot-password/page';
+import ResetPasswordPage from './pages/reset-password/page';
 
 export const queryClient = new QueryClient();
 
@@ -88,6 +90,14 @@ const router = createBrowserRouter([
   {
     path: '/app/upgrade',
     element: <UpgradePage />,
+  },
+  {
+    path: '/forgot-password',
+    element: <ForgotPasswordPage />,
+  },
+  {
+    path: '/reset-password',
+    element: <ResetPasswordPage />,
   },
   {
     path: '/admin',
