@@ -35,7 +35,9 @@ export default function AdminPricingPage() {
   const fetchPlans = async () => {
     try {
       const res = await api.get('/api/admin/pricing');
-      setPlans(res.data);
+      // Backend retourne { plans: [...], activeStripePrice: {...} }
+      const data = res.data;
+      setPlans(Array.isArray(data) ? data : (data.plans ?? []));
     } catch (err: any) {
       addToast('Erreur lors du chargement des plans', 'error');
     } finally {
