@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Mail, Lock, User, ArrowRight, Loader2, ShieldCheck, Sparkles } from 'lucide-react';
+import { Mail, Lock, User, ArrowRight, Loader2, ShieldCheck, Sparkles, CreditCard } from 'lucide-react';
 import api from '../../lib/api';
 import { useAuth } from '../../hooks/useAuth';
 import { useToast } from '../../hooks/useToast';
@@ -57,6 +57,24 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchToLogin, ini
         <h2 className="text-3xl font-black mb-2 tracking-tight">Créer un compte</h2>
         <p className="text-txt-2 text-sm">Rejoignez la communauté Behind The Trade dès aujourd'hui.</p>
       </div>
+
+      {formData.plan !== 'free' && (
+        <div className="flex items-center gap-3 p-4 rounded-2xl bg-accent/10 border border-accent/20">
+          <div className="w-9 h-9 rounded-xl bg-accent/20 flex items-center justify-center shrink-0">
+            <Sparkles size={16} className="text-accent" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-xs font-black text-accent uppercase tracking-wider">
+              Plan {formData.plan.toUpperCase()} sélectionné
+            </p>
+            <p className="text-[11px] text-txt-2 mt-0.5">
+              Vous serez redirigé vers{' '}
+              {formData.gateway === 'moncash' ? 'MonCash' : 'Stripe'} pour finaliser le paiement.
+            </p>
+          </div>
+          <CreditCard size={16} className="text-accent shrink-0" />
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="space-y-5">
         <div className="space-y-4">
