@@ -274,12 +274,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen = false, onMobileCl
           </button>
         </div>
 
-        {user?.role === 'admin' && (
+        {(user?.role === 'admin' || user?.role === 'cto') && (
           <button
             onClick={handleReturnToAdmin}
             className="w-full flex items-center justify-center gap-2 py-2 mt-2 bg-loss/10 text-loss rounded-lg font-bold hover:bg-loss/20 transition-colors border border-loss/20 text-xs"
           >
-            Retour SuperAdmin
+            {user?.role === 'cto' ? 'Retour CTO Panel' : 'Retour SuperAdmin'}
           </button>
         )}
       </div>
