@@ -26,7 +26,8 @@ export const AdminQuickPricing = () => {
   const fetchPlans = async () => {
     try {
       const res = await api.get('/api/admin/pricing');
-      setPlans(res.data);
+      const data = res.data;
+      setPlans(Array.isArray(data) ? data : (data.plans ?? []));
     } catch (err: any) {
       addToast('Erreur lors du chargement des plans', 'error');
     } finally {
