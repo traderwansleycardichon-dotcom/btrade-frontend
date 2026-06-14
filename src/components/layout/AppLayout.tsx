@@ -7,12 +7,14 @@ import { ToastContainer } from '../ui/Toast';
 import { UnreadMessagePopup } from '../messaging/UnreadMessagePopup';
 import { Lock, CreditCard, LogOut } from 'lucide-react';
 import { TodoSummaryModal } from '../todo/TodoSummaryModal';
+import { PhoneModal } from '../modals/PhoneModal';
 
 export const AppLayout: React.FC = () => {
   const { user, isAuthenticated, isLoading, refreshUser, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isPhoneModalOpen, setIsPhoneModalOpen] = useState(false);
 
   useEffect(() => {
     if (isAuthenticated) refreshUser();
@@ -23,6 +25,13 @@ export const AppLayout: React.FC = () => {
   useEffect(() => {
     setSidebarOpen(false);
   }, [location.pathname]);
+
+  // Affiche le modal téléphone si l'utilisateur n'en a pas
+  useEffect(() => {
+    if (user && !user.phone) {
+      setIsPhoneModalOpen(true);
+    }
+  }, [user?.id, user?.phone]);
 
   // Empêche le scroll body quand le drawer est ouvert sur mobile
   useEffect(() => {
@@ -102,6 +111,9 @@ export const AppLayout: React.FC = () => {
 
       <ToastContainer />
       <UnreadMessagePopup />
+      {isPhoneModalOpen && (
+        <PhoneModal onClose={() => setIsPhoneModalOpen(false)} />
+      )}
     </div>
   );
 };
