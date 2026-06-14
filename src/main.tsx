@@ -54,6 +54,7 @@ import MessagesPage from './pages/app/messages/page';
 import AdminMessagingPage from './pages/admin/messaging/page';
 import AdminWalletPage from './pages/admin/wallet/page';
 import AdminEmailsPage from './pages/admin/emails/page';
+import AdminCampaignsPage from './pages/admin/campaigns/page';
 import ForgotPasswordPage from './pages/forgot-password/page';
 import ResetPasswordPage from './pages/reset-password/page';
 
@@ -111,6 +112,7 @@ const router = createBrowserRouter([
       { path: 'billing', element: <AdminBillingPage /> },
       { path: 'wallet', element: <AdminWalletPage /> },
       { path: 'emails', element: <AdminEmailsPage /> },
+      { path: 'campaigns', element: <AdminCampaignsPage /> },
       { path: 'pricing', element: <AdminPricingPage /> },
       { path: 'promo-codes', element: <PromoCodesPage /> },
       { path: 'support', element: <AdminSupportPage /> },
