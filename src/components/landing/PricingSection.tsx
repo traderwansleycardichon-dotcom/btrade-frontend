@@ -280,7 +280,7 @@ export const PricingSection: React.FC = () => {
             compte financé ?
           </h2>
           <p className="text-white/65 text-lg leading-relaxed mb-10">
-            Rejoignez les traders qui ont fait de Behind The Trade leur garde-fou quotidien.
+            Rejoignez les traders qui ont fait de Behind The Trades leur garde-fou quotidien.
             Pas d'engagement, pas de carte.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">

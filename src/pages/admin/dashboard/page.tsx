@@ -1,16 +1,148 @@
 import React, { useEffect, useState } from 'react';
-import { Users, Activity, Wallet, TrendingUp, AlertTriangle } from 'lucide-react';
+import { Users, Activity, Wallet, TrendingUp, AlertTriangle, Server, Database, Cpu, MemoryStick, Clock, CheckCircle, XCircle } from 'lucide-react';
 import { KpiCard } from '../../../components/ui/KpiCard';
 import api from '../../../lib/api';
+import { useAuth } from '../../../hooks/useAuth';
 
 import { AdminActivityChart } from '../../../components/admin/AdminActivityChart';
 import { AdminBillingStats } from '../../../components/admin/AdminBillingStats';
 import { AdminQuickPricing } from '../../../components/admin/AdminQuickPricing';
 import { BazikWalletCard } from '../../../components/admin/BazikWalletCard';
 
+function CTODashboard() {
+  const [health, setHealth] = useState<any>(null);
+  const [logs, setLogs] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    Promise.all([
+      api.get('/api/admin/system/health'),
+      api.get('/api/admin/system/logs'),
+    ]).then(([h, l]) => {
+      setHealth(h.data.data);
+      setLogs(l.data.data || []);
+    }).catch(console.error).finally(() => setLoading(false));
+  }, []);
+
+  if (loading) return <div className="text-txt-2 text-sm p-8">Chargement système...</div>;
+
+  return (
+    <div className="space-y-8 animate-[fadeIn_0.5s_ease-out]">
+      <div>
+        <h1 className="text-2xl font-black mb-1 flex items-center gap-3">
+          <Server className="text-purple-400" />
+          Dashboard Technique — CTO
+        </h1>
+        <p className="text-txt-2 text-sm">Supervision en temps réel de l'infrastructure Behind The Trades</p>
+      </div>
+
+      {/* Health KPIs */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="glass p-5 rounded-2xl border border-border">
+          <div className="flex items-center gap-2 mb-3">
+            <Server size={16} className="text-purple-400" />
+            <span className="text-xs font-bold text-txt-3 uppercase tracking-widest">API</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <CheckCircle size={16} className="text-win" />
+            <span className="font-black text-win">Opérationnel</span>
+          </div>
+          <p className="text-txt-3 text-xs mt-1">Latence: {health?.api?.latency || '—'}</p>
+        </div>
+
+        <div className="glass p-5 rounded-2xl border border-border">
+          <div className="flex items-center gap-2 mb-3">
+            <Database size={16} className="text-blue-400" />
+            <span className="text-xs font-bold text-txt-3 uppercase tracking-widest">Base de données</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <CheckCircle size={16} className="text-win" />
+            <span className="font-black text-win">Connectée</span>
+          </div>
+          <p className="text-txt-3 text-xs mt-1">Latence: {health?.database?.latency || '—'} · {health?.database?.provider || 'PostgreSQL'}</p>
+        </div>
+
+        <div className="glass p-5 rounded-2xl border border-border">
+          <div className="flex items-center gap-2 mb-3">
+            <Cpu size={16} className="text-accent" />
+            <span className="text-xs font-bold text-txt-3 uppercase tracking-widest">CPU Load</span>
+          </div>
+          <p className="font-black text-2xl text-txt">{health?.server?.cpuLoad || '—'}</p>
+          <p className="text-txt-3 text-xs mt-1">Charge moyenne (1 min)</p>
+        </div>
+
+        <div className="glass p-5 rounded-2xl border border-border">
+          <div className="flex items-center gap-2 mb-3">
+            <MemoryStick size={16} className="text-yellow-400" />
+            <span className="text-xs font-bold text-txt-3 uppercase tracking-widest">Mémoire</span>
+          </div>
+          <p className="font-black text-2xl text-txt">{health?.server?.memoryUsage || '—'}</p>
+          <p className="text-txt-3 text-xs mt-1">Uptime: {health?.api?.uptime || '—'}</p>
+        </div>
+      </div>
+
+      {/* System Logs — complets */}
+      <div className="glass rounded-3xl border border-border overflow-hidden">
+        <div className="px-6 py-4 border-b border-border flex items-center justify-between">
+          <h3 className="font-bold flex items-center gap-2">
+            <Clock size={16} className="text-txt-2" />
+            Logs Système
+            <span className="text-xs font-normal text-txt-3">({logs.length} entrées)</span>
+          </h3>
+          <button
+            onClick={() => api.get('/api/admin/system/logs').then(r => setLogs(r.data.data || []))}
+            className="text-xs text-accent hover:underline"
+          >
+            Rafraîchir
+          </button>
+        </div>
+        <div className="overflow-x-auto max-h-[500px] overflow-y-auto">
+          {logs.length === 0 ? (
+            <div className="p-8 text-center text-txt-3 italic">Aucun log disponible</div>
+          ) : (
+            <table className="w-full text-xs">
+              <thead className="bg-surface/80 sticky top-0">
+                <tr>
+                  <th className="px-4 py-2 text-left text-txt-3 font-bold uppercase tracking-widest">Horodatage</th>
+                  <th className="px-4 py-2 text-left text-txt-3 font-bold uppercase tracking-widest">Niveau</th>
+                  <th className="px-4 py-2 text-left text-txt-3 font-bold uppercase tracking-widest">Type</th>
+                  <th className="px-4 py-2 text-left text-txt-3 font-bold uppercase tracking-widest">Message</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border/40">
+                {logs.map((log: any, i: number) => (
+                  <tr key={log.id || i} className="hover:bg-elevated/30 transition-colors">
+                    <td className="px-4 py-2 font-mono text-txt-3 whitespace-nowrap">
+                      {new Date(log.createdAt).toLocaleString('fr-FR')}
+                    </td>
+                    <td className="px-4 py-2">
+                      <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold uppercase ${
+                        log.level === 'error' ? 'bg-loss/20 text-loss' :
+                        log.level === 'warn' ? 'bg-yellow-500/20 text-yellow-400' :
+                        'bg-win/10 text-win'
+                      }`}>
+                        {log.level || 'info'}
+                      </span>
+                    </td>
+                    <td className="px-4 py-2 text-txt-3">{log.type || '—'}</td>
+                    <td className="px-4 py-2 text-txt max-w-xs truncate">{log.message}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function AdminDashboardPage() {
+  const { user } = useAuth();
   const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+
+  if (user?.role === 'cto') return <CTODashboard />;
 
   useEffect(() => {
     api.get('/api/admin/stats')

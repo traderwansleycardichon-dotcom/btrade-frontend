@@ -50,7 +50,7 @@ export const TopBar: React.FC<TopBarProps> = ({ onOpenMenu }) => {
     if (path.includes('/formation')) return 'Academy';
     if (path.includes('/settings')) return 'Paramètres';
     if (path.includes('/reports')) return 'Analyses';
-    return 'Behind The Trade';
+    return 'Behind The Trades';
   };
 
   return (

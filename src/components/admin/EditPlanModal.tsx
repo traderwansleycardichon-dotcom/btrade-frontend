@@ -129,7 +129,7 @@ export const EditPlanModal: React.FC<EditPlanModalProps> = ({ isOpen, onClose, u
         
         <div className="p-4 rounded-xl bg-loss/5 border border-loss/20 text-xs text-txt-2">
           <span className="text-loss font-bold block mb-1">Attention</span>
-          Modifier le plan manuellement n'impacte pas les abonnements Stripe en cours. Cela force uniquement les droits d'accès sur la plateforme Behind The Trade.
+          Modifier le plan manuellement n'impacte pas les abonnements Stripe en cours. Cela force uniquement les droits d'accès sur la plateforme Behind The Trades 
         </div>
       </div>
     </Modal>

@@ -79,7 +79,7 @@ const FormationHub: React.FC = () => {
     printWindow.document.write(`
       <html>
         <head>
-          <title>BTrade Academy - Certificat</title>
+          <title>Behind The Trades Academy - Certificat</title>
           <style>
             @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Montserrat:wght@300;400;600&display=swap');
             body {
@@ -556,7 +556,7 @@ const FormationHub: React.FC = () => {
                       {settings?.certificate_logo || settings?.platform_logo ? (
                         <img src={settings?.certificate_logo || settings?.platform_logo} alt="Logo" className="h-6 w-auto object-contain" />
                       ) : (
-                        <span className="text-[9px] font-mono font-bold text-accent uppercase tracking-widest">BTrade Academy</span>
+                        <span className="text-[9px] font-mono font-bold text-accent uppercase tracking-widest">Behind The Trades Academy</span>
                       )}
                       <span className="text-[8px] font-mono text-txt-3 border border-border px-2 py-0.5 rounded uppercase tracking-wider">
                         Certificat Officiel
@@ -566,7 +566,7 @@ const FormationHub: React.FC = () => {
                     <div className="space-y-2 relative z-10">
                       <Award className="text-accent mx-auto" size={36} />
                       <h4 className="text-lg font-black uppercase text-accent tracking-widest">Certificat de Réussite</h4>
-                      <p className="text-[9px] font-mono text-txt-3 uppercase tracking-widest">BTrade Academy Premium</p>
+                      <p className="text-[9px] font-mono text-txt-3 uppercase tracking-widest">Behind The Trades Academy Premium</p>
                     </div>
 
                     <div className="space-y-1 relative z-10">
@@ -638,7 +638,7 @@ const FormationPage: React.FC = () => {
   return (
     <FeatureGate
       feature="hasAcademy"
-      fallbackTitle="Academy BTrade Réservée aux Membres Pro"
+      fallbackTitle="Academy Behind The Trades Réservée aux Membres Pro"
       fallbackDesc="Accédez à des cours exclusifs, des masterclass sur le price action, des modules sur la psychologie du trading et des quiz pour valider vos compétences."
     >
       <FormationHub />

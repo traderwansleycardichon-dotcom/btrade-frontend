@@ -52,24 +52,28 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
     navigate('/app/dashboard');
   };
 
-  const navItems = [
-    { label: 'Dashboard',      icon: LayoutDashboard, href: '/admin/dashboard' },
-    { label: 'Utilisateurs',   icon: Users,           href: '/admin/users' },
-    { label: 'Messagerie',     icon: MessageSquare,   href: '/admin/messaging' },
-    { label: 'Finance',        icon: CreditCard,      href: '/admin/billing' },
-    { label: 'Wallet',         icon: Wallet,          href: '/admin/wallet' },
-    { label: 'Emails',         icon: Mail,            href: '/admin/emails' },
-    { label: 'Campagnes',      icon: Send,            href: '/admin/campaigns' },
-    { label: 'Plans Tarifaires',icon: Ticket,         href: '/admin/pricing' },
-    { label: 'Codes Promo',    icon: Ticket,          href: '/admin/promo-codes' },
-    { label: 'Academy',        icon: BookOpen,        href: '/admin/academy' },
-    { label: 'Coaching',       icon: Video,           href: '/admin/coaching' },
-    { label: 'Helpdesk',       icon: LifeBuoy,        href: '/admin/support' },
-    { label: 'Broadcast',      icon: Megaphone,       href: '/admin/broadcast' },
-    { label: 'Légal',          icon: Shield,          href: '/admin/legal' },
-    { label: 'Système',        icon: Server,          href: '/admin/system' },
-    { label: 'Paramètres',     icon: Settings,        href: '/admin/settings' },
+  const isCTO = user?.role === 'cto';
+
+  const allNavItems = [
+    { label: 'Dashboard',       icon: LayoutDashboard, href: '/admin/dashboard',   adminOnly: false },
+    { label: 'Utilisateurs',    icon: Users,           href: '/admin/users',       adminOnly: false },
+    { label: 'Messagerie',      icon: MessageSquare,   href: '/admin/messaging',   adminOnly: false },
+    { label: 'Finance',         icon: CreditCard,      href: '/admin/billing',     adminOnly: true  },
+    { label: 'Wallet',          icon: Wallet,          href: '/admin/wallet',      adminOnly: true  },
+    { label: 'Emails',          icon: Mail,            href: '/admin/emails',      adminOnly: false },
+    { label: 'Campagnes',       icon: Send,            href: '/admin/campaigns',   adminOnly: false },
+    { label: 'Plans Tarifaires',icon: Ticket,          href: '/admin/pricing',     adminOnly: false },
+    { label: 'Codes Promo',     icon: Ticket,          href: '/admin/promo-codes', adminOnly: false },
+    { label: 'Academy',         icon: BookOpen,        href: '/admin/academy',     adminOnly: false },
+    { label: 'Coaching',        icon: Video,           href: '/admin/coaching',    adminOnly: false },
+    { label: 'Helpdesk',        icon: LifeBuoy,        href: '/admin/support',     adminOnly: false },
+    { label: 'Broadcast',       icon: Megaphone,       href: '/admin/broadcast',   adminOnly: false },
+    { label: 'Légal',           icon: Shield,          href: '/admin/legal',       adminOnly: false },
+    { label: 'Système',         icon: Server,          href: '/admin/system',      adminOnly: false },
+    { label: 'Paramètres',      icon: Settings,        href: '/admin/settings',    adminOnly: false },
   ];
+
+  const navItems = allNavItems.filter(item => !isCTO || !item.adminOnly);
 
   return (
     <>
@@ -90,7 +94,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
           <div className="flex items-center gap-3">
             {settings?.platform_logo ? (
               <>
-                <img src={settings.platform_logo} alt="Logo Behind The Trade" className="h-8 w-auto object-contain" />
+                <img src={settings.platform_logo} alt="Logo Behind The Trades" className="h-8 w-auto object-contain" />
                 <div>
                   <span className="text-[10px] font-black text-loss uppercase tracking-widest block leading-tight mt-1">Admin Control</span>
                 </div>
@@ -101,7 +105,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
                   <Shield size={20} className="text-white" />
                 </div>
                 <div>
-                  <span className="font-bold text-lg tracking-tight block leading-tight">Behind The Trade</span>
+                  <span className="font-bold text-lg tracking-tight block leading-tight">Behind The Trades</span>
                   <span className="text-[10px] font-black text-loss uppercase tracking-widest">Admin Control</span>
                 </div>
               </>

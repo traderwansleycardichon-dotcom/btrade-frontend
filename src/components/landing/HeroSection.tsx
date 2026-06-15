@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, PlayCircle, ShieldCheck, TrendingUp } from 'lucide-react';
+import { ArrowRight, PlayCircle, ShieldCheck, TrendingUp, Sparkles } from 'lucide-react';
 
 // Vraies images Unsplash (trading desks / écrans Bloomberg)
 const BG_TRADING = 'https://images.unsplash.com/photo-1640340434855-6084b1f4901c?auto=format&fit=crop&w=2400&q=80';
@@ -48,28 +48,32 @@ export const HeroSection: React.FC = () => {
 
         {/* Subtitle */}
         <p className="mx-auto max-w-2xl text-center text-[17px] leading-relaxed text-white/65 mb-10">
-          Behind The Trade analyse chaque exécution, détecte vos biais et certifie votre
+          Behind The Trades analyse chaque exécution, détecte vos biais et certifie votre
           conformité Prop Firm — pour que vous gardiez votre compte financé,
           pas seulement vos espoirs.
         </p>
 
         {/* CTAs */}
-        <div className="flex flex-col sm:flex-row gap-3 justify-center mb-16">
+        <div className="flex flex-col sm:flex-row gap-3 justify-center mb-6">
           <Link
             to="/register"
-            className="group inline-flex items-center justify-center gap-2 h-12 px-7 rounded-xl bg-accent hover:bg-accent-2 text-white font-semibold text-[14px] shadow-[0_10px_40px_-10px_rgba(243,108,0,0.6)] transition-all"
+            className="group inline-flex items-center justify-center gap-2 h-12 px-7 rounded-xl glass-frost text-white font-medium text-[14px] hover:bg-white/[0.08] transition-all border border-white/10"
           >
             Commencer gratuitement
             <ArrowRight size={16} className="group-hover:translate-x-0.5 transition-transform" />
           </Link>
-          <button
-            type="button"
-            className="inline-flex items-center justify-center gap-2 h-12 px-7 rounded-xl glass-frost text-white font-medium text-[14px] hover:bg-white/[0.08] transition-all"
+          <Link
+            to="/login?plan=pro"
+            className="group inline-flex items-center justify-center gap-2 h-12 px-7 rounded-xl bg-accent hover:bg-accent-2 text-white font-semibold text-[14px] shadow-[0_10px_40px_-10px_rgba(243,108,0,0.6)] transition-all"
           >
-            <PlayCircle size={18} className="text-white/70" />
-            Voir la démo
-          </button>
+            <Sparkles size={16} />
+            Passer PRO
+            <ArrowRight size={16} className="group-hover:translate-x-0.5 transition-transform" />
+          </Link>
         </div>
+        <p className="text-center text-white/35 text-[11px] mb-10">
+          Plan gratuit disponible · Sans carte bancaire
+        </p>
 
         {/* Trust row */}
         <div className="flex flex-wrap justify-center items-center gap-x-8 gap-y-3 text-[12px] text-white/45 mb-20">
@@ -116,7 +120,7 @@ export const HeroSection: React.FC = () => {
             <div className="relative rounded-xl overflow-hidden border border-white/[0.06]">
               <img
                 src={DASH_SHOT}
-                alt="Aperçu du tableau de bord Behind The Trade"
+                alt="Aperçu du tableau de bord Behind The Trades"
                 className="w-full h-auto aspect-[16/9] object-cover"
                 loading="lazy"
               />
