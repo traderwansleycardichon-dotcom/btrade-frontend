@@ -249,7 +249,63 @@
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(243, 108, 0, 0.5);
 }
+/* Contrat Rendering Styles */
+.contract-document {
+  font-family: 'Georgia', serif;
+  line-height: 1.7;
+  color: #1a1a1a;
+  font-size: 1.05rem;
+}
 
+.contract-document p {
+  margin-bottom: 1.2em;
+}
+
+.contract-document h1,
+.contract-document h2,
+.contract-document h3,
+.contract-document h4 {
+  font-family: 'Inter', sans-serif;
+  font-weight: 800;
+  color: #000;
+  margin-top: 1.5em;
+  margin-bottom: 0.8em;
+}
+
+.contract-document h1 { font-size: 1.8rem; }
+.contract-document h2 { font-size: 1.5rem; }
+.contract-document h3 { font-size: 1.25rem; }
+
+.contract-document strong, .contract-document b {
+  font-weight: 700;
+}
+
+/* Quill Classes Support in Contract View */
+.contract-document .ql-align-center { text-align: center; }
+.contract-document .ql-align-right { text-align: right; }
+.contract-document .ql-align-justify { text-align: justify; }
+
+.contract-document .ql-indent-1 { padding-left: 3em; }
+.contract-document .ql-indent-2 { padding-left: 6em; }
+.contract-document .ql-indent-3 { padding-left: 9em; }
+.contract-document .ql-indent-4 { padding-left: 12em; }
+.contract-document .ql-indent-5 { padding-left: 15em; }
+
+.contract-document ul {
+  list-style-type: disc;
+  padding-left: 2em;
+  margin-bottom: 1.2em;
+}
+
+.contract-document ol {
+  list-style-type: decimal;
+  padding-left: 2em;
+  margin-bottom: 1.2em;
+}
+
+.contract-document li {
+  margin-bottom: 0.5em;
+}
 /* ── Prototype dashboard styles ──────────────────────────────────────── */
 .mono { font-family: 'JetBrains Mono', monospace; font-feature-settings: 'tnum' 1, 'cv11' 1; }
 
