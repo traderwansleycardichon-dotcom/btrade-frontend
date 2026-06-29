@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Plus, FileText, Send, Loader2, Users, Download, CheckCircle, Clock } from 'lucide-react';
+import { Plus, FileText, Send, Loader2, Users, Download, CheckCircle, Clock, Trash2 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../../../lib/api';
 import toast from 'react-hot-toast';
@@ -31,7 +31,7 @@ export default function AdminContractsPage() {
   const templates = data || [];
 
   // Fetch assigned contracts
-  const { data: assignedContractsData, isLoading: isLoadingAssigned } = useQuery({
+  const { data: assignedContractsData, isLoading: isLoadingAssigned, refetch: refetchAssigned } = useQuery({
     queryKey: ['admin-assigned-contracts'],
     queryFn: async () => {
       const res = await api.get('/api/contracts');
@@ -72,11 +72,26 @@ export default function AdminContractsPage() {
         setIsAssignModalOpen(false);
         setSelectedUsers([]);
         setSelectedTemplateId(null);
+        refetchAssigned();
       }
     } catch (err: any) {
       toast.error(err.response?.data?.error || 'Erreur lors de l\'envoi');
     } finally {
       setIsAssigning(false);
+    }
+  };
+
+  const handleDeleteContract = async (contractId: string) => {
+    if (!window.confirm('Voulez-vous vraiment supprimer ce contrat ?')) return;
+    
+    try {
+      const res = await api.delete(`/api/contracts/${contractId}`);
+      if (res.data.success) {
+        toast.success('Contrat supprimé');
+        refetchAssigned();
+      }
+    } catch (err: any) {
+      toast.error(err.response?.data?.error || 'Erreur lors de la suppression');
     }
   };
 
@@ -226,17 +241,26 @@ export default function AdminContractsPage() {
                       )}
                     </td>
                     <td className="px-6 py-4 text-right">
-                      {contract.status === 'signed' && contract.pdfUrl && (
-                        <a
-                          href={contract.pdfUrl}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="inline-flex p-2 bg-white/5 hover:bg-white/10 text-white rounded-lg transition-colors"
-                          title="Télécharger le contrat signé"
+                      <div className="flex items-center justify-end gap-2">
+                        {contract.status === 'signed' && contract.pdfUrl && (
+                          <a
+                            href={contract.pdfUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="inline-flex p-2 bg-white/5 hover:bg-white/10 text-white rounded-lg transition-colors"
+                            title="Télécharger le contrat signé"
+                          >
+                            <Download size={16} />
+                          </a>
+                        )}
+                        <button
+                          onClick={() => handleDeleteContract(contract.id)}
+                          className="p-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-lg transition-colors"
+                          title="Supprimer ce contrat"
                         >
-                          <Download size={16} />
-                        </a>
-                      )}
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
