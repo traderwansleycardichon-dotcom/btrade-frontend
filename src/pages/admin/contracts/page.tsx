@@ -39,7 +39,7 @@ export default function AdminContractsPage() {
     enabled: isAssignModalOpen
   });
 
-  const users = usersData?.users || [];
+  const users = Array.isArray(usersData) ? usersData : [];
 
   const handleAssign = async () => {
     if (!selectedTemplateId) return;
