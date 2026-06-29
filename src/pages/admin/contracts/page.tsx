@@ -162,6 +162,23 @@ export default function AdminContractsPage() {
             </p>
 
             <div className="max-h-60 overflow-y-auto space-y-2 mb-6 hide-scrollbar border border-white/5 rounded-lg p-2 bg-white/5">
+              {users.length > 0 && !isLoadingUsers && (
+                <label className="flex items-center gap-3 p-2 hover:bg-white/5 rounded cursor-pointer transition-colors border-b border-white/10 mb-2">
+                  <input 
+                    type="checkbox" 
+                    className="rounded border-white/20 bg-bg text-accent focus:ring-accent"
+                    checked={selectedUsers.length === users.length}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setSelectedUsers(users.map((u: any) => u.id));
+                      } else {
+                        setSelectedUsers([]);
+                      }
+                    }}
+                  />
+                  <div className="text-sm font-bold text-white">Tout sélectionner</div>
+                </label>
+              )}
               {isLoadingUsers ? (
                 <div className="flex justify-center p-4">
                   <Loader2 className="animate-spin text-accent" />
