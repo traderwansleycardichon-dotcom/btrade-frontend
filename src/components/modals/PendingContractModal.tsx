@@ -12,13 +12,13 @@ export const PendingContractModal: React.FC = () => {
   
   const shouldShow = !(user?.role === 'admin' || user?.role === 'superadmin' || location.pathname.includes('/contracts'));
 
-  const { data: contracts } = useQuery({
-    queryKey: ['my-contracts'],
+  const { data: pendingContracts } = useQuery({
+    queryKey: ['pending-contracts', user?.id],
     queryFn: async () => {
       const res = await api.get('/api/contracts');
-      return res.data.data;
+      return res.data.data.filter((c: any) => c.status === 'pending' && c.userId === user?.id);
     },
-    enabled: shouldShow
+    enabled: !!user,
   });
 
   // Don't show for admins or if already on contracts page
@@ -26,9 +26,7 @@ export const PendingContractModal: React.FC = () => {
     return null;
   }
 
-  const pendingContracts = contracts?.filter((c: any) => c.status === 'pending') || [];
-
-  if (pendingContracts.length === 0) return null;
+  if (!pendingContracts || pendingContracts.length === 0) return null;
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-[fadeIn_0.3s_ease-out]">
