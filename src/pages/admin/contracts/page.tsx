@@ -339,24 +339,26 @@ export default function AdminContractsPage() {
                   (u.fullName || '').toLowerCase().includes(userSearch.toLowerCase()) ||
                   (u.email || '').toLowerCase().includes(userSearch.toLowerCase())
                 );
+
+                const assignableUsers = filteredUsers.filter((u: any) => !u.userContracts?.some((c: any) => c.templateId === selectedTemplateId));
                 
                 return (
                   <>
-                    {filteredUsers.length > 0 && !isLoadingUsers && (
+                    {assignableUsers.length > 0 && !isLoadingUsers && (
                       <label className="flex items-center gap-3 p-2 hover:bg-white/5 rounded cursor-pointer transition-colors border-b border-white/10 mb-2">
                         <input 
                           type="checkbox" 
                           className="rounded border-white/20 bg-bg text-accent focus:ring-accent"
-                          checked={selectedUsers.length === filteredUsers.length && filteredUsers.length > 0}
+                          checked={selectedUsers.length === assignableUsers.length && assignableUsers.length > 0}
                           onChange={(e) => {
                             if (e.target.checked) {
-                              setSelectedUsers(filteredUsers.map((u: any) => u.id));
+                              setSelectedUsers(assignableUsers.map((u: any) => u.id));
                             } else {
                               setSelectedUsers([]);
                             }
                           }}
                         />
-                        <div className="text-sm font-bold text-white">Tout sélectionner ({filteredUsers.length})</div>
+                        <div className="text-sm font-bold text-white">Tout sélectionner ({assignableUsers.length})</div>
                       </label>
                     )}
                     {isLoadingUsers ? (
@@ -368,26 +370,37 @@ export default function AdminContractsPage() {
                         Aucun utilisateur trouvé.
                       </div>
                     ) : (
-                      filteredUsers.map((user: any) => (
-                        <label key={user.id} className="flex items-center gap-3 p-2 hover:bg-white/5 rounded cursor-pointer transition-colors">
-                          <input 
-                            type="checkbox" 
-                            className="rounded border-white/20 bg-bg text-accent focus:ring-accent"
-                            checked={selectedUsers.includes(user.id)}
-                            onChange={(e) => {
-                              if (e.target.checked) {
-                                setSelectedUsers([...selectedUsers, user.id]);
-                              } else {
-                                setSelectedUsers(selectedUsers.filter(id => id !== user.id));
-                              }
-                            }}
-                          />
-                          <div>
-                            <div className="text-sm font-medium text-white">{user.fullName || 'Utilisateur'}</div>
-                            <div className="text-xs text-white/50">{user.email}</div>
-                          </div>
-                        </label>
-                      ))
+                      filteredUsers.map((user: any) => {
+                        const hasContract = user.userContracts?.some((c: any) => c.templateId === selectedTemplateId);
+                        return (
+                          <label key={user.id} className={`flex items-center gap-3 p-2 rounded transition-colors ${hasContract ? 'opacity-50 cursor-not-allowed bg-white/5' : 'hover:bg-white/5 cursor-pointer'}`}>
+                            <input 
+                              type="checkbox" 
+                              disabled={hasContract}
+                              className="rounded border-white/20 bg-bg text-accent focus:ring-accent disabled:opacity-50"
+                              checked={selectedUsers.includes(user.id)}
+                              onChange={(e) => {
+                                if (e.target.checked) {
+                                  setSelectedUsers([...selectedUsers, user.id]);
+                                } else {
+                                  setSelectedUsers(selectedUsers.filter(id => id !== user.id));
+                                }
+                              }}
+                            />
+                            <div className="flex-1 min-w-0 flex items-center justify-between gap-2">
+                              <div>
+                                <div className="text-sm font-medium text-white truncate">{user.fullName || 'Utilisateur'}</div>
+                                <div className="text-xs text-white/50 truncate">{user.email}</div>
+                              </div>
+                              {hasContract && (
+                                <span className="text-[10px] font-bold text-accent bg-accent/10 px-2 py-0.5 rounded border border-accent/20 whitespace-nowrap">
+                                  Déjà envoyé
+                                </span>
+                              )}
+                            </div>
+                          </label>
+                        );
+                      })
                     )}
                   </>
                 );
