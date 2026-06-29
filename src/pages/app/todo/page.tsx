@@ -125,7 +125,7 @@ export default function TodoPage() {
   // Tasks for the selected day only
   const dailyTasks = useMemo(() => {
     return weekTasks
-      .filter(t => isSameDay(parseISO(t.date), selectedDate))
+      .filter(t => t.date && t.date.split('T')[0] === format(selectedDate, 'yyyy-MM-dd'))
       .sort((a, b) => a.position - b.position);
   }, [weekTasks, selectedDate]);
 
@@ -315,7 +315,7 @@ export default function TodoPage() {
         {daysOfWeek.map(day => {
           const isSelected = isSameDay(day, selectedDate);
           const isToday = isSameDay(day, new Date());
-          const tasksForDay = weekTasks.filter(t => isSameDay(parseISO(t.date), day));
+          const tasksForDay = weekTasks.filter(t => t.date && t.date.split('T')[0] === format(day, 'yyyy-MM-dd'));
           const completedTasks = tasksForDay.filter(t => t.isCompleted).length;
           
           return (
