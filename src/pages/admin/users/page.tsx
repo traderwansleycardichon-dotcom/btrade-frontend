@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Search, MoreVertical, ShieldAlert, Edit, Trash2, UserPlus, Shield } from 'lucide-react';
+import { Search, MoreVertical, ShieldAlert, Edit, Trash2, UserPlus, Shield, Lock } from 'lucide-react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import api from '../../../lib/api';
@@ -165,6 +165,10 @@ export default function AdminUsersPage() {
                         ) : user.role === 'staff' ? (
                           <span className="text-[10px] font-bold px-2 py-0.5 rounded uppercase bg-accent/10 text-accent flex items-center gap-1">
                             <Shield size={10} /> Staff Support
+                          </span>
+                        ) : user.plan === 'locked' ? (
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded uppercase bg-loss/10 text-loss flex items-center gap-1 border border-loss/20">
+                            <Lock size={10} /> LOCKED
                           </span>
                         ) : (
                           <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase ${user.plan === 'pro' ? 'bg-win/10 text-win' : 'bg-elevated text-txt-2'}`}>
