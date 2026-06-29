@@ -14,6 +14,7 @@ interface User {
   currency?: string;
   phone?: string;
   createdAt?: string;
+  trialEnd?: string;
 }
 
 interface Subscription {
