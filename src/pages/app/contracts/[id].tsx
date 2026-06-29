@@ -163,61 +163,69 @@ export default function ContractSignaturePage() {
             <div className="mt-12 pt-8 border-t border-gray-200">
               <h3 className="text-lg font-bold mb-4">Signature Électronique</h3>
               
-              <div className="grid md:grid-cols-2 gap-8">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Nom complet (faisant foi)
-                  </label>
-                  <input
-                    type="text"
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:border-blue-500 focus:outline-none"
-                    placeholder="Prénom Nom"
-                  />
-                  <p className="text-xs text-gray-500 mt-2">
-                    En signant ce document, vous acceptez les termes et conditions du contrat.
-                  </p>
-                </div>
+              {user?.id === contract.userId ? (
+                <>
+                  <div className="grid md:grid-cols-2 gap-8">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Nom complet (faisant foi)
+                      </label>
+                      <input
+                        type="text"
+                        value={fullName}
+                        onChange={(e) => setFullName(e.target.value)}
+                        className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:border-blue-500 focus:outline-none"
+                        placeholder="Prénom Nom"
+                      />
+                      <p className="text-xs text-gray-500 mt-2">
+                        En signant ce document, vous acceptez les termes et conditions du contrat.
+                      </p>
+                    </div>
 
-                <div>
-                  <div className="flex justify-between items-center mb-2">
-                    <label className="block text-sm font-medium text-gray-700">
-                      Dessinez votre signature
-                    </label>
-                    <button 
-                      onClick={handleClear}
-                      className="text-xs text-red-500 hover:underline"
+                    <div>
+                      <div className="flex justify-between items-center mb-2">
+                        <label className="block text-sm font-medium text-gray-700">
+                          Dessinez votre signature
+                        </label>
+                        <button 
+                          onClick={handleClear}
+                          className="text-xs text-red-500 hover:underline"
+                        >
+                          Effacer
+                        </button>
+                      </div>
+                      <div className="border border-gray-300 rounded-lg bg-gray-50 overflow-hidden">
+                        <SignatureCanvas 
+                          ref={sigPad}
+                          penColor="blue"
+                          canvasProps={{ className: 'w-full h-32 md:h-40 cursor-crosshair' }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {error && (
+                    <div className="mt-4 p-3 bg-red-50 text-red-500 text-sm rounded-lg border border-red-100">
+                      {error}
+                    </div>
+                  )}
+
+                  <div className="mt-8 flex justify-end">
+                    <button
+                      onClick={handleSign}
+                      disabled={isSigning}
+                      className="flex items-center gap-2 px-8 py-3 bg-accent text-white rounded-xl hover:bg-accent-hover transition-colors font-bold text-lg disabled:opacity-50"
                     >
-                      Effacer
+                      {isSigning ? <Loader2 size={20} className="animate-spin" /> : <CheckCircle2 size={20} />}
+                      Signer le contrat
                     </button>
                   </div>
-                  <div className="border border-gray-300 rounded-lg bg-gray-50 overflow-hidden">
-                    <SignatureCanvas 
-                      ref={sigPad}
-                      penColor="blue"
-                      canvasProps={{ className: 'w-full h-32 md:h-40 cursor-crosshair' }}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {error && (
-                <div className="mt-4 p-3 bg-red-50 text-red-500 text-sm rounded-lg border border-red-100">
-                  {error}
+                </>
+              ) : (
+                <div className="p-8 text-center bg-gray-50 rounded-xl border border-gray-200">
+                  <p className="text-gray-500">En attente de la signature par l'utilisateur {contract.user?.fullName}.</p>
                 </div>
               )}
-
-              <div className="mt-8 flex justify-end">
-                <button
-                  onClick={handleSign}
-                  disabled={isSigning}
-                  className="flex items-center gap-2 px-8 py-3 bg-accent text-white rounded-xl hover:bg-accent-hover transition-colors font-bold text-lg disabled:opacity-50"
-                >
-                  {isSigning ? <Loader2 size={20} className="animate-spin" /> : <CheckCircle2 size={20} />}
-                  Signer le contrat
-                </button>
-              </div>
             </div>
           )}
         </div>

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Plus, FileText, Send, Loader2, Users, Download, CheckCircle, Clock, Trash2 } from 'lucide-react';
+import { Plus, FileText, Send, Loader2, Users, Download, CheckCircle, Clock, Trash2, Eye } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../../../lib/api';
 import toast from 'react-hot-toast';
@@ -265,6 +265,13 @@ export default function AdminContractsPage() {
                     </td>
                     <td className="px-6 py-4 text-right">
                       <div className="flex items-center justify-end gap-2">
+                        <button
+                          onClick={() => navigate(`/app/contracts/${contract.id}`)}
+                          className="p-2 bg-white/5 hover:bg-white/10 text-white rounded-lg transition-colors"
+                          title="Voir le contrat"
+                        >
+                          <Eye size={16} />
+                        </button>
                         {contract.status === 'signed' && contract.pdfUrl && (
                           <a
                             href={contract.pdfUrl}
