@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Plus, FileText, Send, Loader2, Users } from 'lucide-react';
+import { Plus, FileText, Send, Loader2, Users, Download, CheckCircle, Clock } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../../../lib/api';
 import toast from 'react-hot-toast';
@@ -14,20 +14,32 @@ interface ContractTemplate {
 
 export default function AdminContractsPage() {
   const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState<'templates' | 'assigned'>('templates');
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
   const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const [isAssigning, setIsAssigning] = useState(false);
 
-  const { data, isLoading } = useQuery({
-    queryKey: ['admin-contract-templates'],
+  const { data, isLoading } = useQuery<ContractTemplate[]>({
+    queryKey: ['admin-templates'],
     queryFn: async () => {
       const res = await api.get('/api/contracts/templates');
-      return res.data.data as ContractTemplate[];
+      return res.data.data;
     }
   });
 
   const templates = data || [];
+
+  // Fetch assigned contracts
+  const { data: assignedContractsData, isLoading: isLoadingAssigned } = useQuery({
+    queryKey: ['admin-assigned-contracts'],
+    queryFn: async () => {
+      const res = await api.get('/api/contracts');
+      return res.data.data;
+    },
+    enabled: activeTab === 'assigned'
+  });
+  const assignedContracts = assignedContractsData || [];
 
   // Load users for assignment
   const { data: usersData, isLoading: isLoadingUsers } = useQuery({
@@ -69,12 +81,13 @@ export default function AdminContractsPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 animate-[fadeIn_0.5s_ease-out]">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-white">Gestion des Contrats</h1>
-          <p className="text-white/60 text-sm">Créez et assignez des contrats à vos utilisateurs.</p>
+          <h1 className="text-2xl font-black mb-2">Contrats</h1>
+          <p className="text-txt-2 text-sm">Gérez les modèles de contrats et suivez les signatures.</p>
         </div>
+        
         <Link 
           to="/admin/contracts/new"
           className="flex items-center gap-2 px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent-hover transition-colors text-sm font-medium"
@@ -84,8 +97,32 @@ export default function AdminContractsPage() {
         </Link>
       </div>
 
+      <div className="flex gap-4 border-b border-white/10 pb-px">
+        <button
+          onClick={() => setActiveTab('templates')}
+          className={`pb-2 px-2 text-sm font-medium transition-colors border-b-2 ${
+            activeTab === 'templates' 
+              ? 'border-accent text-accent' 
+              : 'border-transparent text-white/60 hover:text-white'
+          }`}
+        >
+          Modèles de contrats
+        </button>
+        <button
+          onClick={() => setActiveTab('assigned')}
+          className={`pb-2 px-2 text-sm font-medium transition-colors border-b-2 ${
+            activeTab === 'assigned' 
+              ? 'border-accent text-accent' 
+              : 'border-transparent text-white/60 hover:text-white'
+          }`}
+        >
+          Suivi des signatures
+        </button>
+      </div>
+
       <div className="bg-white/5 border border-white/10 rounded-xl overflow-hidden">
-        {isLoading ? (
+        {activeTab === 'templates' ? (
+          isLoading ? (
           <div className="p-8 flex justify-center">
             <Loader2 className="h-8 w-8 text-accent animate-spin" />
           </div>
@@ -146,6 +183,65 @@ export default function AdminContractsPage() {
               ))}
             </tbody>
           </table>
+        ) : (
+          isLoadingAssigned ? (
+            <div className="p-8 flex justify-center">
+              <Loader2 className="h-8 w-8 text-accent animate-spin" />
+            </div>
+          ) : assignedContracts.length === 0 ? (
+            <div className="p-8 text-center text-white/40">
+              <FileText className="h-12 w-12 mx-auto mb-3 opacity-50" />
+              <p>Aucun contrat n'a encore été assigné.</p>
+            </div>
+          ) : (
+            <table className="w-full text-left">
+              <thead className="bg-white/5 border-b border-white/10 text-white/60 text-sm">
+                <tr>
+                  <th className="px-6 py-4 font-medium">Utilisateur</th>
+                  <th className="px-6 py-4 font-medium">Contrat</th>
+                  <th className="px-6 py-4 font-medium">Statut</th>
+                  <th className="px-6 py-4 font-medium text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-white/10">
+                {assignedContracts.map((contract: any) => (
+                  <tr key={contract.id} className="hover:bg-white/5 transition-colors">
+                    <td className="px-6 py-4">
+                      <div className="text-white font-medium">{contract.user?.fullName || 'N/A'}</div>
+                      <div className="text-white/50 text-xs">{contract.user?.email || 'N/A'}</div>
+                    </td>
+                    <td className="px-6 py-4 text-white/80 text-sm">
+                      {contract.template?.title || 'Contrat'}
+                    </td>
+                    <td className="px-6 py-4">
+                      {contract.status === 'signed' ? (
+                        <span className="flex items-center gap-1 text-green-500 text-xs px-2 py-1 bg-green-500/10 rounded-full w-fit">
+                          <CheckCircle size={12} /> Signé le {new Date(contract.signedAt).toLocaleDateString('fr-FR')}
+                        </span>
+                      ) : (
+                        <span className="flex items-center gap-1 text-yellow-500 text-xs px-2 py-1 bg-yellow-500/10 rounded-full w-fit">
+                          <Clock size={12} /> En attente
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      {contract.status === 'signed' && contract.pdfUrl && (
+                        <a
+                          href={contract.pdfUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex p-2 bg-white/5 hover:bg-white/10 text-white rounded-lg transition-colors"
+                          title="Télécharger le contrat signé"
+                        >
+                          <Download size={16} />
+                        </a>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )
         )}
       </div>
 
