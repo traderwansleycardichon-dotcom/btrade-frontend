@@ -20,6 +20,7 @@ export default function AdminContractEditorPage() {
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const [isAssigning, setIsAssigning] = useState(false);
+  const [userSearch, setUserSearch] = useState('');
 
   const modules = useMemo(() => ({
     toolbar: {
@@ -205,59 +206,83 @@ export default function AdminContractEditorPage() {
               Sélectionnez les utilisateurs qui doivent signer ce contrat. Un email leur sera envoyé.
             </p>
 
+            <div className="mb-4 relative">
+              <input
+                type="text"
+                placeholder="Rechercher par nom ou email..."
+                value={userSearch}
+                onChange={(e) => setUserSearch(e.target.value)}
+                className="w-full bg-surface border border-white/10 rounded-lg py-2 pl-3 pr-4 focus:outline-none focus:border-accent text-sm text-white"
+              />
+            </div>
+
             <div className="max-h-60 overflow-y-auto space-y-2 mb-6 hide-scrollbar border border-white/5 rounded-lg p-2 bg-white/5">
-              {users.length > 0 && !isLoadingUsers && (
-                <label className="flex items-center gap-3 p-2 hover:bg-white/5 rounded cursor-pointer transition-colors border-b border-white/10 mb-2">
-                  <input 
-                    type="checkbox" 
-                    className="rounded border-white/20 bg-bg text-accent focus:ring-accent"
-                    checked={selectedUsers.length === users.length}
-                    onChange={(e) => {
-                      if (e.target.checked) {
-                        setSelectedUsers(users.map((u: any) => u.id));
-                      } else {
-                        setSelectedUsers([]);
-                      }
-                    }}
-                  />
-                  <div className="text-sm font-bold text-white">Tout sélectionner</div>
-                </label>
-              )}
-              {isLoadingUsers ? (
-                <div className="flex justify-center p-4">
-                  <Loader2 className="animate-spin text-accent" />
-                </div>
-              ) : users.length === 0 ? (
-                <div className="text-center text-white/50 py-4 text-sm">
-                  Aucun utilisateur trouvé.
-                </div>
-              ) : (
-                users.map((user: any) => (
-                  <label key={user.id} className="flex items-center gap-3 p-2 hover:bg-white/5 rounded cursor-pointer transition-colors">
-                    <input 
-                      type="checkbox" 
-                      className="rounded border-white/20 bg-bg text-accent focus:ring-accent"
-                      checked={selectedUsers.includes(user.id)}
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          setSelectedUsers([...selectedUsers, user.id]);
-                        } else {
-                          setSelectedUsers(selectedUsers.filter(id => id !== user.id));
-                        }
-                      }}
-                    />
-                    <div>
-                      <div className="text-sm font-medium text-white">{user.fullName || 'Utilisateur'}</div>
-                      <div className="text-xs text-white/50">{user.email}</div>
-                    </div>
-                  </label>
-                ))
-              )}
+              {(() => {
+                const filteredUsers = users.filter((u: any) => 
+                  (u.fullName || '').toLowerCase().includes(userSearch.toLowerCase()) ||
+                  (u.email || '').toLowerCase().includes(userSearch.toLowerCase())
+                );
+                
+                return (
+                  <>
+                    {filteredUsers.length > 0 && !isLoadingUsers && (
+                      <label className="flex items-center gap-3 p-2 hover:bg-white/5 rounded cursor-pointer transition-colors border-b border-white/10 mb-2">
+                        <input 
+                          type="checkbox" 
+                          className="rounded border-white/20 bg-bg text-accent focus:ring-accent"
+                          checked={selectedUsers.length === filteredUsers.length && filteredUsers.length > 0}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setSelectedUsers(filteredUsers.map((u: any) => u.id));
+                            } else {
+                              setSelectedUsers([]);
+                            }
+                          }}
+                        />
+                        <div className="text-sm font-bold text-white">Tout sélectionner ({filteredUsers.length})</div>
+                      </label>
+                    )}
+                    {isLoadingUsers ? (
+                      <div className="flex justify-center p-4">
+                        <Loader2 className="animate-spin text-accent" />
+                      </div>
+                    ) : filteredUsers.length === 0 ? (
+                      <div className="text-center text-white/50 py-4 text-sm">
+                        Aucun utilisateur trouvé.
+                      </div>
+                    ) : (
+                      filteredUsers.map((user: any) => (
+                        <label key={user.id} className="flex items-center gap-3 p-2 hover:bg-white/5 rounded cursor-pointer transition-colors">
+                          <input 
+                            type="checkbox" 
+                            className="rounded border-white/20 bg-bg text-accent focus:ring-accent"
+                            checked={selectedUsers.includes(user.id)}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setSelectedUsers([...selectedUsers, user.id]);
+                              } else {
+                                setSelectedUsers(selectedUsers.filter(id => id !== user.id));
+                              }
+                            }}
+                          />
+                          <div>
+                            <div className="text-sm font-medium text-white">{user.fullName || 'Utilisateur'}</div>
+                            <div className="text-xs text-white/50">{user.email}</div>
+                          </div>
+                        </label>
+                      ))
+                    )}
+                  </>
+                );
+              })()}
             </div>
 
             <div className="flex gap-3 justify-end">
               <button
-                onClick={() => setIsAssignModalOpen(false)}
+                onClick={() => {
+                  setIsAssignModalOpen(false);
+                  setUserSearch('');
+                }}
                 className="px-4 py-2 text-white/60 hover:text-white transition-colors text-sm font-medium"
               >
                 Annuler
