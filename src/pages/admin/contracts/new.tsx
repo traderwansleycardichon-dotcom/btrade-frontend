@@ -22,26 +22,14 @@ export default function AdminContractEditorPage() {
   const [isAssigning, setIsAssigning] = useState(false);
 
   const modules = useMemo(() => ({
-    table: true,
     toolbar: {
       container: [
         [{ 'header': [1, 2, 3, false] }],
         ['bold', 'italic', 'underline', 'strike'],
         [{ 'list': 'ordered'}, { 'list': 'bullet' }],
         [{ 'align': '' }, { 'align': 'center' }, { 'align': 'right' }, { 'align': 'justify' }],
-        ['table'],
         ['clean']
-      ],
-      handlers: {
-        table: function() {
-          // @ts-ignore - this.quill is available in handler context
-          const quill = this.quill;
-          const tableModule = quill.getModule('table');
-          if (tableModule) {
-            tableModule.insertTable(1, 2);
-          }
-        }
-      }
+      ]
     }
   }), []);
 
