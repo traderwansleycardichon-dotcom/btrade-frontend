@@ -45,6 +45,8 @@ import AdminLegalPage from './pages/admin/legal/AdminLegalPage';
 import { PromoCodesPage } from './pages/admin/promo-codes/PromoCodesPage';
 import AdminAcademyPage from './pages/admin/academy/page';
 import AdminLessonsPage from './pages/admin/academy/[moduleId]/page';
+import AdminContractsPage from './pages/admin/contracts/page';
+import AdminContractEditorPage from './pages/admin/contracts/new';
 import LegalPage from './pages/legal/LegalPage';
 import { SettingsProvider } from './contexts/SettingsContext';
 import { SoundProvider } from './context/SoundContext';
@@ -57,6 +59,9 @@ import AdminEmailsPage from './pages/admin/emails/page';
 import AdminCampaignsPage from './pages/admin/campaigns/page';
 import ForgotPasswordPage from './pages/forgot-password/page';
 import ResetPasswordPage from './pages/reset-password/page';
+import UserContractsPage from './pages/app/contracts/page';
+import ContractSignaturePage from './pages/app/contracts/[id]';
+import { Toaster } from 'react-hot-toast';
 
 export const queryClient = new QueryClient();
 
@@ -124,6 +129,8 @@ const router = createBrowserRouter([
       { path: 'legal', element: <AdminLegalPage /> },
       { path: 'academy', element: <AdminAcademyPage /> },
       { path: 'academy/:moduleId', element: <AdminLessonsPage /> },
+      { path: 'contracts', element: <AdminContractsPage /> },
+      { path: 'contracts/new', element: <AdminContractEditorPage /> },
     ],
   },
   {
@@ -154,6 +161,8 @@ const router = createBrowserRouter([
       { path: 'messages', element: <MessagesPage /> },
       { path: 'support', element: <SupportPage /> },
       { path: 'coaching', element: <CoachingPage /> },
+      { path: 'contracts', element: <UserContractsPage /> },
+      { path: 'contracts/:id', element: <ContractSignaturePage /> },
     ],
   },
   // Catch-all fallback to redirect any unknown routes to the landing page
@@ -172,6 +181,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <QueryClientProvider client={queryClient}>
       <SoundProvider>
         <SettingsProvider>
+          <Toaster position="top-right" toastOptions={{ className: 'bg-surface border border-border text-text' }} />
           <RouterProvider router={router} future={{ v7_startTransition: true }} />
         </SettingsProvider>
       </SoundProvider>

@@ -139,6 +139,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen = false, onMobileCl
         { label: 'Messages',        icon: MessageSquare, href: '/app/messages' },
         { label: 'Coaching 1-on-1', icon: Video,         href: '/app/coaching' },
         { label: 'Support & Aide',  icon: LifeBuoy,      href: '/app/support' },
+        { label: 'Contrats',        icon: FileText,      href: '/app/contracts' },
         { label: 'Paramètres', icon: Settings,       href: '/app/settings' },
       ]
     }

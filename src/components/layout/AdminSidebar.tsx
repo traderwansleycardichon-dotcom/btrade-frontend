@@ -69,6 +69,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
     { label: 'Helpdesk',        icon: LifeBuoy,        href: '/admin/support',     adminOnly: false },
     { label: 'Broadcast',       icon: Megaphone,       href: '/admin/broadcast',   adminOnly: false },
     { label: 'Légal',           icon: Shield,          href: '/admin/legal',       adminOnly: false },
+    { label: 'Contrats',        icon: BookOpen,        href: '/admin/contracts',   adminOnly: false },
     { label: 'Système',         icon: Server,          href: '/admin/system',      adminOnly: false },
     { label: 'Paramètres',      icon: Settings,        href: '/admin/settings',    adminOnly: false },
   ];

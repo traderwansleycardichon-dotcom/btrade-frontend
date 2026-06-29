@@ -182,6 +182,8 @@ export default function TodoPage() {
       if (data.success) {
         setWeekTasks([...weekTasks, data.data]);
         setNewTaskTitle('');
+        // Re-fetch to ensure exact synchronization
+        fetchWeekTasks();
       } else if (data.error?.includes('Trial expired')) {
         setIsTrialLocked(true);
       }
