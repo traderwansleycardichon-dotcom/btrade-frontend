@@ -10,6 +10,9 @@ interface ContractTemplate {
   title: string;
   isDraft: boolean;
   createdAt: string;
+  _count?: {
+    userContracts: number;
+  };
 }
 
 export default function AdminContractsPage() {
@@ -185,8 +188,15 @@ export default function AdminContractsPage() {
                       {template.isDraft ? 'Brouillon' : 'Actif'}
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-white/60 text-sm">
-                    {new Date(template.createdAt).toLocaleDateString('fr-FR')}
+                  <td className="px-6 py-4 text-sm">
+                    <div className="flex flex-col gap-1 items-start">
+                      <span className="text-white/60">{new Date(template.createdAt).toLocaleDateString('fr-FR')}</span>
+                      {template._count !== undefined && (
+                        <span className="text-[10px] font-bold text-accent bg-accent/10 px-2 py-0.5 rounded border border-accent/20">
+                          Envoyé à {template._count.userContracts} personne{template._count.userContracts !== 1 ? 's' : ''}
+                        </span>
+                      )}
+                    </div>
                   </td>
                   <td className="px-6 py-4 text-right">
                     <div className="flex items-center justify-end gap-2">
