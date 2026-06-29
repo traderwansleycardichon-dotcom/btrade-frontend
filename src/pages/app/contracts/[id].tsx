@@ -10,7 +10,7 @@ import { useAuth } from '../../../hooks/useAuth';
 export default function ContractSignaturePage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user, refetchUser } = useAuth();
+  const { user, refreshUser } = useAuth();
   
   const [fullName, setFullName] = useState(user?.fullName || '');
   const [isSigning, setIsSigning] = useState(false);
@@ -53,7 +53,9 @@ export default function ContractSignaturePage() {
 
       if (res.data.success) {
         toast.success('Contrat signé avec succès !');
-        refetchUser(); // Refresh user if name was updated
+        if (refreshUser) {
+          await refreshUser();
+        }
         refetch(); // Refresh contract data to show signed state
       }
     } catch (err: any) {
