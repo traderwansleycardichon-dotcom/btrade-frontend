@@ -10,18 +10,21 @@ export const PendingContractModal: React.FC = () => {
   const location = useLocation();
   const { user } = useAuth();
   
-  // Don't show for admins or if already on contracts page
-  if (user?.role === 'admin' || user?.role === 'superadmin' || location.pathname.includes('/contracts')) {
-    return null;
-  }
+  const shouldShow = !(user?.role === 'admin' || user?.role === 'superadmin' || location.pathname.includes('/contracts'));
 
   const { data: contracts } = useQuery({
     queryKey: ['my-contracts'],
     queryFn: async () => {
       const res = await api.get('/api/contracts');
       return res.data.data;
-    }
+    },
+    enabled: shouldShow
   });
+
+  // Don't show for admins or if already on contracts page
+  if (!shouldShow) {
+    return null;
+  }
 
   const pendingContracts = contracts?.filter((c: any) => c.status === 'pending') || [];
 
