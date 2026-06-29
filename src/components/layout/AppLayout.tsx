@@ -8,6 +8,7 @@ import { UnreadMessagePopup } from '../messaging/UnreadMessagePopup';
 import { Lock, CreditCard, LogOut } from 'lucide-react';
 import { TodoSummaryModal } from '../todo/TodoSummaryModal';
 import { PhoneModal } from '../modals/PhoneModal';
+import { PendingContractModal } from '../modals/PendingContractModal';
 
 export const AppLayout: React.FC = () => {
   const { user, isAuthenticated, isLoading, refreshUser, logout } = useAuth();
@@ -95,6 +96,7 @@ export const AppLayout: React.FC = () => {
   return (
     <div className="flex min-h-screen bg-bg text-txt relative dashboard-view">
       <TodoSummaryModal />
+      <PendingContractModal />
       
       {/* Sidebar — drawer mobile + fixe desktop */}
       <Sidebar
