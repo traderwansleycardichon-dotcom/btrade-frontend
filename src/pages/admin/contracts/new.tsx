@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Save, Send, ArrowLeft, Loader2, Users } from 'lucide-react';
 import ReactQuill from 'react-quill';
@@ -20,6 +20,30 @@ export default function AdminContractEditorPage() {
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const [isAssigning, setIsAssigning] = useState(false);
+
+  const modules = useMemo(() => ({
+    table: true,
+    toolbar: {
+      container: [
+        [{ 'header': [1, 2, 3, false] }],
+        ['bold', 'italic', 'underline', 'strike'],
+        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+        [{ 'align': '' }, { 'align': 'center' }, { 'align': 'right' }, { 'align': 'justify' }],
+        ['table'],
+        ['clean']
+      ],
+      handlers: {
+        table: function() {
+          // @ts-ignore - this.quill is available in handler context
+          const quill = this.quill;
+          const tableModule = quill.getModule('table');
+          if (tableModule) {
+            tableModule.insertTable(1, 2);
+          }
+        }
+      }
+    }
+  }), []);
 
   // Load existing template if editing
   useEffect(() => {
@@ -175,15 +199,7 @@ export default function AdminContractEditorPage() {
               value={content} 
               onChange={setContent}
               style={{ height: '400px' }}
-              modules={{
-                toolbar: [
-                  [{ 'header': [1, 2, 3, false] }],
-                  ['bold', 'italic', 'underline', 'strike'],
-                  [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                  [{ 'align': '' }, { 'align': 'center' }, { 'align': 'right' }, { 'align': 'justify' }],
-                  ['clean']
-                ]
-              }}
+              modules={modules}
             />
           </div>
         </div>
