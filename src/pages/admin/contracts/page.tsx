@@ -183,6 +183,7 @@ export default function AdminContractsPage() {
               ))}
             </tbody>
           </table>
+          )
         ) : (
           isLoadingAssigned ? (
             <div className="p-8 flex justify-center">
