@@ -300,7 +300,7 @@ export default function AdminCoachingPage() {
         isOpen={!!chatRequestId}
         onClose={() => setChatRequestId(null)}
         ticketId={chatRequestId}
-        fetchEndpoint={chatRequestId ? `/api/coaching/${chatRequestId}/messages` : undefined}
+        fetchEndpoint={chatRequestId ? `/api/admin/coaching/${chatRequestId}/messages` : undefined}
         replyEndpoint={chatRequestId ? `/api/admin/coaching/${chatRequestId}/messages` : undefined}
         isAdminView={true}
       />
