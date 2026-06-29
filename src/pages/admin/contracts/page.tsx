@@ -152,7 +152,7 @@ export default function AdminContractsPage() {
       {/* Assign Modal */}
       {isAssignModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="bg-background border border-white/10 rounded-2xl p-6 w-full max-w-lg shadow-2xl relative">
+          <div className="bg-bg border border-white/10 rounded-2xl p-6 w-full max-w-lg shadow-2xl relative">
             <h3 className="text-xl font-bold text-white mb-2 flex items-center gap-2">
               <Users className="text-accent" />
               Assigner le contrat
@@ -166,7 +166,7 @@ export default function AdminContractsPage() {
                 <label key={user.id} className="flex items-center gap-3 p-2 hover:bg-white/5 rounded cursor-pointer transition-colors">
                   <input 
                     type="checkbox" 
-                    className="rounded border-white/20 bg-background text-accent focus:ring-accent"
+                    className="rounded border-white/20 bg-bg text-accent focus:ring-accent"
                     checked={selectedUsers.includes(user.id)}
                     onChange={(e) => {
                       if (e.target.checked) {
