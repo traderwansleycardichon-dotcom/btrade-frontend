@@ -252,13 +252,13 @@
 /* Contrat Rendering Styles */
 .contract-document {
   font-family: 'Georgia', serif;
-  line-height: 1.7;
+  line-height: 1.5;
   color: #1a1a1a;
   font-size: 1.05rem;
 }
 
 .contract-document p {
-  margin-bottom: 1.2em;
+  margin-bottom: 0.5em;
 }
 
 .contract-document h1,
