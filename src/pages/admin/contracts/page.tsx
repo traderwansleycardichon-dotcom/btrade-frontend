@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Plus, FileText, Send, Loader2 } from 'lucide-react';
+import { Plus, FileText, Send, Loader2, Users } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../../../lib/api';
 import toast from 'react-hot-toast';
@@ -16,6 +16,8 @@ export default function AdminContractsPage() {
   const navigate = useNavigate();
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
   const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
+  const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
+  const [isAssigning, setIsAssigning] = useState(false);
 
   const { data, isLoading } = useQuery({
     queryKey: ['admin-contract-templates'],
@@ -26,6 +28,45 @@ export default function AdminContractsPage() {
   });
 
   const templates = data || [];
+
+  // Load users for assignment
+  const { data: usersData } = useQuery({
+    queryKey: ['admin-users'],
+    queryFn: async () => {
+      const res = await api.get('/api/admin/users');
+      return res.data.data;
+    },
+    enabled: isAssignModalOpen
+  });
+
+  const users = usersData?.users || [];
+
+  const handleAssign = async () => {
+    if (!selectedTemplateId) return;
+    if (selectedUsers.length === 0) {
+      toast.error('Sélectionnez au moins un utilisateur');
+      return;
+    }
+
+    try {
+      setIsAssigning(true);
+      const res = await api.post('/api/contracts/assign', {
+        templateId: selectedTemplateId,
+        userIds: selectedUsers
+      });
+
+      if (res.data.success) {
+        toast.success(`Contrat envoyé à ${selectedUsers.length} utilisateur(s)`);
+        setIsAssignModalOpen(false);
+        setSelectedUsers([]);
+        setSelectedTemplateId(null);
+      }
+    } catch (err: any) {
+      toast.error(err.response?.data?.error || 'Erreur lors de l\'envoi');
+    } finally {
+      setIsAssigning(false);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -88,6 +129,18 @@ export default function AdminContractsPage() {
                     >
                       <FileText size={16} />
                     </button>
+                    {!template.isDraft && (
+                      <button
+                        onClick={() => {
+                          setSelectedTemplateId(template.id);
+                          setIsAssignModalOpen(true);
+                        }}
+                        className="p-2 bg-win/20 hover:bg-win/40 text-win rounded-lg transition-colors"
+                        title="Envoyer"
+                      >
+                        <Send size={16} />
+                      </button>
+                    )}
                   </td>
                 </tr>
               ))}
@@ -95,6 +148,64 @@ export default function AdminContractsPage() {
           </table>
         )}
       </div>
+
+      {/* Assign Modal */}
+      {isAssignModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+          <div className="bg-background border border-white/10 rounded-2xl p-6 w-full max-w-lg shadow-2xl relative">
+            <h3 className="text-xl font-bold text-white mb-2 flex items-center gap-2">
+              <Users className="text-accent" />
+              Assigner le contrat
+            </h3>
+            <p className="text-white/60 text-sm mb-6">
+              Sélectionnez les utilisateurs qui doivent signer ce contrat. Un email leur sera envoyé.
+            </p>
+
+            <div className="max-h-60 overflow-y-auto space-y-2 mb-6 hide-scrollbar border border-white/5 rounded-lg p-2 bg-white/5">
+              {users.map((user: any) => (
+                <label key={user.id} className="flex items-center gap-3 p-2 hover:bg-white/5 rounded cursor-pointer transition-colors">
+                  <input 
+                    type="checkbox" 
+                    className="rounded border-white/20 bg-background text-accent focus:ring-accent"
+                    checked={selectedUsers.includes(user.id)}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setSelectedUsers([...selectedUsers, user.id]);
+                      } else {
+                        setSelectedUsers(selectedUsers.filter(id => id !== user.id));
+                      }
+                    }}
+                  />
+                  <div>
+                    <div className="text-sm font-medium text-white">{user.fullName || 'Utilisateur'}</div>
+                    <div className="text-xs text-white/50">{user.email}</div>
+                  </div>
+                </label>
+              ))}
+            </div>
+
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => {
+                  setIsAssignModalOpen(false);
+                  setSelectedTemplateId(null);
+                }}
+                className="px-4 py-2 text-white/60 hover:text-white transition-colors text-sm font-medium"
+              >
+                Annuler
+              </button>
+              <button
+                onClick={handleAssign}
+                disabled={isAssigning || selectedUsers.length === 0}
+                className="flex items-center gap-2 px-6 py-2 bg-accent text-white rounded-lg hover:bg-accent-hover transition-colors text-sm font-medium disabled:opacity-50"
+              >
+                {isAssigning ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
+                Envoyer
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

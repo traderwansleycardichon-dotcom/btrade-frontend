@@ -169,7 +169,7 @@ export default function AdminContractEditorPage() {
           <p className="text-xs text-white/40 mb-3">
             Variables disponibles: <code>{`{{user_name}}`}</code>, <code>{`{{date}}`}</code>
           </p>
-          <div className="bg-white rounded-lg overflow-hidden text-black">
+          <div className="bg-background border border-white/10 rounded-lg overflow-hidden text-white quill-dark">
             <ReactQuill 
               theme="snow" 
               value={content} 
