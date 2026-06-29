@@ -20,7 +20,7 @@ export default function AdminContractsPage() {
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const [isAssigning, setIsAssigning] = useState(false);
 
-  const { data, isLoading } = useQuery<ContractTemplate[]>({
+  const { data, isLoading, refetch } = useQuery<ContractTemplate[]>({
     queryKey: ['admin-templates'],
     queryFn: async () => {
       const res = await api.get('/api/contracts/templates');
