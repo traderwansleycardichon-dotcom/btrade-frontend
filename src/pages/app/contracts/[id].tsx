@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, Loader2, CheckCircle2, Download, AlertCircle } from 'lucide-react';
 import SignatureCanvas from 'react-signature-canvas';
 import toast from 'react-hot-toast';
@@ -11,6 +11,7 @@ export default function ContractSignaturePage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user, refreshUser } = useAuth();
+  const queryClient = useQueryClient();
   
   const [fullName, setFullName] = useState(user?.fullName || '');
   const [isSigning, setIsSigning] = useState(false);
@@ -61,10 +62,12 @@ export default function ContractSignaturePage() {
 
       if (res.data.success) {
         toast.success('Contrat signé avec succès !');
+        // Mettre à jour le cache React Query immédiatement pour que l'interface se mette à jour sans recharger
+        queryClient.setQueryData(['contract', id], res.data.data);
+        
         if (refreshUser) {
           await refreshUser();
         }
-        refetch(); // Refresh contract data to show signed state
       }
     } catch (err: any) {
       console.error(err);
