@@ -180,7 +180,7 @@ export default function AdminContractEditorPage() {
                   [{ 'header': [1, 2, 3, false] }],
                   ['bold', 'italic', 'underline', 'strike'],
                   [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                  [{ 'align': [] }],
+                  [{ 'align': '' }, { 'align': 'center' }, { 'align': 'right' }, { 'align': 'justify' }],
                   ['clean']
                 ]
               }}
