@@ -201,6 +201,20 @@
   color: rgba(255, 255, 255, 0.7);
 }
 
+.quill-dark .ql-snow .ql-picker-options {
+  background-color: #1a1a1a;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.quill-dark .ql-snow .ql-picker-item {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.quill-dark .ql-snow .ql-picker-item:hover,
+.quill-dark .ql-snow .ql-picker-item.ql-selected {
+  color: #c8ff00;
+}
+
 .quill-dark .ql-snow.ql-toolbar button:hover .ql-stroke,
 .quill-dark .ql-snow .ql-toolbar button:hover .ql-stroke,
 .quill-dark .ql-snow.ql-toolbar button.ql-active .ql-stroke,
