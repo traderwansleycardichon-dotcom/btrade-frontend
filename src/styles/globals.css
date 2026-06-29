@@ -219,6 +219,10 @@
   color: rgba(255, 255, 255, 0.4);
 }
 
+.quill-dark .ql-editor {
+  color: white;
+}
+
 ::-webkit-scrollbar-track {
   background: transparent;
 }
