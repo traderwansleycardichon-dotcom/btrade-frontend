@@ -95,6 +95,20 @@ export default function AdminContractsPage() {
     }
   };
 
+  const handleDeleteTemplate = async (templateId: string) => {
+    if (!window.confirm('Voulez-vous vraiment supprimer ce modèle ?')) return;
+    
+    try {
+      const res = await api.delete(`/api/contracts/templates/${templateId}`);
+      if (res.data.success) {
+        toast.success('Modèle supprimé avec succès');
+        refetch();
+      }
+    } catch (err: any) {
+      toast.error(err.response?.data?.error || 'Erreur lors de la suppression');
+    }
+  };
+
   return (
     <div className="space-y-8 animate-[fadeIn_0.5s_ease-out]">
       <div className="flex justify-between items-center">
@@ -174,25 +188,34 @@ export default function AdminContractsPage() {
                     {new Date(template.createdAt).toLocaleDateString('fr-FR')}
                   </td>
                   <td className="px-6 py-4 text-right">
-                    <button
-                      onClick={() => navigate(`/admin/contracts/new?id=${template.id}`)}
-                      className="p-2 bg-white/5 hover:bg-white/10 text-white rounded-lg transition-colors mr-2"
-                      title="Modifier"
-                    >
-                      <FileText size={16} />
-                    </button>
-                    {!template.isDraft && (
+                    <div className="flex items-center justify-end gap-2">
                       <button
-                        onClick={() => {
-                          setSelectedTemplateId(template.id);
-                          setIsAssignModalOpen(true);
-                        }}
-                        className="p-2 bg-win/20 hover:bg-win/40 text-win rounded-lg transition-colors"
-                        title="Envoyer"
+                        onClick={() => navigate(`/admin/contracts/new?id=${template.id}`)}
+                        className="p-2 bg-white/5 hover:bg-white/10 text-white rounded-lg transition-colors"
+                        title="Modifier"
                       >
-                        <Send size={16} />
+                        <FileText size={16} />
                       </button>
-                    )}
+                      {!template.isDraft && (
+                        <button
+                          onClick={() => {
+                            setSelectedTemplateId(template.id);
+                            setIsAssignModalOpen(true);
+                          }}
+                          className="p-2 bg-win/20 hover:bg-win/40 text-win rounded-lg transition-colors"
+                          title="Envoyer"
+                        >
+                          <Send size={16} />
+                        </button>
+                      )}
+                      <button
+                        onClick={() => handleDeleteTemplate(template.id)}
+                        className="p-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-lg transition-colors"
+                        title="Supprimer ce modèle"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
