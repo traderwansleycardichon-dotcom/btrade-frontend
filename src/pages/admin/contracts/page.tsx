@@ -30,7 +30,7 @@ export default function AdminContractsPage() {
   const templates = data || [];
 
   // Load users for assignment
-  const { data: usersData } = useQuery({
+  const { data: usersData, isLoading: isLoadingUsers } = useQuery({
     queryKey: ['admin-users'],
     queryFn: async () => {
       const res = await api.get('/api/admin/users');
@@ -162,26 +162,36 @@ export default function AdminContractsPage() {
             </p>
 
             <div className="max-h-60 overflow-y-auto space-y-2 mb-6 hide-scrollbar border border-white/5 rounded-lg p-2 bg-white/5">
-              {users.map((user: any) => (
-                <label key={user.id} className="flex items-center gap-3 p-2 hover:bg-white/5 rounded cursor-pointer transition-colors">
-                  <input 
-                    type="checkbox" 
-                    className="rounded border-white/20 bg-bg text-accent focus:ring-accent"
-                    checked={selectedUsers.includes(user.id)}
-                    onChange={(e) => {
-                      if (e.target.checked) {
-                        setSelectedUsers([...selectedUsers, user.id]);
-                      } else {
-                        setSelectedUsers(selectedUsers.filter(id => id !== user.id));
-                      }
-                    }}
-                  />
-                  <div>
-                    <div className="text-sm font-medium text-white">{user.fullName || 'Utilisateur'}</div>
-                    <div className="text-xs text-white/50">{user.email}</div>
-                  </div>
-                </label>
-              ))}
+              {isLoadingUsers ? (
+                <div className="flex justify-center p-4">
+                  <Loader2 className="animate-spin text-accent" />
+                </div>
+              ) : users.length === 0 ? (
+                <div className="text-center text-white/50 py-4 text-sm">
+                  Aucun utilisateur trouvé.
+                </div>
+              ) : (
+                users.map((user: any) => (
+                  <label key={user.id} className="flex items-center gap-3 p-2 hover:bg-white/5 rounded cursor-pointer transition-colors">
+                    <input 
+                      type="checkbox" 
+                      className="rounded border-white/20 bg-bg text-accent focus:ring-accent"
+                      checked={selectedUsers.includes(user.id)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setSelectedUsers([...selectedUsers, user.id]);
+                        } else {
+                          setSelectedUsers(selectedUsers.filter(id => id !== user.id));
+                        }
+                      }}
+                    />
+                    <div>
+                      <div className="text-sm font-medium text-white">{user.fullName || 'Utilisateur'}</div>
+                      <div className="text-xs text-white/50">{user.email}</div>
+                    </div>
+                  </label>
+                ))
+              )}
             </div>
 
             <div className="flex gap-3 justify-end">
