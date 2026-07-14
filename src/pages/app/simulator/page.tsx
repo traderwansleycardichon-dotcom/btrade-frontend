@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../../../hooks/useAuth";
-import { Navigate } from "react-router-dom";
 import api from "../../../lib/api";
-import { toast } from "react-hot-toast";
 import { AdvancedRealTimeChart } from "react-ts-tradingview-widgets";
 import { OrderPanel } from "../../../components/simulator/OrderPanel";
 import { PositionsTable } from "../../../components/simulator/PositionsTable";
@@ -18,141 +16,94 @@ import {
 } from "../../../components/simulator/ChallengeModals";
 import { TraderProfileStats } from "../../../components/simulator/TraderProfileStats";
 import { SimulatorPerformanceStats } from "../../../components/simulator/SimulatorPerformanceStats";
+import {
+  useSimulatorStatus,
+  useSimulatorTrades,
+  useSimulatorStats,
+  useSimulatorCooldown,
+  useSimulatorRefresh,
+} from "../../../hooks/useSimulator";
 
 export default function SimulatorPage() {
   const { user } = useAuth();
-  const [account, setAccount] = useState<any>(null);
-  const [todayPnl, setTodayPnl] = useState(0);
-  const [trades, setTrades] = useState<any[]>([]);
+  const navigate = useNavigate();
+  const refreshSimulator = useSimulatorRefresh();
+
+  // ── React Query (remplace les 4 setInterval manuels) ──────────────────
+  const { data: statusData, isLoading } = useSimulatorStatus();
+  const { data: trades = [] } = useSimulatorTrades();
+  const { data: stats } = useSimulatorStats();
+  const { data: cooldown } = useSimulatorCooldown();
+
+  const account  = statusData?.account  ?? null;
+  const todayPnl = statusData?.todayPnl ?? 0;
+
+  // ── UI state local ─────────────────────────────────────────────────────
   const [floatingPnl, setFloatingPnl] = useState(0);
-  const [loading, setLoading] = useState(true);
-  const [stats, setStats] = useState<any>(null);
-  const [cooldown, setCooldown] = useState<any>(null);
-  const [showPassedModal, setShowPassedModal] = useState(false);
-  const [showFailedModal, setShowFailedModal] = useState(false);
+  const [showPassedModal, setShowPassedModal]   = useState(false);
+  const [showFailedModal, setShowFailedModal]   = useState(false);
   const [showExpiredModal, setShowExpiredModal] = useState(false);
   const [showSelectorForced, setShowSelectorForced] = useState(false);
-  const navigate = useNavigate();
-
-  // Asset géré localement pour propager aux enfants
   const [assetSymbol, setAssetSymbol] = useState("BTCUSDT");
 
+  // ── Triggers modals quand le statut du challenge change ────────────────
   useEffect(() => {
-    fetchData();
-    const interval = setInterval(() => {
-      fetchData(true);
-    }, 3000);
-    return () => clearInterval(interval);
-  }, []);
+    if (!account) return;
+    if (account.status === "passed" && !sessionStorage.getItem(`modal_passed_${account.id}`)) {
+      setShowPassedModal(true);
+      sessionStorage.setItem(`modal_passed_${account.id}`, "true");
+    } else if (account.status?.startsWith("failed") && !sessionStorage.getItem(`modal_failed_${account.id}`)) {
+      setShowFailedModal(true);
+      sessionStorage.setItem(`modal_failed_${account.id}`, "true");
+    } else if (account.status === "expired" && !sessionStorage.getItem(`modal_expired_${account.id}`)) {
+      setShowExpiredModal(true);
+      sessionStorage.setItem(`modal_expired_${account.id}`, "true");
+    }
+  }, [account?.id, account?.status]);
 
+  // ── Floating P&L (poll prix des positions ouvertes) ────────────────────
   useEffect(() => {
     let interval: ReturnType<typeof setInterval>;
     const fetchOpenTradePrices = async () => {
-      if (!trades) return;
-      const openTrades = trades.filter((t) => t.status === "open");
-      if (openTrades.length === 0) {
-        setFloatingPnl(0);
-        return;
-      }
-
-      const uniqueAssets = [...new Set(openTrades.map((t) => t.asset))];
+      const openTrades = (trades as any[]).filter((t: any) => t.status === "open");
+      if (openTrades.length === 0) { setFloatingPnl(0); return; }
+      const uniqueAssets = [...new Set(openTrades.map((t: any) => t.asset as string))];
       let totalFloating = 0;
-
       try {
-        const pricePromises = uniqueAssets.map((asset) =>
-          api
-            .get(`/api/simulator/market/price?symbol=${asset}`)
-            .then((res) => ({ asset, price: res.data.price })),
+        const prices = await Promise.all(
+          uniqueAssets.map((asset) =>
+            api.get(`/api/simulator/market/price?symbol=${asset}`).then((r) => ({ asset, price: r.data.price as number }))
+          )
         );
-        const prices = await Promise.all(pricePromises);
         const priceMap: Record<string, number> = prices.reduce(
-          (acc: any, curr) => ({ ...acc, [curr.asset]: curr.price }),
-          {},
+          (acc: Record<string, number>, c) => ({ ...acc, [c.asset]: c.price }), {}
         );
-
-        openTrades.forEach((trade) => {
-          const currentPrice = priceMap[trade.asset];
-          if (currentPrice) {
-            const entryPrice = parseFloat(trade.entryPrice);
-            const quantity = parseFloat(trade.quantity);
-            if (trade.direction === "long") {
-              totalFloating += (currentPrice - entryPrice) * quantity;
-            } else {
-              totalFloating += (entryPrice - currentPrice) * quantity;
-            }
+        openTrades.forEach((trade: any) => {
+          const cp = priceMap[trade.asset];
+          if (cp) {
+            const ep = parseFloat(trade.entryPrice);
+            const qty = parseFloat(trade.quantity);
+            totalFloating += trade.direction === "long" ? (cp - ep) * qty : (ep - cp) * qty;
           }
         });
         setFloatingPnl(totalFloating);
-      } catch (err) {
-        console.error("Failed to fetch open trade prices", err);
-      }
+      } catch {}
     };
-
     fetchOpenTradePrices();
     interval = setInterval(fetchOpenTradePrices, 1500);
     return () => clearInterval(interval);
   }, [trades]);
 
-  const fetchData = async (isBackground = false) => {
-    try {
-      if (!isBackground) setLoading(true);
-      const accRes = await api.get("/api/simulator/challenge/status");
-      const fetchedAccount = accRes.data.data.account;
-      setAccount(fetchedAccount);
-      setTodayPnl(accRes.data.data.todayPnl);
-      const trRes = await api.get("/api/simulator/trades");
-      setTrades(trRes.data.data);
-
-      // Fetch stats and cooldown
-      const statsRes = await api.get("/api/simulator/challenge/statistics");
-      if (statsRes.data.success) setStats(statsRes.data.data);
-
-      const cdRes = await api.get("/api/simulator/challenge/cooldown");
-      if (cdRes.data.success) setCooldown(cdRes.data.data);
-
-      // Handle modals based on status
-      if (fetchedAccount) {
-        if (
-          fetchedAccount.status === "passed" &&
-          !sessionStorage.getItem(`modal_passed_${fetchedAccount.id}`)
-        ) {
-          setShowPassedModal(true);
-          sessionStorage.setItem(`modal_passed_${fetchedAccount.id}`, "true");
-        } else if (
-          fetchedAccount.status.startsWith("failed") &&
-          !sessionStorage.getItem(`modal_failed_${fetchedAccount.id}`)
-        ) {
-          setShowFailedModal(true);
-          sessionStorage.setItem(`modal_failed_${fetchedAccount.id}`, "true");
-        } else if (
-          fetchedAccount.status === "expired" &&
-          !sessionStorage.getItem(`modal_expired_${fetchedAccount.id}`)
-        ) {
-          setShowExpiredModal(true);
-          sessionStorage.setItem(`modal_expired_${fetchedAccount.id}`, "true");
-        }
-      }
-    } catch (err: any) {
-      if (err.response?.status !== 403 && !isBackground) {
-        toast.error("Erreur de chargement du simulateur");
-      }
-    } finally {
-      if (!isBackground) setLoading(false);
-    }
-  };
-
   const getCooldownLeft = () => {
     if (!cooldown) return undefined;
-    const now = new Date().getTime();
-    const end = new Date(cooldown.availableRestartTime).getTime();
-    const diff = end - now;
+    const diff = new Date(cooldown.availableRestartTime).getTime() - Date.now();
     if (diff <= 0) return undefined;
-    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-    return `${hours}h ${minutes}m`;
+    const h = Math.floor((diff % 86400000) / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    return `${h}h ${m}m`;
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="p-8 flex justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -173,13 +124,10 @@ export default function SimulatorPage() {
         <div className="w-24 h-24 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
           <BrainCircuit className="w-12 h-12 text-primary" />
         </div>
-        <h1 className="text-3xl font-bold text-text mb-4">
-          Paper Trading Simulator
-        </h1>
+        <h1 className="text-3xl font-bold text-text mb-4">Paper Trading Simulator</h1>
         <p className="text-text-muted text-lg mb-8">
           Le simulateur de trading est réservé aux membres PRO. Passez à la
-          vitesse supérieure et entraînez-vous en conditions réelles sans
-          risquer votre capital !
+          vitesse supérieure et entraînez-vous en conditions réelles sans risquer votre capital !
         </p>
         <button
           onClick={() => (window.location.href = "/app/upgrade")}
@@ -195,7 +143,7 @@ export default function SimulatorPage() {
   if (!account?.challengeLevel) {
     return (
       <div className="h-[calc(100vh-4rem)] overflow-y-auto">
-        <ChallengeSelector onChallengeStarted={fetchData} />
+        <ChallengeSelector onChallengeStarted={refreshSimulator} />
       </div>
     );
   }
@@ -212,7 +160,7 @@ export default function SimulatorPage() {
         <ChallengeSelector
           onChallengeStarted={() => {
             setShowSelectorForced(false);
-            fetchData();
+            refreshSimulator();
           }}
         />
       </div>
@@ -383,7 +331,7 @@ export default function SimulatorPage() {
             </div>
           )}
           <OrderPanel
-            onTradeOpened={() => fetchData(true)}
+            onTradeOpened={refreshSimulator}
             assetSymbol={assetSymbol}
             trades={trades}
             account={account}
@@ -394,7 +342,7 @@ export default function SimulatorPage() {
       <SimulatorPerformanceStats account={account} trades={trades} />
 
       <div className="bg-surface rounded-2xl border border-border min-h-[350px] overflow-hidden flex flex-col shadow-sm">
-        <PositionsTable trades={trades} onTradeClosed={() => fetchData(true)} />
+        <PositionsTable trades={trades} onTradeClosed={refreshSimulator} />
       </div>
     </div>
   );
