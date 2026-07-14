@@ -18,6 +18,12 @@ export default function AdminSettingsPage() {
     email: user?.email || '',
   });
 
+  const [emailChange, setEmailChange] = useState({
+    newEmail: '',
+    password: '',
+  });
+  const [emailChangeLoading, setEmailChangeLoading] = useState(false);
+
   const [passwords, setPasswords] = useState({
     current: '',
     new: '',
@@ -35,6 +41,25 @@ export default function AdminSettingsPage() {
       telegram_link: settings.telegram_link || '',
     });
   }, [settings.discord_link, settings.telegram_link]);
+
+  const handleChangeEmail = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!emailChange.newEmail || !emailChange.password) return;
+    setEmailChangeLoading(true);
+    try {
+      await api.patch('/api/me/email', {
+        email: emailChange.newEmail,
+        current_password: emailChange.password,
+      });
+      await refreshUser();
+      addToast('Email mis à jour avec succès', 'success');
+      setEmailChange({ newEmail: '', password: '' });
+    } catch (err: any) {
+      addToast(err.response?.data?.error || 'Erreur lors du changement d\'email', 'error');
+    } finally {
+      setEmailChangeLoading(false);
+    }
+  };
 
   const handleSaveSocialLinks = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -153,6 +178,7 @@ export default function AdminSettingsPage() {
 
         <div className="md:col-span-2 space-y-8">
           {currentTab === 'profile' && (
+            <>
             <form onSubmit={handleUpdateProfile} className="glass p-8 rounded-3xl border border-border space-y-6 animate-[slideUp_0.3s_ease-out]">
               <h3 className="font-bold text-lg mb-6 flex items-center gap-2">
                 <User size={20} className="text-loss" />
@@ -170,9 +196,9 @@ export default function AdminSettingsPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-bold text-txt-3 uppercase tracking-widest mb-2">Email (Lecture seule)</label>
-                  <input 
-                    type="email" 
+                  <label className="block text-[10px] font-bold text-txt-3 uppercase tracking-widest mb-2">Email actuel</label>
+                  <input
+                    type="email"
                     value={formData.email}
                     disabled
                     className="w-full bg-surface border border-border rounded-xl px-4 py-3 text-sm text-txt-3 cursor-not-allowed"
@@ -180,8 +206,8 @@ export default function AdminSettingsPage() {
                 </div>
               </div>
 
-              <button 
-                type="submit" 
+              <button
+                type="submit"
                 disabled={loading}
                 className="btn-primary bg-loss hover:bg-loss/80 text-white flex items-center gap-2"
               >
@@ -189,6 +215,57 @@ export default function AdminSettingsPage() {
                 Enregistrer les modifications
               </button>
             </form>
+
+            {/* Email change — one-time only */}
+            {(user as any)?.emailChangedAt ? (
+              <div className="glass p-6 rounded-3xl border border-border animate-[slideUp_0.3s_ease-out]">
+                <div className="flex items-start gap-3 text-sm text-txt-2">
+                  <CheckCircle size={16} className="text-win shrink-0 mt-0.5" />
+                  <p>L'email administrateur a déjà été modifié une fois. Ce changement ne peut pas être répété.</p>
+                </div>
+              </div>
+            ) : (
+              <form onSubmit={handleChangeEmail} className="glass p-8 rounded-3xl border border-amber-500/20 space-y-6 animate-[slideUp_0.3s_ease-out]">
+                <div>
+                  <h3 className="font-bold text-base flex items-center gap-2 mb-1">
+                    <AlertTriangle size={18} className="text-amber-500" />
+                    Changer l'email administrateur
+                  </h3>
+                  <p className="text-xs text-txt-2">Cette action n'est autorisée qu'une seule fois. Confirmez votre mot de passe pour continuer.</p>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-[10px] font-bold text-txt-3 uppercase tracking-widest mb-2">Nouvel email</label>
+                    <input
+                      type="email"
+                      required
+                      value={emailChange.newEmail}
+                      onChange={e => setEmailChange(p => ({ ...p, newEmail: e.target.value }))}
+                      className="w-full bg-elevated border border-border rounded-xl px-4 py-3 text-sm focus:border-amber-500/50 outline-none transition-all"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold text-txt-3 uppercase tracking-widest mb-2">Mot de passe actuel</label>
+                    <input
+                      type="password"
+                      required
+                      value={emailChange.password}
+                      onChange={e => setEmailChange(p => ({ ...p, password: e.target.value }))}
+                      className="w-full bg-elevated border border-border rounded-xl px-4 py-3 text-sm focus:border-amber-500/50 outline-none transition-all"
+                    />
+                  </div>
+                </div>
+                <button
+                  type="submit"
+                  disabled={emailChangeLoading || !emailChange.newEmail || !emailChange.password}
+                  className="btn-primary bg-amber-600 hover:bg-amber-500 text-white flex items-center gap-2 disabled:opacity-50"
+                >
+                  <Save size={16} />
+                  {emailChangeLoading ? 'Mise à jour...' : 'Confirmer le changement d\'email'}
+                </button>
+              </form>
+            )}
+            </>
           )}
 
           {currentTab === 'security' && (
