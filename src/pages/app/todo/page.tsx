@@ -16,7 +16,7 @@ import {
   useSortable
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { Plus, GripVertical, Trash2, CheckCircle2, Circle, Lock, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Plus, GripVertical, Trash2, CheckCircle2, Circle, Lock, ChevronLeft, ChevronRight, History, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../../hooks/useAuth';
 import api from '../../../lib/api';
@@ -100,6 +100,11 @@ export default function TodoPage() {
   const [isTrialLocked, setIsTrialLocked] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [showAnimation, setShowAnimation] = useState(false);
+  const [memo, setMemo] = useState('');
+  const [memoSaving, setMemoSaving] = useState(false);
+  const [showMemoHistory, setShowMemoHistory] = useState(false);
+  const [memoHistory, setMemoHistory] = useState<any[]>([]);
+  const [loadingHistory, setLoadingHistory] = useState(false);
 
   // Drag and drop sensors
   const sensors = useSensors(
@@ -152,6 +157,55 @@ export default function TodoPage() {
   useEffect(() => {
     fetchWeekTasks();
   }, [weekStart]); // Fetch whenever the week changes
+
+  useEffect(() => {
+    fetchMemo();
+  }, [selectedDate]);
+
+  const fetchMemo = async () => {
+    try {
+      const dateStr = format(selectedDate, 'yyyy-MM-dd');
+      const res = await api.get(`/api/todo/memo?date=${dateStr}`);
+      if (res.data.success && res.data.data) {
+        setMemo(res.data.data.content);
+      } else {
+        setMemo('');
+      }
+    } catch (err) {
+      console.error('Error fetching memo', err);
+      setMemo('');
+    }
+  };
+
+  const fetchMemoHistory = async () => {
+    try {
+      setLoadingHistory(true);
+      const res = await api.get('/api/todo/memos');
+      if (res.data.success) {
+        setMemoHistory(res.data.data);
+      }
+    } catch (err) {
+      console.error('Error fetching memo history:', err);
+    } finally {
+      setLoadingHistory(false);
+    }
+  };
+
+  const openMemoHistory = async () => {
+    // Save current memo instantly before fetching history
+    try {
+      setMemoSaving(true);
+      const dateStr = format(selectedDate, 'yyyy-MM-dd');
+      await api.put('/api/todo/memo', { date: dateStr, content: memo });
+    } catch (err) {
+      console.error('Error saving before history', err);
+    } finally {
+      setMemoSaving(false);
+    }
+    
+    setShowMemoHistory(true);
+    fetchMemoHistory();
+  };
 
   const fetchWeekTasks = async () => {
     try {
@@ -250,6 +304,25 @@ export default function TodoPage() {
       }
     }
   };
+
+  useEffect(() => {
+    const timeoutId = setTimeout(async () => {
+      // Don't save if loading or empty but never edited
+      // We'll just always save the current state to keep it simple, 
+      // but avoid spamming by adding a dirty check if needed.
+      // For now, simple debounce is fine.
+      try {
+        setMemoSaving(true);
+        const dateStr = format(selectedDate, 'yyyy-MM-dd');
+        await api.put('/api/todo/memo', { date: dateStr, content: memo });
+      } catch (err) {
+        console.error('Error saving memo', err);
+      } finally {
+        setMemoSaving(false);
+      }
+    }, 1000);
+    return () => clearTimeout(timeoutId);
+  }, [memo, selectedDate]);
 
   return (
     <div className="space-y-6 animate-[fadeIn_0.5s_ease-out] relative">
@@ -451,6 +524,78 @@ export default function TodoPage() {
             </div>
           </SortableContext>
         </DndContext>
+      )}
+
+      {/* Memo Section */}
+      <div className="mt-8 bg-white/5 border border-white/10 rounded-2xl p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-white font-medium flex items-center gap-2">
+            Journal du jour
+          </h3>
+          <div className="flex items-center gap-4">
+            {memoSaving && (
+              <span className="text-[10px] text-white/40 uppercase tracking-wider animate-pulse">
+                Enregistrement...
+              </span>
+            )}
+            <button 
+              onClick={openMemoHistory}
+              className="text-white/40 hover:text-white transition-colors flex items-center gap-1.5 text-xs"
+            >
+              <History className="w-3.5 h-3.5" />
+              Historique
+            </button>
+          </div>
+        </div>
+        <textarea
+          value={memo}
+          onChange={(e) => setMemo(e.target.value)}
+          placeholder={`Ajouter des notes, idées ou un journal pour ce ${format(selectedDate, 'EEEE', { locale: fr })}...`}
+          className="w-full min-h-[150px] bg-transparent text-sm text-white placeholder-white/30 resize-y focus:outline-none"
+        />
+      </div>
+
+      {/* Memo History Modal */}
+      {showMemoHistory && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm">
+          <div className="bg-surface border border-border w-full max-w-2xl rounded-2xl shadow-xl max-h-[80vh] flex flex-col">
+            <div className="flex items-center justify-between p-6 border-b border-border">
+              <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                <History className="w-5 h-5 text-accent" />
+                Historique des mémos
+              </h2>
+              <button 
+                onClick={() => setShowMemoHistory(false)}
+                className="p-2 hover:bg-white/5 rounded-full transition-colors"
+              >
+                <X className="w-5 h-5 text-white/60" />
+              </button>
+            </div>
+            
+            <div className="flex-1 overflow-y-auto p-6 space-y-6">
+              {loadingHistory ? (
+                <div className="flex justify-center py-12">
+                  <div className="w-8 h-8 border-2 border-accent border-t-transparent rounded-full animate-spin"></div>
+                </div>
+              ) : memoHistory.length === 0 ? (
+                <div className="text-center py-12 text-white/40">
+                  Aucun mémo enregistré pour l'instant.
+                </div>
+              ) : (
+                memoHistory.map((m) => (
+                  <div key={m.id} className="bg-white/5 border border-white/10 rounded-xl p-5">
+                    <div className="text-accent font-medium text-sm mb-3 pb-3 border-b border-white/10">
+                      {format(new Date(m.date), 'EEEE d MMMM yyyy', { locale: fr })}
+                    </div>
+                    <div className="text-white/80 whitespace-pre-wrap text-sm leading-relaxed">
+                      {m.content}
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
