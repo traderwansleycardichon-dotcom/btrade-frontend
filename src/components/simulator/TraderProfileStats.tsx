@@ -36,7 +36,7 @@ export function TraderProfileStats({ stats }: StatsProps) {
             <span className="text-xs font-medium uppercase tracking-wider truncate">Réussis</span>
           </div>
           <div className="text-xl font-black text-green-500">{stats.passedCount}</div>
-          <div className="text-xs text-green-500/70 mt-1">Taux: {stats.successRate.toFixed(1)}%</div>
+          <div className="text-xs text-green-500/70 mt-1">Taux: {Number(stats.successRate || 0).toFixed(1)}%</div>
         </div>
 
         <div className="bg-background rounded-xl p-3 border border-red-500/20">
