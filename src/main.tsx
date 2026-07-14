@@ -8,6 +8,8 @@ import { PublicRoute } from './components/auth/AuthGuards';
 import { AppLayout } from './components/layout/AppLayout';
 import DashboardPage from './pages/app/dashboard/page';
 import TradesPage from './pages/app/trades/page';
+import SimulatorPage from './pages/app/simulator/page';
+import SimulatorLeaderboardPage from './pages/app/simulator/leaderboard/page';
 import AccountsPage from './pages/app/accounts/page';
 import PayoutsPage from './pages/app/payouts/page';
 import CalendarPage from './pages/app/calendar/page';
@@ -57,6 +59,7 @@ import AdminMessagingPage from './pages/admin/messaging/page';
 import AdminWalletPage from './pages/admin/wallet/page';
 import AdminEmailsPage from './pages/admin/emails/page';
 import AdminCampaignsPage from './pages/admin/campaigns/page';
+import AdminSimulatorPage from './pages/admin/simulator/page';
 import ForgotPasswordPage from './pages/forgot-password/page';
 import ResetPasswordPage from './pages/reset-password/page';
 import UserContractsPage from './pages/app/contracts/page';
@@ -118,6 +121,7 @@ const router = createBrowserRouter([
       { path: 'wallet', element: <AdminWalletPage /> },
       { path: 'emails', element: <AdminEmailsPage /> },
       { path: 'campaigns', element: <AdminCampaignsPage /> },
+      { path: 'simulator', element: <AdminSimulatorPage /> },
       { path: 'pricing', element: <AdminPricingPage /> },
       { path: 'promo-codes', element: <PromoCodesPage /> },
       { path: 'support', element: <AdminSupportPage /> },
@@ -143,6 +147,8 @@ const router = createBrowserRouter([
       { path: 'accounts', element: <AccountsPage /> },
       { path: 'payouts', element: <PayoutsPage /> },
       { path: 'calendar', element: <CalendarPage /> },
+      { path: 'simulator', element: <SimulatorPage /> },
+      { path: 'simulator/leaderboard', element: <SimulatorLeaderboardPage /> },
       { path: 'journal', element: <JournalPage /> },
       { path: 'todo', element: <TodoPage /> },
       { path: 'psychology', element: <PsychologyPage /> },
@@ -163,6 +169,7 @@ const router = createBrowserRouter([
       { path: 'coaching', element: <CoachingPage /> },
       { path: 'contracts', element: <UserContractsPage /> },
       { path: 'contracts/:id', element: <ContractSignaturePage /> },
+      { path: 'simulator', element: <SimulatorPage /> },
     ],
   },
   // Catch-all fallback to redirect any unknown routes to the landing page

@@ -8,21 +8,16 @@ export const UnreadMessagePopup: React.FC = () => {
   const { user } = useAuth();
   const { data: count = 0 } = useUnreadMessagesCount();
   const [visible, setVisible] = useState(false);
+  const [lastCount, setLastCount] = useState(0);
   const navigate = useNavigate();
   
   const isAdmin = user?.role === 'admin';
 
-  // Affiche le popup de manière récurrente (toutes les 20 secondes) s'il y a des non-lus
   useEffect(() => {
-    if (count > 0) {
+    if (count > lastCount) {
       setVisible(true);
-      const interval = setInterval(() => {
-        setVisible(true);
-      }, 20000); // Popup réapparaît toutes les 20 secondes si on le ferme sans lire
-      return () => clearInterval(interval);
-    } else {
-      setVisible(false);
     }
+    setLastCount(count);
   }, [count]);
 
   if (!visible || count === 0) return null;

@@ -178,6 +178,15 @@
   --sidebar-w: 250px;
 }
 
+/* Hide scrollbar utility */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
 /* React Quill Dark Mode Overrides */
 .quill-dark .ql-toolbar.ql-snow {
   border: none;
