@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Play, Square, Minus, Plus } from "lucide-react";
 import api from "../../lib/api";
 import { toast } from "react-hot-toast";
+import { sounds } from "../../utils/sounds";
 
 interface Props {
   onTradeOpened: () => void;
@@ -30,6 +31,13 @@ export function OrderPanel({
   const [currentPrice, setCurrentPrice] = useState<number | null>(null);
   const [isLimitLoading, setIsLimitLoading] = useState(false);
 
+  const [qtyMode, setQtyMode] = useState<"lots" | "risk">("lots");
+  const [riskPercent, setRiskPercent] = useState<number>(1);
+  const [riskSlPrice, setRiskSlPrice] = useState<number | null>(null);
+
+  const [useTrailingStop, setUseTrailingStop] = useState(false);
+  const [trailingDistance, setTrailingDistance] = useState<number>(10);
+
   const activeTrade = trades.find(
     (t) => t.status === "open" && sameAsset(t.asset, assetSymbol),
   );
@@ -50,6 +58,19 @@ export function OrderPanel({
     return () => clearInterval(interval);
   }, [assetSymbol]);
 
+  useEffect(() => {
+    if (qtyMode === "risk" && riskPercent > 0 && riskSlPrice && riskSlPrice > 0 && currentPrice) {
+      const balance = account ? Number(account.currentBalance || account.initialBalance) : 100000;
+      const riskAmount = balance * (riskPercent / 100);
+      const entryPrice = orderType === "limit" && limitPrice ? limitPrice : currentPrice;
+      const distance = Math.abs(entryPrice - riskSlPrice);
+      if (distance > 0) {
+        const calculatedQty = Number((riskAmount / distance).toFixed(2));
+        setQuantity(Math.max(0.01, calculatedQty));
+      }
+    }
+  }, [qtyMode, riskPercent, riskSlPrice, currentPrice, orderType, limitPrice, account]);
+
   const executeTrade = async (direction: "long" | "short") => {
     if (quantity <= 0) {
       toast.error("Quantité invalide");
@@ -64,6 +85,9 @@ export function OrderPanel({
       setLoading(direction);
 
       let stopLoss = slPrice > 0 ? slPrice : null;
+      if (qtyMode === "risk" && riskSlPrice && riskSlPrice > 0) {
+        stopLoss = riskSlPrice;
+      }
       let takeProfit = tpPrice > 0 ? tpPrice : null;
 
       await api.post("/api/simulator/trades/open", {
@@ -71,10 +95,13 @@ export function OrderPanel({
         direction,
         orderType,
         quantity,
+        limitPrice: orderType === "limit" ? limitPrice : undefined,
         stopLoss,
         takeProfit,
-        ...(orderType === "limit" && { limitPrice }),
+        trailingDistance: useTrailingStop && trailingDistance > 0 ? trailingDistance : null
       });
+
+      sounds.play('open');
       toast.success(
         orderType === "limit"
           ? `Ordre Limite ${direction.toUpperCase()} placé`
@@ -110,6 +137,7 @@ export function OrderPanel({
         await api.put(`/api/simulator/trades/${activeTrade.id}/limits`, {
           takeProfit: tpPrice || null,
           stopLoss: slPrice || null,
+          trailingDistance: useTrailingStop && trailingDistance > 0 ? trailingDistance : null
         });
         toast.success("Limites mises à jour pour la position ouverte");
         onTradeOpened(); // Refresh data
@@ -188,45 +216,98 @@ export function OrderPanel({
           </div>
         )}
 
-        {/* Quantity Selector */}
+        {/* Mode Toggle & Quantity/Risk */}
         <div>
-          <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2 text-center">
-            Quantité (Contrats)
-          </label>
-          <div className="flex items-center gap-2 bg-[#1e222d] rounded-lg p-1 border border-[#2a2e39]">
+          <div className="flex bg-[#1e222d] rounded-lg p-1 border border-[#2a2e39] mb-3">
             <button
               type="button"
-              onClick={() => adjustQty(-1)}
-              className="p-2 text-gray-400 hover:text-white hover:bg-[#2a2e39] rounded-md transition-colors"
+              onClick={() => setQtyMode("lots")}
+              className={`flex-1 py-1 text-[10px] font-bold uppercase tracking-wider rounded ${
+                qtyMode === "lots" ? "bg-[#2a2e39] text-white" : "text-gray-500 hover:text-gray-300"
+              }`}
             >
-              <Minus size={16} />
+              Lots
             </button>
-            <input
-              type="number"
-              step="0.1"
-              value={quantity}
-              onChange={(e) => setQuantity(Number(e.target.value))}
-              className="flex-1 bg-transparent text-center text-sm font-bold text-white focus:outline-none"
-            />
             <button
               type="button"
-              onClick={() => adjustQty(1)}
-              className="p-2 text-gray-400 hover:text-white hover:bg-[#2a2e39] rounded-md transition-colors"
+              onClick={() => setQtyMode("risk")}
+              className={`flex-1 py-1 text-[10px] font-bold uppercase tracking-wider rounded ${
+                qtyMode === "risk" ? "bg-[#2a2e39] text-white" : "text-gray-500 hover:text-gray-300"
+              }`}
             >
-              <Plus size={16} />
+              Risque %
             </button>
           </div>
-          <div className="flex justify-between gap-2 mt-2">
-            {[1, 2, 5, 10].map((qty) => (
-              <button
-                key={qty}
-                onClick={() => setQuantity(qty)}
-                className="flex-1 bg-[#1e222d] hover:bg-[#2a2e39] border border-[#2a2e39] text-gray-300 text-sm font-medium py-1 rounded transition-colors"
-              >
-                {qty}
-              </button>
-            ))}
-          </div>
+
+          {qtyMode === "lots" ? (
+            <>
+              <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2 text-center">
+                Quantité (Contrats)
+              </label>
+              <div className="flex items-center gap-2 bg-[#1e222d] rounded-lg p-1 border border-[#2a2e39]">
+                <button
+                  type="button"
+                  onClick={() => adjustQty(-1)}
+                  className="p-2 text-gray-400 hover:text-white hover:bg-[#2a2e39] rounded-md transition-colors"
+                >
+                  <Minus size={16} />
+                </button>
+                <input
+                  type="number"
+                  step="0.1"
+                  value={quantity}
+                  onChange={(e) => setQuantity(Number(e.target.value))}
+                  className="flex-1 bg-transparent text-center text-sm font-bold text-white focus:outline-none"
+                />
+                <button
+                  type="button"
+                  onClick={() => adjustQty(1)}
+                  className="p-2 text-gray-400 hover:text-white hover:bg-[#2a2e39] rounded-md transition-colors"
+                >
+                  <Plus size={16} />
+                </button>
+              </div>
+              <div className="flex justify-between gap-2 mt-2">
+                {[1, 2, 5, 10].map((qty) => (
+                  <button
+                    key={qty}
+                    onClick={() => setQuantity(qty)}
+                    className="flex-1 bg-[#1e222d] hover:bg-[#2a2e39] border border-[#2a2e39] text-gray-300 text-sm font-medium py-1 rounded transition-colors"
+                  >
+                    {qty}
+                  </button>
+                ))}
+              </div>
+            </>
+          ) : (
+            <div className="space-y-3 bg-[#1e222d] p-3 rounded-lg border border-[#2a2e39]">
+              <div className="flex justify-between items-center text-xs">
+                <span className="text-gray-500 font-bold uppercase">Risque (%)</span>
+                <input
+                  type="number"
+                  step="0.1"
+                  value={riskPercent}
+                  onChange={(e) => setRiskPercent(Number(e.target.value) || 0)}
+                  className="w-20 bg-[#2a2e39] text-white rounded p-1.5 text-right focus:outline-none"
+                />
+              </div>
+              <div className="flex justify-between items-center text-xs">
+                <span className="text-gray-500 font-bold uppercase">Stop Loss</span>
+                <input
+                  type="number"
+                  step="0.01"
+                  value={riskSlPrice || ""}
+                  onChange={(e) => setRiskSlPrice(Number(e.target.value) || 0)}
+                  placeholder="0.00"
+                  className="w-20 bg-[#2a2e39] text-white rounded p-1.5 text-right focus:outline-none"
+                />
+              </div>
+              <div className="pt-2 border-t border-[#2a2e39] flex justify-between items-center">
+                <span className="text-[10px] text-gray-400 font-bold uppercase">Lots Calculés</span>
+                <span className="text-sm font-bold text-primary">{quantity}</span>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* ATM Brackets */}
@@ -267,6 +348,37 @@ export function OrderPanel({
               />
             </div>
           </div>
+          
+          <div className="mt-3 pt-3 border-t border-[#2a2e39]">
+            <label className="flex items-center gap-2 cursor-pointer mb-2">
+              <input
+                type="checkbox"
+                checked={useTrailingStop}
+                onChange={(e) => setUseTrailingStop(e.target.checked)}
+                className="w-3.5 h-3.5 accent-primary bg-[#2a2e39] border-none rounded"
+                disabled={!activeTrade}
+              />
+              <span className="text-[10px] font-bold text-gray-400 uppercase">
+                Activer Trailing Stop (Points)
+              </span>
+            </label>
+            {useTrailingStop && (
+              <div className="flex justify-between items-center text-xs">
+                <span className="text-gray-500 font-bold">Distance</span>
+                <input
+                  type="number"
+                  min="0"
+                  step="1"
+                  value={trailingDistance}
+                  onChange={(e) => setTrailingDistance(Number(e.target.value) || 0)}
+                  placeholder="Points"
+                  className="w-16 bg-[#2a2e39] text-white rounded p-1 text-right focus:outline-none disabled:opacity-50"
+                  disabled={!activeTrade}
+                />
+              </div>
+            )}
+          </div>
+
           <button
             onClick={handleSetLimit}
             disabled={isLimitLoading || (!tpPrice && !slPrice) || !activeTrade}

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Target, AlertTriangle, ShieldCheck, Clock, ShieldX, ShieldAlert } from 'lucide-react';
+import { EquityCurveChart } from "./EquityCurveChart";
 
 interface Props {
   account: any;
@@ -111,6 +112,10 @@ export function PropFirmDashboard({ account, todayPnl, trades = [] }: Props) {
             </p>
           </div>
         </div>
+      </div>
+
+      <div className="mb-6">
+        <EquityCurveChart trades={trades} initialBalance={initialBalance} />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

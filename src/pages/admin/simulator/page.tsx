@@ -15,7 +15,7 @@ export default function AdminSimulatorPage() {
 
   const fetchLeaderboard = async () => {
     try {
-      const res = await api.get('/admin/leaderboard');
+      const res = await api.get('/api/admin/leaderboard');
       if (res.data?.success) {
         setAccounts(res.data.data);
       }
@@ -29,7 +29,7 @@ export default function AdminSimulatorPage() {
   const handleGrantBadge = async () => {
     if (!grantBadgeAccount || !badgeName) return;
     try {
-      const res = await api.post('/admin/reward', {
+      const res = await api.post('/api/admin/reward', {
         userId: grantBadgeAccount.user.id,
         badge: badgeName,
         description: 'Granted manually by admin'

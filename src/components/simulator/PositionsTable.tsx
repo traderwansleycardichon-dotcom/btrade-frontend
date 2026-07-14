@@ -3,6 +3,7 @@ import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import api from '../../lib/api';
 import { toast } from 'react-hot-toast';
+import { sounds } from '../../utils/sounds';
 
 interface Trade {
   id: string;
@@ -28,12 +29,18 @@ interface Props {
 export function PositionsTable({ trades, onTradeClosed }: Props) {
   const [closingId, setClosingId] = useState<string | null>(null);
   const [cancellingId, setCancellingId] = useState<string | null>(null);
+  
+  const [journalTrade, setJournalTrade] = useState<Trade | null>(null);
+  const [journalNotes, setJournalNotes] = useState("");
+  const [isJournalSaving, setIsJournalSaving] = useState(false);
 
-  const handleClose = async (tradeId: string) => {
+  const handleClose = async (tradeId: string, quantity?: number) => {
     try {
       setClosingId(tradeId);
-      await api.post(`/api/simulator/trades/close/${tradeId}`);
-      toast.success('Position fermée');
+      const payload = quantity ? { quantity } : {};
+      await api.post(`/api/simulator/trades/close/${tradeId}`, payload);
+      sounds.play('close');
+      toast.success(quantity ? `Fermeture partielle (${quantity})` : 'Position fermée');
       onTradeClosed();
     } catch (err: any) {
       toast.error(err.response?.data?.error || 'Erreur lors de la fermeture');
@@ -52,6 +59,21 @@ export function PositionsTable({ trades, onTradeClosed }: Props) {
       toast.error(err.response?.data?.error || 'Erreur lors de l\'annulation');
     } finally {
       setCancellingId(null);
+    }
+  };
+
+  const handleSaveJournal = async () => {
+    if (!journalTrade) return;
+    try {
+      setIsJournalSaving(true);
+      await api.put(`/api/simulator/trades/${journalTrade.id}/journal`, { notes: journalNotes });
+      toast.success('Notes sauvegardées avec succès');
+      onTradeClosed(); // refresh
+      setJournalTrade(null);
+    } catch (err: any) {
+      toast.error(err.response?.data?.error || 'Erreur lors de la sauvegarde du journal');
+    } finally {
+      setIsJournalSaving(false);
     }
   };
 
@@ -151,13 +173,25 @@ export function PositionsTable({ trades, onTradeClosed }: Props) {
                     {!trade.takeProfit && !trade.stopLoss && <span className="text-gray-500">-</span>}
                   </td>
                   <td className="py-1.5 px-3 text-right">
-                    <button
-                      onClick={() => handleClose(trade.id)}
-                      disabled={closingId === trade.id}
-                      className="bg-red-500 hover:bg-red-600 text-white px-2 py-0.5 rounded text-[10px] font-semibold transition-colors disabled:opacity-50"
-                    >
-                      {closingId === trade.id ? 'Fermeture...' : 'Fermer'}
-                    </button>
+                    <div className="flex justify-end gap-1">
+                      {trade.quantity > 0.01 && (
+                        <button
+                          onClick={() => handleClose(trade.id, Number((trade.quantity / 2).toFixed(2)))}
+                          disabled={closingId === trade.id}
+                          className="bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-500 px-2 py-0.5 rounded text-[10px] font-semibold transition-colors disabled:opacity-50"
+                          title="Fermer 50%"
+                        >
+                          50%
+                        </button>
+                      )}
+                      <button
+                        onClick={() => handleClose(trade.id)}
+                        disabled={closingId === trade.id}
+                        className="bg-red-500 hover:bg-red-600 text-white px-2 py-0.5 rounded text-[10px] font-semibold transition-colors disabled:opacity-50"
+                      >
+                        {closingId === trade.id ? '...' : 'Fermer'}
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))
@@ -179,6 +213,7 @@ export function PositionsTable({ trades, onTradeClosed }: Props) {
               <th className="py-2 px-3 font-medium text-text-muted">Clôture</th>
               <th className="py-2 px-3 font-medium text-text-muted text-right">Sortie</th>
               <th className="py-2 px-3 font-medium text-text-muted text-right">P&L</th>
+              <th className="py-2 px-3 font-medium text-text-muted text-right">Action</th>
             </tr>
           </thead>
           <tbody>
@@ -195,11 +230,62 @@ export function PositionsTable({ trades, onTradeClosed }: Props) {
                 <td className={`py-1.5 px-3 text-right font-bold ${Number(trade.profitLoss) >= 0 ? 'text-green-500' : 'text-red-500'}`}>
                   {Number(trade.profitLoss) >= 0 ? '+' : ''}{Number(trade.profitLoss).toLocaleString('en-US', { style: 'currency', currency: 'USD' })}
                 </td>
+                <td className="py-1.5 px-3 text-right">
+                  <button
+                    onClick={() => {
+                      setJournalTrade(trade);
+                      setJournalNotes(trade.notes || "");
+                    }}
+                    className="bg-blue-500/20 hover:bg-blue-500/30 text-blue-500 px-2 py-0.5 rounded text-[10px] font-semibold transition-colors"
+                  >
+                    Journal
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+
+      {journalTrade && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="bg-[#1a1d27] border border-[#2a2e39] rounded-xl w-full max-w-md overflow-hidden shadow-2xl">
+            <div className="p-4 border-b border-[#2a2e39] flex justify-between items-center bg-[#1e222d]">
+              <h3 className="font-bold text-white">Journal - {journalTrade.asset}</h3>
+              <button 
+                onClick={() => setJournalTrade(null)}
+                className="text-gray-400 hover:text-white"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="p-4">
+              <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Notes & Leçons</label>
+              <textarea
+                value={journalNotes}
+                onChange={(e) => setJournalNotes(e.target.value)}
+                placeholder="Ex: Raison d'entrée, émotions, erreurs commises..."
+                className="w-full bg-[#0d1117] border border-[#2a2e39] rounded-lg p-3 text-sm text-white focus:outline-none focus:border-primary h-32 resize-none"
+              />
+            </div>
+            <div className="p-4 border-t border-[#2a2e39] flex justify-end gap-3 bg-[#1e222d]">
+              <button
+                onClick={() => setJournalTrade(null)}
+                className="px-4 py-2 rounded font-bold text-sm text-gray-400 hover:text-white transition-colors"
+              >
+                Annuler
+              </button>
+              <button
+                onClick={handleSaveJournal}
+                disabled={isJournalSaving}
+                className="bg-primary hover:bg-primary-hover text-[#0d1117] px-4 py-2 rounded font-bold text-sm transition-colors disabled:opacity-50"
+              >
+                {isJournalSaving ? 'Sauvegarde...' : 'Sauvegarder'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
