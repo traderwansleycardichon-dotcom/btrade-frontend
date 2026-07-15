@@ -28,7 +28,8 @@ import {
   Lock,
   MessageSquare,
   Video,
-  BrainCircuit
+  BrainCircuit,
+  FlaskConical
 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { useAccounts } from '../../hooks/useAccounts';
@@ -99,7 +100,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen = false, onMobileCl
         { label: 'Dashboard',  icon: LayoutDashboard, href: '/app/dashboard' },
         { label: 'Comptes',    icon: Wallet,          href: '/app/accounts' },
         { label: 'Mes Trades', icon: Activity,        href: '/app/trades' },
-        { label: 'Trader Simulator', icon: BrainCircuit, href: '/app/simulator', proOnly: true },
+        { label: 'Trader Simulator', icon: BrainCircuit,   href: '/app/simulator',   proOnly: true },
+        { label: 'Backtesting',      icon: FlaskConical,   href: '/app/backtesting', proOnly: true },
         { label: 'Calendrier', icon: Calendar,        href: '/app/calendar' },
         { label: 'Playbooks',  icon: FileText,        href: '/app/playbooks' },
       ]

@@ -10,6 +10,7 @@ import DashboardPage from './pages/app/dashboard/page';
 import TradesPage from './pages/app/trades/page';
 import SimulatorPage from './pages/app/simulator/page';
 import SimulatorLeaderboardPage from './pages/app/simulator/leaderboard/page';
+import BacktestingPage from './pages/app/backtesting/page';
 import AccountsPage from './pages/app/accounts/page';
 import PayoutsPage from './pages/app/payouts/page';
 import CalendarPage from './pages/app/calendar/page';
@@ -149,6 +150,7 @@ const router = createBrowserRouter([
       { path: 'calendar', element: <CalendarPage /> },
       { path: 'simulator', element: <SimulatorPage /> },
       { path: 'simulator/leaderboard', element: <SimulatorLeaderboardPage /> },
+      { path: 'backtesting', element: <BacktestingPage /> },
       { path: 'journal', element: <JournalPage /> },
       { path: 'todo', element: <TodoPage /> },
       { path: 'psychology', element: <PsychologyPage /> },
