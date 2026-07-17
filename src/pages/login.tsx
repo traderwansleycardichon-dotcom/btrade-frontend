@@ -73,6 +73,10 @@ const LoginPage: React.FC<{ defaultRegister?: boolean }> = ({ defaultRegister = 
     }
 
     if (isAuthenticated && !isLoading && user) {
+      if (user.role === 'staff') {
+        navigate('/admin/support', { replace: true });
+        return;
+      }
       if (user.role === 'admin' || user.role === 'cto') {
         navigate('/admin/dashboard', { replace: true });
         return;

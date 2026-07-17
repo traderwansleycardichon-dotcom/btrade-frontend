@@ -9,6 +9,7 @@ import { Lock, CreditCard, LogOut } from 'lucide-react';
 import { TodoSummaryModal } from '../todo/TodoSummaryModal';
 import { PhoneModal } from '../modals/PhoneModal';
 import { PendingContractModal } from '../modals/PendingContractModal';
+import SystemUpdatesModal from '../modals/SystemUpdatesModal';
 
 export const AppLayout: React.FC = () => {
   const { user, isAuthenticated, isLoading, refreshUser, logout } = useAuth();
@@ -139,6 +140,7 @@ export const AppLayout: React.FC = () => {
       {isPhoneModalOpen && (
         <PhoneModal onClose={() => setIsPhoneModalOpen(false)} />
       )}
+      <SystemUpdatesModal />
     </div>
   );
 };

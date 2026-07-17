@@ -14,6 +14,13 @@ import { PnlCard } from '../../../components/dashboard/PnlCard';
 import { WinRateGauge } from '../../../components/dashboard/WinRateGauge';
 import { EquityCurve } from '../../../components/dashboard/EquityCurve';
 import { LatestTrades } from '../../../components/dashboard/LatestTrades';
+
+import { RDistribution } from '../../../components/dashboard/RDistribution';
+import { CalendarHeatmap } from '../../../components/dashboard/CalendarHeatmap';
+import { DisciplinePanel } from '../../../components/dashboard/DisciplinePanel';
+import { BadgesPanel } from '../../../components/dashboard/BadgesPanel';
+import { MacroNext24h } from '../../../components/dashboard/MacroNext24h';
+import { TimeHeatmap } from '../../../components/dashboard/TimeHeatmap';
 import { ChevronDown, Check } from 'lucide-react';
 
 const num = (v: any) => Number(v ?? 0);
@@ -221,6 +228,8 @@ const DashboardPage: React.FC = () => {
           loading={isLoading}
         />
       </div>
+
+      <BadgesPanel />
 
       {/* MIDDLE ROW : PnL Card + WinRate Gauge + Open Positions — même hauteur */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-12 gap-3 sm:gap-4 lg:gap-6 items-stretch">

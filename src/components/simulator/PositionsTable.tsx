@@ -19,6 +19,7 @@ interface Trade {
   profitLoss: number;
   openDate: string;
   closeDate: string | null;
+  notes?: string;
 }
 
 interface Props {
@@ -59,6 +60,17 @@ export function PositionsTable({ trades, onTradeClosed }: Props) {
       toast.error(err.response?.data?.error || 'Erreur lors de l\'annulation');
     } finally {
       setCancellingId(null);
+    }
+  };
+
+  const handleBreakeven = async (tradeId: string) => {
+    try {
+      await api.post(`/api/simulator/trades/${tradeId}/breakeven`);
+      sounds.play('profit'); // Assuming success sound exists
+      toast.success('Stop Loss placé à Breakeven (0 risque)');
+      onTradeClosed();
+    } catch (err: any) {
+      toast.error(err.response?.data?.error || 'Erreur lors de la mise à jour du SL');
     }
   };
 
@@ -174,6 +186,14 @@ export function PositionsTable({ trades, onTradeClosed }: Props) {
                   </td>
                   <td className="py-1.5 px-3 text-right">
                     <div className="flex justify-end gap-1">
+                      <button
+                        onClick={() => handleBreakeven(trade.id)}
+                        disabled={trade.stopLoss === trade.entryPrice}
+                        className="bg-purple-500/20 hover:bg-purple-500/30 text-purple-500 px-2 py-0.5 rounded text-[10px] font-semibold transition-colors disabled:opacity-50"
+                        title="Placer SL au prix d'entrée (Breakeven)"
+                      >
+                        BE
+                      </button>
                       {trade.quantity > 0.01 && (
                         <button
                           onClick={() => handleClose(trade.id, Number((trade.quantity / 2).toFixed(2)))}

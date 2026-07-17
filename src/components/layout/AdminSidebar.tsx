@@ -46,6 +46,10 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
   const navigate = useNavigate();
   const { settings } = useSettings();
 
+  const [isStaffMode, setIsStaffMode] = React.useState(
+    sessionStorage.getItem('btt_staff_mode') === 'true'
+  );
+
   const handleSwitchToClientMode = () => {
     // Efface tout le cache React Query pour garantir que l'admin
     // ne voit JAMAIS des données d'un autre utilisateur
@@ -53,30 +57,47 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
     navigate('/app/dashboard');
   };
 
-  const isCTO = user?.role === 'cto';
+  const handleSwitchToStaffMode = () => {
+    sessionStorage.setItem('btt_staff_mode', 'true');
+    setIsStaffMode(true);
+    navigate('/admin/dashboard');
+  };
+
+  const handleExitStaffMode = () => {
+    sessionStorage.removeItem('btt_staff_mode');
+    setIsStaffMode(false);
+  };
+
+  const isCTO = user?.role === 'cto' && !isStaffMode;
+  const isStaff = user?.role === 'staff' || isStaffMode;
 
   const allNavItems = [
-    { label: 'Dashboard',       icon: LayoutDashboard, href: '/admin/dashboard',   adminOnly: false },
-    { label: 'Utilisateurs',    icon: Users,           href: '/admin/users',       adminOnly: false },
-    { label: 'Messagerie',      icon: MessageSquare,   href: '/admin/messaging',   adminOnly: false },
-    { label: 'Finance',         icon: CreditCard,      href: '/admin/billing',     adminOnly: true  },
-    { label: 'Wallet',          icon: Wallet,          href: '/admin/wallet',      adminOnly: true  },
-    { label: 'Emails',          icon: Mail,            href: '/admin/emails',      adminOnly: false },
-    { label: 'Campagnes',       icon: Send,            href: '/admin/campaigns',   adminOnly: false },
-    { label: 'Plans Tarifaires',icon: Ticket,          href: '/admin/pricing',     adminOnly: false },
-    { label: 'Codes Promo',     icon: Ticket,          href: '/admin/promo-codes', adminOnly: false },
-    { label: 'Simulator',        icon: Trophy,          href: '/admin/simulator',   adminOnly: false },
-    { label: 'Academy',         icon: BookOpen,        href: '/admin/academy',     adminOnly: false },
-    { label: 'Coaching',        icon: Video,           href: '/admin/coaching',    adminOnly: false },
-    { label: 'Helpdesk',        icon: LifeBuoy,        href: '/admin/support',     adminOnly: false },
-    { label: 'Broadcast',       icon: Megaphone,       href: '/admin/broadcast',   adminOnly: false },
-    { label: 'Légal',           icon: Shield,          href: '/admin/legal',       adminOnly: false },
-    { label: 'Contrats',        icon: BookOpen,        href: '/admin/contracts',   adminOnly: false },
-    { label: 'Système',         icon: Server,          href: '/admin/system',      adminOnly: false },
-    { label: 'Paramètres',      icon: Settings,        href: '/admin/settings',    adminOnly: false },
+    { label: 'Dashboard',       icon: LayoutDashboard, href: '/admin/dashboard',   adminOnly: false, staffAllowed: true },
+    { label: 'Utilisateurs',    icon: Users,           href: '/admin/users',       adminOnly: false, staffAllowed: true },
+    { label: 'Messagerie',      icon: MessageSquare,   href: '/admin/messaging',   adminOnly: false, staffAllowed: true },
+    { label: 'Finance',         icon: CreditCard,      href: '/admin/billing',     adminOnly: true,  staffAllowed: false },
+    { label: 'Wallet',          icon: Wallet,          href: '/admin/wallet',      adminOnly: true,  staffAllowed: false },
+    { label: 'Emails',          icon: Mail,            href: '/admin/emails',      adminOnly: false, staffAllowed: false },
+    { label: 'Campagnes',       icon: Send,            href: '/admin/campaigns',   adminOnly: false, staffAllowed: false },
+    { label: 'Plans Tarifaires',icon: Ticket,          href: '/admin/pricing',     adminOnly: false, staffAllowed: false },
+    { label: 'Codes Promo',     icon: Ticket,          href: '/admin/promo-codes', adminOnly: false, staffAllowed: false },
+    { label: 'Simulator',       icon: Trophy,          href: '/admin/simulator',   adminOnly: false, staffAllowed: false },
+    { label: 'Academy',         icon: BookOpen,        href: '/admin/academy',     adminOnly: false, staffAllowed: true },
+    { label: 'Coaching',        icon: Video,           href: '/admin/coaching',    adminOnly: false, staffAllowed: true },
+    { label: 'Helpdesk',        icon: LifeBuoy,        href: '/admin/support',     adminOnly: false, staffAllowed: true },
+    { label: 'Broadcast',       icon: Megaphone,       href: '/admin/broadcast',   adminOnly: false, staffAllowed: false },
+    { label: 'Légal',           icon: Shield,          href: '/admin/legal',       adminOnly: false, staffAllowed: false },
+    { label: 'Contrats',        icon: BookOpen,        href: '/admin/contracts',   adminOnly: false, staffAllowed: false },
+    { label: 'Système',         icon: Server,          href: '/admin/system',      adminOnly: false, staffAllowed: false },
+    { label: 'Mises à jour',    icon: Megaphone,       href: '/admin/updates',     adminOnly: false, staffAllowed: false },
+    { label: 'Paramètres',      icon: Settings,        href: '/admin/settings',    adminOnly: false, staffAllowed: false },
   ];
 
-  const navItems = allNavItems.filter(item => !isCTO || !item.adminOnly);
+  const navItems = allNavItems.filter(item => {
+    if (isStaff) return item.staffAllowed;
+    if (isCTO) return !item.adminOnly;
+    return true;
+  });
 
   return (
     <>
@@ -143,7 +164,27 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
         </nav>
 
         {/* Mode Client Switch */}
-        <div className="px-4 py-2 mt-auto">
+        <div className="px-4 py-2 mt-auto space-y-2">
+          {user?.role === 'cto' && !isStaffMode && (
+            <button
+              onClick={handleSwitchToStaffMode}
+              className="w-full flex items-center justify-center gap-2 py-3 bg-accent/10 text-accent border border-accent/20 rounded-xl font-bold hover:bg-accent/20 transition-colors"
+            >
+              <Shield size={18} />
+              Mode Staff
+            </button>
+          )}
+
+          {isStaffMode && user?.role === 'cto' && (
+            <button
+              onClick={handleExitStaffMode}
+              className="w-full flex items-center justify-center gap-2 py-3 bg-loss/10 text-loss border border-loss/20 rounded-xl font-bold hover:bg-loss/20 transition-colors"
+            >
+              <Shield size={18} />
+              Retour CTO
+            </button>
+          )}
+
           <button
             onClick={handleSwitchToClientMode}
             className="w-full flex items-center justify-center gap-2 py-3 bg-accent text-bg rounded-xl font-bold hover:bg-accent-hover transition-colors shadow-lg shadow-accent/20"

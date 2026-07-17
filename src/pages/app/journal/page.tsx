@@ -41,6 +41,8 @@ const dateLabel = (iso: string) => {
   return d.toLocaleDateString('fr-FR', { weekday: 'long', day: '2-digit', month: 'long' });
 };
 
+import { DeepAnalyticsPanel } from '../../../components/trading/DeepAnalyticsPanel';
+
 const JournalPage: React.FC = () => {
   const { entries, isLoading, error, createEntry, deleteEntry } = useJournal();
   const { accounts } = useAccounts();
@@ -146,6 +148,7 @@ const JournalPage: React.FC = () => {
 
   return (
     <div className="space-y-4 animate-[fadeIn_0.5s_ease-out]">
+      <DeepAnalyticsPanel />
       {/* STATS */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <StatCard label="Total entrées" value={isLoading ? '—' : stats.total.toString()} icon={BookOpen} />

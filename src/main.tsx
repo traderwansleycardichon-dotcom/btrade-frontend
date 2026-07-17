@@ -10,7 +10,6 @@ import DashboardPage from './pages/app/dashboard/page';
 import TradesPage from './pages/app/trades/page';
 import SimulatorPage from './pages/app/simulator/page';
 import SimulatorLeaderboardPage from './pages/app/simulator/leaderboard/page';
-import BacktestingPage from './pages/app/backtesting/page';
 import AccountsPage from './pages/app/accounts/page';
 import PayoutsPage from './pages/app/payouts/page';
 import CalendarPage from './pages/app/calendar/page';
@@ -60,6 +59,7 @@ import AdminMessagingPage from './pages/admin/messaging/page';
 import AdminWalletPage from './pages/admin/wallet/page';
 import AdminEmailsPage from './pages/admin/emails/page';
 import AdminCampaignsPage from './pages/admin/campaigns/page';
+import AdminUpdatesPage from './pages/admin/updates/page';
 import AdminSimulatorPage from './pages/admin/simulator/page';
 import ForgotPasswordPage from './pages/forgot-password/page';
 import ResetPasswordPage from './pages/reset-password/page';
@@ -129,6 +129,7 @@ const router = createBrowserRouter([
       { path: 'coaching', element: <AdminCoachingPage /> },
       { path: 'broadcast', element: <AdminBroadcastPage /> },
       { path: 'cms', element: <AdminCmsPage /> },
+      { path: 'updates', element: <AdminUpdatesPage /> },
       { path: 'system', element: <AdminSystemPage /> },
       { path: 'settings', element: <AdminSettingsPage /> },
       { path: 'legal', element: <AdminLegalPage /> },
@@ -150,7 +151,6 @@ const router = createBrowserRouter([
       { path: 'calendar', element: <CalendarPage /> },
       { path: 'simulator', element: <SimulatorPage /> },
       { path: 'simulator/leaderboard', element: <SimulatorLeaderboardPage /> },
-      { path: 'backtesting', element: <BacktestingPage /> },
       { path: 'journal', element: <JournalPage /> },
       { path: 'todo', element: <TodoPage /> },
       { path: 'psychology', element: <PsychologyPage /> },

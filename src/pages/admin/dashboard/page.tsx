@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Users, Activity, Wallet, TrendingUp, AlertTriangle, Server, Database, Cpu, MemoryStick, Clock, CheckCircle, XCircle } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Users, Activity, Wallet, TrendingUp, AlertTriangle, Server, Database, Cpu, MemoryStick, Clock, CheckCircle, XCircle, LifeBuoy, MessageSquare } from 'lucide-react';
 import { KpiCard } from '../../../components/ui/KpiCard';
 import api from '../../../lib/api';
 import { useAuth } from '../../../hooks/useAuth';
@@ -136,13 +137,58 @@ function CTODashboard() {
     </div>
   );
 }
+function StaffDashboard() {
+  return (
+    <div className="space-y-8 animate-[fadeIn_0.5s_ease-out]">
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-2xl font-black mb-2">Espace Staff</h1>
+          <p className="text-txt-2 text-sm">Bienvenue dans votre espace de gestion et support.</p>
+        </div>
+        <div className="bg-primary/10 text-primary px-3 py-1 rounded-lg text-xs font-bold border border-primary/20 flex items-center gap-2">
+          <LifeBuoy size={14} />
+          Staff
+        </div>
+      </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <Link to="/admin/support" className="glass p-6 rounded-2xl border-white/5 hover:border-primary/30 transition-colors group">
+          <div className="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+            <LifeBuoy size={24} />
+          </div>
+          <h2 className="font-bold text-lg mb-2">Helpdesk</h2>
+          <p className="text-sm text-txt-2">Gérer les tickets de support et assister les utilisateurs.</p>
+        </Link>
+        
+        <Link to="/admin/users" className="glass p-6 rounded-2xl border-white/5 hover:border-accent/30 transition-colors group">
+          <div className="w-12 h-12 rounded-xl bg-accent/10 text-accent flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+            <Users size={24} />
+          </div>
+          <h2 className="font-bold text-lg mb-2">Utilisateurs</h2>
+          <p className="text-sm text-txt-2">Rechercher un client et vérifier son statut.</p>
+        </Link>
+
+        <Link to="/admin/messaging" className="glass p-6 rounded-2xl border-white/5 hover:border-win/30 transition-colors group">
+          <div className="w-12 h-12 rounded-xl bg-win/10 text-win flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+            <MessageSquare size={24} />
+          </div>
+          <h2 className="font-bold text-lg mb-2">Messagerie</h2>
+          <p className="text-sm text-txt-2">Répondre aux messages de la plateforme.</p>
+        </Link>
+      </div>
+    </div>
+  );
+}
 
 export default function AdminDashboardPage() {
   const { user } = useAuth();
   const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
-  if (user?.role === 'cto') return <CTODashboard />;
+  const isStaffMode = sessionStorage.getItem('btt_staff_mode') === 'true';
+
+  if (user?.role === 'cto' && !isStaffMode) return <CTODashboard />;
+  if (user?.role === 'staff' || isStaffMode) return <StaffDashboard />;
 
   useEffect(() => {
     api.get('/api/admin/stats')

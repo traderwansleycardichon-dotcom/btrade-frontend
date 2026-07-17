@@ -8,14 +8,16 @@ import { BrainCircuit } from "lucide-react";
 import { ChallengeSelector } from "../../../components/simulator/ChallengeSelector";
 import { PropFirmDashboard } from "../../../components/simulator/PropFirmDashboard";
 import { useNavigate } from "react-router-dom";
-import { Trophy, History } from "lucide-react";
+import { Trophy, History, PlayCircle } from "lucide-react";
 import {
   ChallengePassedModal,
   ChallengeFailedModal,
   ChallengeExpiredModal,
 } from "../../../components/simulator/ChallengeModals";
+
 import { TraderProfileStats } from "../../../components/simulator/TraderProfileStats";
 import { SimulatorPerformanceStats } from "../../../components/simulator/SimulatorPerformanceStats";
+import { MacroEventsPanel } from "../../../components/simulator/MacroEventsPanel";
 import {
   useSimulatorStatus,
   useSimulatorTrades,
@@ -45,6 +47,8 @@ export default function SimulatorPage() {
   const [showExpiredModal, setShowExpiredModal] = useState(false);
   const [showSelectorForced, setShowSelectorForced] = useState(false);
   const [assetSymbol, setAssetSymbol] = useState("BTCUSDT");
+
+
 
   // ── Triggers modals quand le statut du challenge change ────────────────
   useEffect(() => {
@@ -179,6 +183,8 @@ export default function SimulatorPage() {
     : null;
   const displayTodayPnl = todayPnl + floatingPnl;
 
+
+
   return (
     <div className="p-4 md:p-2 w-full h-[calc(100vh-4rem)] flex flex-col gap-4 overflow-y-auto hide-scrollbar">
       <ChallengePassedModal
@@ -217,6 +223,7 @@ export default function SimulatorPage() {
             <Trophy className="w-4 h-4" />
             Classement
           </button>
+
         </div>
       </div>
 
@@ -341,8 +348,13 @@ export default function SimulatorPage() {
 
       <SimulatorPerformanceStats account={account} trades={trades} />
 
-      <div className="bg-surface rounded-2xl border border-border min-h-[350px] overflow-hidden flex flex-col shadow-sm">
-        <PositionsTable trades={trades} onTradeClosed={refreshSimulator} />
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 min-h-[350px]">
+        <div className="lg:col-span-3 bg-surface rounded-2xl border border-border overflow-hidden flex flex-col shadow-sm">
+          <PositionsTable trades={trades} onTradeClosed={refreshSimulator} />
+        </div>
+        <div className="lg:col-span-1 h-[350px]">
+          <MacroEventsPanel />
+        </div>
       </div>
     </div>
   );

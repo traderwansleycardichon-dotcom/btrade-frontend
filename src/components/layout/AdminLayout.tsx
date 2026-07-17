@@ -34,7 +34,7 @@ export const AdminLayout: React.FC = () => {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  if (!['admin', 'cto'].includes(user?.role || '')) {
+  if (!['admin', 'cto', 'staff'].includes(user?.role || '')) {
     return (
       <div className="min-h-screen bg-bg flex items-center justify-center p-4">
         <div className="max-w-md w-full glass p-8 rounded-3xl text-center border-loss/20">

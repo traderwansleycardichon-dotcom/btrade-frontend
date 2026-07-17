@@ -9,8 +9,11 @@ import { InviteStaffModal } from '../../../components/admin/InviteStaffModal';
 import { InviteCTOModal } from '../../../components/admin/InviteCTOModal';
 import { ChangeRoleModal } from '../../../components/admin/ChangeRoleModal';
 import { DeleteConfirmModal } from '../../../components/admin/DeleteConfirmModal';
+import { useAuth } from '../../../hooks/useAuth';
 
 export default function AdminUsersPage() {
+  const { user: currentUser } = useAuth();
+  const isStaffMode = sessionStorage.getItem('btt_staff_mode') === 'true';
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -96,20 +99,24 @@ export default function AdminUsersPage() {
             />
           </div>
           
-          <button
-            onClick={() => setIsInviteCTOModalOpen(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-purple-600/20 text-purple-400 border border-purple-600/30 rounded-xl text-sm font-bold hover:bg-purple-600/30 transition-colors"
-          >
-            <Shield size={16} />
-            <span className="hidden md:inline">Inviter CTO</span>
-          </button>
-          <button
-            onClick={() => setIsInviteModalOpen(true)}
-            className="btn-primary bg-loss hover:bg-loss/80 text-white flex items-center gap-2"
-          >
-            <UserPlus size={18} />
-            <span className="hidden md:inline">Inviter un Staff</span>
-          </button>
+          {currentUser?.role !== 'staff' && !isStaffMode && (
+            <>
+              <button
+                onClick={() => setIsInviteCTOModalOpen(true)}
+                className="flex items-center gap-2 px-4 py-2 bg-purple-600/20 text-purple-400 border border-purple-600/30 rounded-xl text-sm font-bold hover:bg-purple-600/30 transition-colors"
+              >
+                <Shield size={16} />
+                <span className="hidden md:inline">Inviter CTO</span>
+              </button>
+              <button
+                onClick={() => setIsInviteModalOpen(true)}
+                className="btn-primary bg-loss hover:bg-loss/80 text-white flex items-center gap-2"
+              >
+                <UserPlus size={18} />
+                <span className="hidden md:inline">Inviter un Staff</span>
+              </button>
+            </>
+          )}
         </div>
       </div>
 
@@ -164,7 +171,7 @@ export default function AdminUsersPage() {
                           </span>
                         ) : user.role === 'staff' ? (
                           <span className="text-[10px] font-bold px-2 py-0.5 rounded uppercase bg-accent/10 text-accent flex items-center gap-1">
-                            <Shield size={10} /> Staff Support
+                            <Shield size={10} /> Staff
                           </span>
                         ) : user.plan === 'locked' ? (
                           <span className="text-[10px] font-bold px-2 py-0.5 rounded uppercase bg-loss/10 text-loss flex items-center gap-1 border border-loss/20">
@@ -196,7 +203,7 @@ export default function AdminUsersPage() {
 
                       {openMenuId === user.id && (
                         <div className="absolute right-6 top-10 w-48 bg-surface border border-border shadow-2xl rounded-xl overflow-hidden z-[100]">
-                          {user.role !== 'admin' && (
+                          {user.role !== 'admin' && currentUser?.role !== 'staff' && !isStaffMode && (
                             <button
                               onClick={() => { setUserForRoleChange(user); setIsChangeRoleModalOpen(true); setOpenMenuId(null); }}
                               className="w-full px-4 py-3 text-sm flex items-center gap-2 hover:bg-elevated transition-colors text-txt-2 hover:text-txt"
@@ -212,7 +219,7 @@ export default function AdminUsersPage() {
                               <Edit size={14} /> Modifier l'abonnement
                             </button>
                           )}
-                          {user.role !== 'admin' && user.role !== 'cto' && (
+                          {user.role !== 'admin' && user.role !== 'cto' && currentUser?.role !== 'staff' && !isStaffMode && (
                             <button
                               onClick={() => openDeleteModal(user)}
                               className="w-full px-4 py-3 text-sm flex items-center gap-2 hover:bg-loss/10 transition-colors text-loss"

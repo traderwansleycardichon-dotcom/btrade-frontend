@@ -11,7 +11,7 @@ interface ChangeRoleModalProps {
 
 const ROLE_OPTIONS = [
   { value: 'user', label: 'Utilisateur', desc: 'Accès standard, aucun privilège admin', color: 'text-txt-2' },
-  { value: 'staff', label: 'Staff Support', desc: 'Accès admin complet sauf suppression et gestion des rôles', color: 'text-accent' },
+  { value: 'staff', label: 'Staff', desc: 'Accès restreint au Helpdesk, Academy, Coaching et Utilisateurs', color: 'text-accent' },
   { value: 'cto', label: 'CTO', desc: 'Accès admin complet sauf suppression et gestion des rôles', color: 'text-purple-400' },
 ];
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Trophy, TrendingUp, ShieldAlert, Zap, Medal, Star, Target } from 'lucide-react';
+import { Trophy, TrendingUp, ShieldAlert, Zap, Medal, Star, Target, Award } from 'lucide-react';
 import api from '../../../../lib/api';
 import { toast } from 'react-hot-toast';
 
@@ -52,6 +52,18 @@ export default function SimulatorLeaderboardPage() {
             <div className="mt-4 px-4 py-1.5 bg-slate-900/50 rounded-lg text-sm text-slate-300 font-medium capitalize">
               {rankings[1]?.level}
             </div>
+            {rankings[1]?.badges?.length > 0 && (
+              <div className="mt-3 flex items-center justify-center gap-1">
+                {rankings[1].badges.map((b: any, i: number) => (
+                  <div key={i} className="text-slate-400 tooltip-trigger relative group/badge p-1 bg-slate-800 rounded">
+                    <Award className="w-3.5 h-3.5" />
+                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 w-max px-2 py-1 bg-slate-900 text-[10px] text-white rounded opacity-0 group-hover/badge:opacity-100 pointer-events-none z-10">
+                      {b.type.replace('_', ' ')}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* First Place */}
@@ -63,6 +75,18 @@ export default function SimulatorLeaderboardPage() {
             <div className="mt-4 px-4 py-1.5 bg-yellow-500/20 text-yellow-500 rounded-lg text-sm font-bold capitalize flex items-center gap-2">
               <Star className="w-4 h-4" fill="currentColor" /> {rankings[0]?.level}
             </div>
+            {rankings[0]?.badges?.length > 0 && (
+              <div className="mt-3 flex items-center justify-center gap-1">
+                {rankings[0].badges.map((b: any, i: number) => (
+                  <div key={i} className="text-yellow-500 tooltip-trigger relative group/badge p-1 bg-yellow-500/10 rounded">
+                    <Award className="w-4 h-4" />
+                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 w-max px-2 py-1 bg-slate-900 text-[10px] text-white rounded opacity-0 group-hover/badge:opacity-100 pointer-events-none z-10">
+                      {b.type.replace('_', ' ')}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Third Place */}
@@ -74,6 +98,18 @@ export default function SimulatorLeaderboardPage() {
             <div className="mt-4 px-4 py-1.5 bg-slate-900/50 rounded-lg text-sm text-slate-300 font-medium capitalize">
               {rankings[2]?.level}
             </div>
+            {rankings[2]?.badges?.length > 0 && (
+              <div className="mt-3 flex items-center justify-center gap-1">
+                {rankings[2].badges.map((b: any, i: number) => (
+                  <div key={i} className="text-amber-500 tooltip-trigger relative group/badge p-1 bg-amber-900/20 rounded">
+                    <Award className="w-3.5 h-3.5" />
+                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 w-max px-2 py-1 bg-slate-900 text-[10px] text-white rounded opacity-0 group-hover/badge:opacity-100 pointer-events-none z-10">
+                      {b.type.replace('_', ' ')}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -88,6 +124,7 @@ export default function SimulatorLeaderboardPage() {
                 <th className="p-5 text-slate-400 font-semibold tracking-wide">Trader</th>
                 <th className="p-5 text-slate-400 font-semibold tracking-wide">Level</th>
                 <th className="p-5 text-slate-400 font-semibold tracking-wide text-center">Score</th>
+                <th className="p-5 text-slate-400 font-semibold tracking-wide text-center">Badges</th>
                 <th className="p-5 text-slate-400 font-semibold tracking-wide text-right">ROI</th>
               </tr>
             </thead>
@@ -120,6 +157,25 @@ export default function SimulatorLeaderboardPage() {
                     <div className="flex items-center justify-center gap-2">
                       <Target className="w-4 h-4 text-emerald-400" />
                       <span className="text-white font-bold">{Math.round(trader.rankingScore)}</span>
+                    </div>
+                  </td>
+                  <td className="p-5 text-center">
+                    <div className="flex items-center justify-center gap-1.5 flex-wrap max-w-[150px] mx-auto">
+                      {trader.badges && trader.badges.length > 0 ? (
+                        trader.badges.map((b: any, i: number) => (
+                          <div 
+                            key={i} 
+                            className="bg-gradient-to-br from-yellow-500/20 to-orange-500/10 border border-yellow-500/30 p-1.5 rounded-lg tooltip-trigger relative group/badge"
+                          >
+                            <Award className="w-4 h-4 text-yellow-500" />
+                            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max px-2 py-1 bg-slate-900 border border-slate-700 text-xs text-white rounded opacity-0 group-hover/badge:opacity-100 pointer-events-none transition-opacity z-10">
+                              {b.type.replace('_', ' ')}
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <span className="text-slate-600 text-xs italic">-</span>
+                      )}
                     </div>
                   </td>
                   <td className="p-5 text-right">

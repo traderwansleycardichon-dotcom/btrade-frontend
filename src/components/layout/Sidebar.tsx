@@ -29,7 +29,8 @@ import {
   MessageSquare,
   Video,
   BrainCircuit,
-  FlaskConical
+  FlaskConical,
+  Trophy
 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { useAccounts } from '../../hooks/useAccounts';
@@ -101,7 +102,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen = false, onMobileCl
         { label: 'Comptes',    icon: Wallet,          href: '/app/accounts' },
         { label: 'Mes Trades', icon: Activity,        href: '/app/trades' },
         { label: 'Trader Simulator', icon: BrainCircuit,   href: '/app/simulator',   proOnly: true },
-        { label: 'Backtesting',      icon: FlaskConical,   href: '/app/backtesting', proOnly: true },
+        { label: 'Leaderboard',    icon: Trophy,         href: '/app/simulator/leaderboard' },
         { label: 'Calendrier', icon: Calendar,        href: '/app/calendar' },
         { label: 'Playbooks',  icon: FileText,        href: '/app/playbooks' },
       ]
@@ -279,12 +280,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen = false, onMobileCl
           </button>
         </div>
 
-        {(user?.role === 'admin' || user?.role === 'cto') && (
+        {['admin', 'cto', 'staff'].includes(user?.role || '') && (
           <button
             onClick={handleReturnToAdmin}
             className="w-full flex items-center justify-center gap-2 py-2 mt-2 bg-loss/10 text-loss rounded-lg font-bold hover:bg-loss/20 transition-colors border border-loss/20 text-xs"
           >
-            {user?.role === 'cto' ? 'Retour CTO Panel' : 'Retour SuperAdmin'}
+            {user?.role === 'cto' ? 'Retour CTO Panel' : user?.role === 'staff' ? 'Retour Staff Panel' : 'Retour SuperAdmin'}
           </button>
         )}
       </div>
