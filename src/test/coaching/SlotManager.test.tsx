@@ -71,7 +71,7 @@ describe('SlotManager', () => {
     const user = userEvent.setup();
     render(<SlotManager />);
     await waitFor(() => expect(screen.getByText('Aucun créneau')).toBeInTheDocument());
-    await user.click(screen.getByText('Ajouter un créneau'));
+    await user.click(screen.getByText('Créneau unique'));
     expect(screen.getByLabelText('Date et heure')).toBeInTheDocument();
   });
 
@@ -84,7 +84,7 @@ describe('SlotManager', () => {
     const user = userEvent.setup();
     render(<SlotManager />);
     await waitFor(() => expect(screen.getByText('Aucun créneau')).toBeInTheDocument());
-    await user.click(screen.getByText('Ajouter un créneau'));
+    await user.click(screen.getByText('Créneau unique'));
     const input = screen.getByLabelText('Date et heure') as HTMLInputElement;
     await user.type(input, '2026-06-15T10:00');
     await user.click(screen.getByRole('button', { name: /^Ajouter$/ }));

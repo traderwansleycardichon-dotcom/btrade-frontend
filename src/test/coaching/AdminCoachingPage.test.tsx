@@ -71,7 +71,7 @@ describe('AdminCoachingPage', () => {
     render(<AdminCoachingPage />);
     await waitFor(() => expect(screen.getByRole('button', { name: /Créneaux/i })).toBeInTheDocument());
     await user.click(screen.getByRole('button', { name: /Créneaux/i }));
-    await waitFor(() => expect(screen.getByText('Ajouter un créneau')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText('Créneau unique')).toBeInTheDocument());
   });
 
   it('affiche les demandes avec nom et email utilisateur', async () => {
