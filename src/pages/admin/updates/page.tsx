@@ -27,7 +27,7 @@ export default function AdminUpdatesPage() {
 
   const fetchUpdates = async () => {
     try {
-      const { data } = await api.get('/system-updates/admin');
+      const { data } = await api.get('/api/system-updates/admin');
       setUpdates(data);
     } catch (err) {
       toast.error('Erreur lors du chargement des mises à jour');
@@ -43,10 +43,10 @@ export default function AdminUpdatesPage() {
   const handleSave = async () => {
     try {
       if (isEditing) {
-        await api.put(`/system-updates/admin/${isEditing.id}`, formData);
+        await api.put(`/api/system-updates/admin/${isEditing.id}`, formData);
         toast.success('Mise à jour modifiée');
       } else {
-        await api.post('/system-updates/admin', formData);
+        await api.post('/api/system-updates/admin', formData);
         toast.success('Mise à jour créée');
       }
       setIsEditing(null);
@@ -60,7 +60,7 @@ export default function AdminUpdatesPage() {
   const handleDelete = async (id: string) => {
     if (!window.confirm('Supprimer cette mise à jour ?')) return;
     try {
-      await api.delete(`/system-updates/admin/${id}`);
+      await api.delete(`/api/system-updates/admin/${id}`);
       toast.success('Supprimée');
       fetchUpdates();
     } catch (err) {
@@ -92,7 +92,7 @@ export default function AdminUpdatesPage() {
             setIsCreating(true);
             setFormData({ version: '', title: '', description: '', isPublished: false });
           }}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition-colors"
+          className="flex items-center gap-2 px-4 py-2 bg-accent hover:bg-accent/80 text-white font-bold rounded-lg transition-colors"
         >
           <Plus className="w-5 h-5" />
           Nouvelle
@@ -149,7 +149,7 @@ export default function AdminUpdatesPage() {
             </button>
             <button
               onClick={handleSave}
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg"
+              className="px-4 py-2 bg-accent hover:bg-accent/80 text-white font-bold rounded-lg transition-colors"
             >
               Sauvegarder
             </button>

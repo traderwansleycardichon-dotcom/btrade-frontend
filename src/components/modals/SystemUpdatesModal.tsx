@@ -17,7 +17,7 @@ export default function SystemUpdatesModal() {
   useEffect(() => {
     const fetchUpdates = async () => {
       try {
-        const { data } = await api.get('/system-updates');
+        const { data } = await api.get('/api/system-updates');
         
         if (data.updates && data.updates.length > 0) {
           const latestUpdate = data.updates[0];
@@ -39,7 +39,7 @@ export default function SystemUpdatesModal() {
   const handleClose = async () => {
     setIsOpen(false);
     try {
-      await api.post('/system-updates/mark-read');
+      await api.post('/api/system-updates/mark-read');
     } catch (err) {
       console.error('Failed to mark updates as read', err);
     }
