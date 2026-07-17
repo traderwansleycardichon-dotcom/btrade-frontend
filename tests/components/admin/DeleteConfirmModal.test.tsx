@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
-import { DeleteConfirmModal } from '../../components/admin/DeleteConfirmModal';
+import { DeleteConfirmModal } from '@/components/admin/DeleteConfirmModal';
 
 // Mock lottie-react pour éviter les erreurs de fetch dans les tests
 vi.mock('lottie-react', () => ({

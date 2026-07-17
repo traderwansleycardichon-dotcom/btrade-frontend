@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '../test-utils';
-import LessonDetailPage from '../../pages/app/formation/LessonDetailPage';
-import api from '../../lib/api';
+import { render, screen, waitFor } from '../../utils/test-utils';
+import LessonDetailPage from '@/pages/app/formation/LessonDetailPage';
+import api from '@/lib/api';
 import userEvent from '@testing-library/user-event';
 
 vi.mock('react-router-dom', async () => {
@@ -13,14 +13,14 @@ vi.mock('react-router-dom', async () => {
   };
 });
 
-vi.mock('../../lib/api', () => ({
+vi.mock('@/lib/api', () => ({
   default: {
     get: vi.fn(),
     post: vi.fn(),
   },
 }));
 
-vi.mock('../../hooks/usePlan', () => ({
+vi.mock('@/hooks/usePlan', () => ({
   usePlan: () => ({ canUse: () => true }),
 }));
 

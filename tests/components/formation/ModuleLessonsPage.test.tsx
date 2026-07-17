@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '../test-utils';
-import ModuleLessonsPage from '../../pages/app/formation/ModuleLessonsPage';
-import api from '../../lib/api';
+import { render, screen, waitFor } from '../../utils/test-utils';
+import ModuleLessonsPage from '@/pages/app/formation/ModuleLessonsPage';
+import api from '@/lib/api';
 
 vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual('react-router-dom');
@@ -13,14 +13,14 @@ vi.mock('react-router-dom', async () => {
 });
 
 // Mock de l'API
-vi.mock('../../lib/api', () => ({
+vi.mock('@/lib/api', () => ({
   default: {
     get: vi.fn(),
   },
 }));
 
 // Mock du hook usePlan pour contourner la FeatureGate
-vi.mock('../../hooks/usePlan', () => ({
+vi.mock('@/hooks/usePlan', () => ({
   usePlan: () => ({
     canUse: () => true,
   }),

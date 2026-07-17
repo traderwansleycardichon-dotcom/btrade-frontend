@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '../test-utils';
+import { render, screen } from '../../utils/test-utils';
 import userEvent from '@testing-library/user-event';
-import { SlotPicker } from '../../components/coaching/SlotPicker';
+import { SlotPicker } from '@/components/coaching/SlotPicker';
 
 const mockSlots = [
   { id: 'slot-1', datetime: '2026-06-10T14:00:00.000Z' },

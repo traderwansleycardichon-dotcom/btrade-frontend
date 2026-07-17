@@ -1,10 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '../test-utils';
+import { render, screen, waitFor } from '../../utils/test-utils';
 import userEvent from '@testing-library/user-event';
-import AdminCoachingPage from '../../pages/admin/coaching/page';
-import api from '../../lib/api';
+import AdminCoachingPage from '@/pages/admin/coaching/page';
+import api from '@/lib/api';
 
-vi.mock('../../lib/api', () => ({
+vi.mock('@/lib/api', () => ({
   default: { get: vi.fn(), patch: vi.fn(), post: vi.fn(), delete: vi.fn() },
 }));
 

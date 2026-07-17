@@ -1,11 +1,11 @@
 // src/test/admin/BulkQuizEditorModal.test.tsx
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '../test-utils';
+import { render, screen, waitFor } from '../../utils/test-utils';
 import userEvent from '@testing-library/user-event';
-import { BulkQuizEditorModal } from '../../components/admin/BulkQuizEditorModal';
-import api from '../../lib/api';
+import { BulkQuizEditorModal } from '@/components/admin/BulkQuizEditorModal';
+import api from '@/lib/api';
 
-vi.mock('../../lib/api', () => ({
+vi.mock('@/lib/api', () => ({
   default: {
     post: vi.fn(),
     put: vi.fn(),
