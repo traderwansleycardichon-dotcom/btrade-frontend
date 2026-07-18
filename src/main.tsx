@@ -26,7 +26,6 @@ import AIInsightsPage from './pages/app/ai-insights/page';
 import PlaybooksPage from './pages/app/playbooks/page';
 import EconomicPage from './pages/app/economic/page';
 import AnalysesPage from './pages/app/analyses/page';
-import AiChatPage from './pages/app/ai-chat/page';
 import SettingsPage from './pages/app/settings/page';
 import SupportPage from './pages/app/support/page';
 import CoachingPage from './pages/app/coaching/page';
@@ -165,7 +164,6 @@ const router = createBrowserRouter([
       { path: 'reports', element: <AnalysesPage /> },
       { path: 'settings', element: <SettingsPage /> },
       { path: 'economic', element: <EconomicPage /> },
-      { path: 'ai-chat', element: <AiChatPage /> },
       { path: 'messages', element: <MessagesPage /> },
       { path: 'support', element: <SupportPage /> },
       { path: 'coaching', element: <CoachingPage /> },

@@ -89,6 +89,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen = false, onMobileCl
 
   const [isUpgradeModalOpen, setIsUpgradeModalOpen] = React.useState(false);
   const [selectedFeature, setSelectedFeature] = React.useState('');
+  const [isCollapsed, setIsCollapsed] = React.useState(false);
 
   /**
    * Configuration de la navigation
@@ -162,24 +163,24 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen = false, onMobileCl
 
       <aside
         className={`
-          bg-surface border-r border-border flex flex-col w-64 shrink-0
+          bg-surface border-r border-border flex flex-col shrink-0
           fixed lg:sticky inset-y-0 left-0 z-50 lg:z-auto
           h-screen lg:top-0
-          transition-transform duration-300 ease-out
-          ${mobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+          transition-all duration-300 ease-out
+          ${mobileOpen ? 'translate-x-0 w-64' : `-translate-x-full lg:translate-x-0 ${isCollapsed ? 'w-20' : 'w-64'}`}
         `}
       >
       {/* Brand */}
-      <div className="p-5 lg:p-6 flex items-center gap-3 justify-between">
-        <div className="flex items-center gap-3">
+      <div className={`p-5 lg:p-6 flex items-center gap-3 ${isCollapsed ? 'justify-center' : 'justify-between'}`}>
+        <div className="flex items-center gap-3 overflow-hidden whitespace-nowrap">
           {settings?.platform_logo ? (
-            <img src={settings.platform_logo} alt="Logo Behind The Trades" className="h-8 w-auto object-contain" />
+            <img src={settings.platform_logo} alt="Logo Behind The Trades" className="h-8 w-auto object-contain shrink-0" />
           ) : (
             <>
-              <div className="w-8 h-8 bg-accent rounded-lg flex items-center justify-center shadow-[0_0_15px_rgba(243,108,0,0.4)]">
+              <div className="w-8 h-8 bg-accent rounded-lg flex items-center justify-center shrink-0 shadow-[0_0_15px_rgba(243,108,0,0.4)]">
                 <TrendingUp size={20} className="text-white" />
               </div>
-              <span className="font-bold text-lg tracking-tight">Behind The Trades</span>
+              {!isCollapsed && <span className="font-bold text-lg tracking-tight">Behind The Trades</span>}
             </>
           )}
         </div>
@@ -194,11 +195,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen = false, onMobileCl
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto px-2 space-y-6 custom-scrollbar">
+      <nav className="flex-1 overflow-y-auto px-2 space-y-6 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
         {navGroups.map((group) => (
           <div key={group.title}>
-            <div className="px-3 mb-2 text-[10px] font-bold text-txt-3 uppercase tracking-[0.2em]">
-              {group.title}
+            <div className={`px-3 mb-2 text-[10px] font-bold text-txt-3 uppercase tracking-[0.2em] ${isCollapsed ? 'text-center' : ''}`}>
+              {isCollapsed ? '—' : group.title}
             </div>
             <div className="space-y-0.5">
               {group.items.map((item) => {
@@ -208,6 +209,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen = false, onMobileCl
                   <NavLink
                     key={item.href}
                     to={isLocked ? '#' : item.href}
+                    title={isCollapsed ? item.label : undefined}
                     onClick={(e) => {
                       if (isLocked) {
                         e.preventDefault();
@@ -218,35 +220,38 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen = false, onMobileCl
                       }
                     }}
                     className={({ isActive }) => cn(
-                      "flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all group",
+                      "flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-all group overflow-hidden whitespace-nowrap",
+                      isCollapsed ? "justify-center" : "justify-between",
                       isLocked
                         ? "text-txt-3/60 hover:text-txt hover:bg-elevated/40 cursor-pointer"
                         : isActive 
-                          ? "bg-accent/10 text-accent border-l-2 border-accent rounded-l-none" 
+                          ? `bg-accent/10 text-accent border-l-2 border-accent ${isCollapsed ? '' : 'rounded-l-none'}`
                           : "text-txt-2 hover:text-txt hover:bg-elevated"
                     )}
                   >
-                    <div className="flex items-center gap-3">
-                      <item.icon size={18} className={isLocked ? "text-txt-3/50" : ""} />
-                      <span className={isLocked ? "opacity-60" : ""}>{item.label}</span>
+                    <div className={`flex items-center gap-3 ${isCollapsed ? 'w-full justify-center' : ''}`}>
+                      <item.icon size={18} className={`shrink-0 ${isLocked ? "text-txt-3/50" : ""}`} />
+                      {!isCollapsed && <span className={isLocked ? "opacity-60" : ""}>{item.label}</span>}
                     </div>
-                    <div className="flex items-center gap-2">
-                      {isLocked ? (
-                        <Lock size={12} className="text-accent" />
-                      ) : (
-                        <>
-                          {item.live && (
-                            <span className="text-[9px] font-black bg-accent text-white px-1.5 py-0.5 rounded leading-none animate-pulse">LIVE</span>
-                          )}
-                          {item.badge && (
-                            <span className="text-[10px] font-bold bg-border text-txt-2 group-hover:bg-accent group-hover:text-white px-1.5 py-0.5 rounded transition-colors">
-                              {item.badge}
-                            </span>
-                          )}
-                          <ChevronRight size={14} className="opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all" />
-                        </>
-                      )}
-                    </div>
+                    {!isCollapsed && (
+                      <div className="flex items-center gap-2">
+                        {isLocked ? (
+                          <Lock size={12} className="text-accent shrink-0" />
+                        ) : (
+                          <>
+                            {item.live && (
+                              <span className="text-[9px] font-black bg-accent text-white px-1.5 py-0.5 rounded leading-none animate-pulse">LIVE</span>
+                            )}
+                            {item.badge && (
+                              <span className="text-[10px] font-bold bg-border text-txt-2 group-hover:bg-accent group-hover:text-white px-1.5 py-0.5 rounded transition-colors shrink-0">
+                                {item.badge}
+                              </span>
+                            )}
+                            <ChevronRight size={14} className="opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all shrink-0" />
+                          </>
+                        )}
+                      </div>
+                    )}
                   </NavLink>
                 );
               })}
@@ -255,39 +260,53 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen = false, onMobileCl
         ))}
       </nav>
 
-      {/* Winning Streak — calculé depuis les vrais trades */}
-      <WinningStreakBlock />
+      {/* Footer Profil (Masqué si collapsé) */}
+      {!isCollapsed && (
+        <div className="p-4 border-t border-border">
+          <div className="flex items-center gap-3 bg-elevated/50 p-2.5 rounded-xl border border-border/50 shadow-sm hover:shadow-md transition-all mb-4">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-accent to-accent-2 flex items-center justify-center font-bold text-lg text-white shadow-lg overflow-hidden border border-border/10 shrink-0">
+              {user?.avatarUrl ? (
+                <img src={user.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+              ) : (
+                user?.fullName?.charAt(0) || 'U'
+              )}
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="text-sm font-bold truncate">{user?.fullName || 'Utilisateur'}</div>
+              <div className="text-[10px] font-bold text-accent uppercase tracking-tighter">Plan {user?.plan || 'Free'}</div>
+            </div>
+            <button 
+              onClick={logout}
+              className="p-2 text-txt-2 hover:text-loss transition-colors"
+              title="Se déconnecter"
+            >
+              <LogOut size={18} />
+            </button>
+          </div>
 
-      {/* User Profile */}
-      <div className="p-4 border-t border-border">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-accent to-accent-2 flex items-center justify-center font-bold text-lg text-white shadow-lg overflow-hidden border border-border/10">
-            {user?.avatarUrl ? (
-              <img src={user.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
-            ) : (
-              user?.fullName?.charAt(0) || 'U'
-            )}
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="text-sm font-bold truncate">{user?.fullName || 'Utilisateur'}</div>
-            <div className="text-[10px] font-bold text-accent uppercase tracking-tighter">Plan {user?.plan || 'Free'}</div>
-          </div>
-          <button 
-            onClick={logout}
-            className="p-2 text-txt-2 hover:text-loss transition-colors"
-          >
-            <LogOut size={18} />
-          </button>
+          {['admin', 'cto', 'staff'].includes(user?.role || '') && (
+            <button
+              onClick={handleReturnToAdmin}
+              className="w-full flex items-center justify-center gap-2 py-2 mt-2 bg-loss/10 text-loss rounded-lg font-bold hover:bg-loss/20 transition-colors border border-loss/20 text-xs"
+            >
+              {user?.role === 'cto' ? 'Retour CTO Panel' : user?.role === 'staff' ? 'Retour Staff Panel' : 'Retour SuperAdmin'}
+            </button>
+          )}
         </div>
+      )}
 
-        {['admin', 'cto', 'staff'].includes(user?.role || '') && (
-          <button
-            onClick={handleReturnToAdmin}
-            className="w-full flex items-center justify-center gap-2 py-2 mt-2 bg-loss/10 text-loss rounded-lg font-bold hover:bg-loss/20 transition-colors border border-loss/20 text-xs"
-          >
-            {user?.role === 'cto' ? 'Retour CTO Panel' : user?.role === 'staff' ? 'Retour Staff Panel' : 'Retour SuperAdmin'}
-          </button>
-        )}
+      {/* Streak (Masqué si collapsé) */}
+      {!isCollapsed && <WinningStreakBlock />}
+
+      {/* Collapse Toggle */}
+      <div className={`p-4 border-t border-border flex ${isCollapsed ? 'justify-center' : 'justify-end'}`}>
+        <button
+          onClick={() => setIsCollapsed(!isCollapsed)}
+          className="hidden lg:flex p-2 rounded-lg text-txt-2 hover:bg-elevated hover:text-txt transition-colors"
+          title={isCollapsed ? "Ouvrir" : "Fermer"}
+        >
+          <ChevronRight size={18} className={`transition-transform duration-300 ${isCollapsed ? '' : 'rotate-180'}`} />
+        </button>
       </div>
       </aside>
 
