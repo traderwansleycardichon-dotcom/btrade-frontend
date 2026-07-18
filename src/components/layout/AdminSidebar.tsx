@@ -206,7 +206,9 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
             </div>
             <div className="flex-1 min-w-0">
               <div className="text-sm font-bold truncate">{user?.fullName || 'Administrateur'}</div>
-              <div className="text-[10px] font-bold text-loss uppercase tracking-tighter">Super Admin</div>
+              <div className="text-[10px] font-bold text-loss uppercase tracking-tighter">
+                {user?.role === 'cto' ? 'CTO' : user?.role === 'staff' ? 'Staff' : 'Super Admin'}
+              </div>
             </div>
             <button
               onClick={toggleMute}
