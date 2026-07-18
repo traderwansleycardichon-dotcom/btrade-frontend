@@ -105,7 +105,7 @@ const LegalPage: React.FC = () => {
         <div className="mt-12 p-8 rounded-3xl bg-accent/5 border border-accent/10 text-center">
           <h3 className="font-bold text-lg mb-2 text-accent">Des questions ?</h3>
           <p className="text-txt-2 text-sm mb-6">Notre équipe juridique est disponible pour répondre à toutes vos interrogations concernant ces documents.</p>
-          <a href="mailto:support@btrade.com" className="btn-ghost inline-flex items-center gap-2">
+          <a href="mailto:support@behindthetrades.com" className="btn-ghost inline-flex items-center gap-2">
              Nous contacter
           </a>
         </div>

@@ -214,7 +214,7 @@ export const PromoCodesPage: React.FC = () => {
 
           <div>
             <label className="block text-xs font-bold text-txt-2 mb-1 uppercase tracking-wider">
-              Code (ex: BTRADE100)
+              Code (ex: BEHINDTHETRADES100)
             </label>
             <input
               type="text"

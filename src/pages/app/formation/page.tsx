@@ -139,7 +139,7 @@ const FormationHub: React.FC = () => {
           <div class="certificate-border">
             <div class="certificate-container">
               <div class="header">
-                ${logoUrl ? `<img src="${logoUrl}" class="logo" />` : `<div class="header-text">BTRADE ACADEMY</div>`}
+                ${logoUrl ? `<img src="${logoUrl}" class="logo" />` : `<div class="header-text">BEHIND THE TRADES ACADEMY</div>`}
                 <div class="header-text">CERTIFICAT OFFICIEL</div>
               </div>
               <div class="main-content">
@@ -213,7 +213,7 @@ const FormationHub: React.FC = () => {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 pb-8 border-b border-border">
         <div>
           <div className="flex items-center gap-3 mb-4">
-            <span className="text-[9px] font-mono font-bold text-accent uppercase tracking-[0.35em]">BTrade</span>
+            <span className="text-[9px] font-mono font-bold text-accent uppercase tracking-[0.35em]">BEHIND THE TRADES</span>
             <span className="w-5 h-px bg-accent/50" />
             <span className="text-[9px] font-mono font-bold text-txt-3 uppercase tracking-[0.35em]">Academy</span>
           </div>

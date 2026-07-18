@@ -58,7 +58,7 @@ export default function SystemUpdatesModal() {
               <Megaphone size={20} />
             </div>
             <div>
-              <h2 className="text-xl font-bold">Nouveautés sur BTrade</h2>
+              <h2 className="text-xl font-bold">Nouveautés sur BEHIND THE TRADES</h2>
               <p className="text-sm text-txt-3">Découvrez ce qui a changé depuis votre dernière connexion.</p>
             </div>
           </div>
@@ -88,7 +88,7 @@ export default function SystemUpdatesModal() {
               </div>
               <h3 className="text-2xl font-bold">{update.title}</h3>
               <div 
-                className="prose prose-invert prose-p:text-txt-2 prose-a:text-accent hover:prose-a:text-accent-2"
+                className="whitespace-pre-wrap prose prose-invert prose-p:text-txt-2 prose-a:text-accent hover:prose-a:text-accent-2"
                 dangerouslySetInnerHTML={{ __html: update.description }}
               />
             </div>
