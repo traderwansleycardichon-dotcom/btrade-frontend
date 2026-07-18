@@ -11,6 +11,13 @@ import { PhoneModal } from '../modals/PhoneModal';
 import { PendingContractModal } from '../modals/PendingContractModal';
 import SystemUpdatesModal from '../modals/SystemUpdatesModal';
 import { TiJohnChatWidget } from '../ai/TiJohnChatWidget';
+import { TiJohnReminderModal } from '../modals/TiJohnReminderModal';
+
+const getDaysRemaining = (endDate?: string) => {
+  if (!endDate) return 0;
+  const diff = new Date(endDate).getTime() - new Date().getTime();
+  return Math.max(0, Math.ceil(diff / (1000 * 3600 * 24)));
+};
 
 export const AppLayout: React.FC = () => {
   const { user, isAuthenticated, isLoading, refreshUser, logout } = useAuth();
@@ -95,12 +102,6 @@ export const AppLayout: React.FC = () => {
     );
   }
 
-  const getDaysRemaining = (endDate?: string) => {
-    if (!endDate) return 0;
-    const diff = new Date(endDate).getTime() - new Date().getTime();
-    return Math.max(0, Math.ceil(diff / (1000 * 3600 * 24)));
-  };
-
   const isFreeTrial = user?.plan === 'free' && user?.trialEnd;
   const daysRemaining = isFreeTrial ? getDaysRemaining(user.trialEnd) : 0;
 
@@ -143,6 +144,7 @@ export const AppLayout: React.FC = () => {
       )}
       <SystemUpdatesModal />
       <TiJohnChatWidget />
+      <TiJohnReminderModal />
     </div>
   );
 };
