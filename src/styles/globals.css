@@ -48,6 +48,15 @@
     letter-spacing: -0.01em;
   }
 
+  /* Masquer globalement toutes les barres de défilement mais garder le scroll */
+  *::-webkit-scrollbar {
+    display: none;
+  }
+  * {
+    -ms-overflow-style: none; /* IE et Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+
   h1 {
     @apply text-3xl md:text-4xl lg:text-5xl font-black tracking-tighter;
   }
