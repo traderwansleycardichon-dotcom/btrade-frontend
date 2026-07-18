@@ -52,7 +52,7 @@ export const TiJohnChatWidget: React.FC = () => {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ duration: 0.2 }}
-            className="fixed bottom-6 right-6 z-[110] w-[400px] max-w-[calc(100vw-3rem)] h-[600px] max-h-[calc(100vh-6rem)] bg-bg border border-border rounded-2xl shadow-2xl overflow-hidden flex flex-col"
+            className="fixed inset-0 md:inset-auto md:bottom-6 md:right-6 z-[110] w-full md:w-[500px] h-[100dvh] md:h-[750px] md:max-h-[calc(100vh-6rem)] bg-bg md:border border-border md:rounded-2xl shadow-2xl overflow-hidden flex flex-col"
           >
             {isPro ? (
               <ChatInterface onClose={() => setIsOpen(false)} />

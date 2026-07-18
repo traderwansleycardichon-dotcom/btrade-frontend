@@ -103,7 +103,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen = false, onMobileCl
         { label: 'Comptes',    icon: Wallet,          href: '/app/accounts' },
         { label: 'Mes Trades', icon: Activity,        href: '/app/trades' },
         { label: 'Trader Simulator', icon: BrainCircuit,   href: '/app/simulator',   proOnly: true },
-        { label: 'Leaderboard',    icon: Trophy,         href: '/app/simulator/leaderboard' },
         { label: 'Calendrier', icon: Calendar,        href: '/app/calendar' },
         { label: 'Playbooks',  icon: FileText,        href: '/app/playbooks' },
       ]

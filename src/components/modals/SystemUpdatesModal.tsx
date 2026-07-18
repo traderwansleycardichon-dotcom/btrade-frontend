@@ -12,6 +12,7 @@ interface SystemUpdate {
 
 export default function SystemUpdatesModal() {
   const [updates, setUpdates] = useState<SystemUpdate[]>([]);
+  const [selectedUpdate, setSelectedUpdate] = useState<SystemUpdate | null>(null);
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
@@ -26,6 +27,7 @@ export default function SystemUpdatesModal() {
 
           if (!lastRead || updateDate > lastRead) {
             setUpdates(data.updates);
+            setSelectedUpdate(latestUpdate);
             setIsOpen(true);
           }
         }
@@ -52,7 +54,7 @@ export default function SystemUpdatesModal() {
       <div className="bg-bg text-txt w-full max-w-2xl rounded-2xl border border-border shadow-2xl flex flex-col max-h-[85vh] animate-[fadeIn_0.2s_ease-out]">
         
         {/* HEADER */}
-        <div className="p-6 border-b border-border flex items-center justify-between">
+        <div className="p-6 border-b border-border flex items-center justify-between shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center text-accent">
               <Megaphone size={20} />
@@ -71,37 +73,59 @@ export default function SystemUpdatesModal() {
         </div>
 
         {/* CONTENT */}
-        <div className="p-6 overflow-y-auto space-y-8 flex-1">
-          {updates.map((update) => (
-            <div key={update.id} className="space-y-3">
+        <div className="p-6 overflow-y-auto flex-1">
+          {selectedUpdate && (
+            <div className="space-y-3 animate-[fadeIn_0.2s_ease-out]" key={selectedUpdate.id}>
               <div className="flex items-center gap-3">
                 <span className="text-sm font-black mono text-accent bg-accent/10 px-2 py-1 rounded">
-                  v{update.version}
+                  v{selectedUpdate.version}
                 </span>
                 <span className="text-sm text-txt-3">
-                  {new Date(update.createdAt).toLocaleDateString('fr-FR', {
+                  {new Date(selectedUpdate.createdAt).toLocaleDateString('fr-FR', {
                     day: 'numeric',
                     month: 'long',
                     year: 'numeric'
                   })}
                 </span>
               </div>
-              <h3 className="text-2xl font-bold">{update.title}</h3>
+              <h3 className="text-2xl font-bold">{selectedUpdate.title}</h3>
               <div 
                 className="whitespace-pre-wrap prose prose-invert prose-p:text-txt-2 prose-a:text-accent hover:prose-a:text-accent-2"
-                dangerouslySetInnerHTML={{ __html: update.description }}
+                dangerouslySetInnerHTML={{ __html: selectedUpdate.description }}
               />
             </div>
-          ))}
+          )}
         </div>
 
+        {/* OLDER UPDATES (BUTTONS) */}
+        {updates.length > 1 && (
+          <div className="px-6 py-4 bg-elevated/30 border-t border-border flex flex-col gap-2 shrink-0">
+            <h4 className="text-xs font-bold text-txt-3 uppercase tracking-wider">Mises à jour disponibles</h4>
+            <div className="flex flex-wrap gap-2">
+              {updates.map((update) => (
+                <button
+                  key={update.id}
+                  onClick={() => setSelectedUpdate(update)}
+                  className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-colors border ${
+                    selectedUpdate?.id === update.id 
+                      ? 'bg-accent/20 border-accent/40 text-accent' 
+                      : 'bg-surface border-border text-txt-2 hover:bg-elevated hover:text-txt'
+                  }`}
+                >
+                  v{update.version}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* FOOTER */}
-        <div className="p-6 border-t border-border flex justify-end">
+        <div className="p-6 border-t border-border flex justify-end shrink-0">
           <button
             onClick={handleClose}
-            className="bg-accent text-white px-6 py-2.5 rounded-lg font-bold hover:bg-accent-2 transition"
+            className="px-6 py-2 bg-accent hover:bg-accent/90 text-white font-bold rounded-lg transition"
           >
-            J'ai compris, fermer
+            J'ai compris
           </button>
         </div>
 
