@@ -43,19 +43,32 @@ export function OrderPanel({
   );
 
   useEffect(() => {
+    const symbol = assetSymbol?.trim();
+    if (!symbol) {
+      setCurrentPrice(null);
+      return;
+    }
+
+    let cancelled = false;
     const fetchPrice = async () => {
       try {
         const res = await api.get(
-          `/api/simulator/market/price?symbol=${assetSymbol}`,
+          `/api/simulator/market/price?symbol=${encodeURIComponent(symbol)}`,
         );
-        setCurrentPrice(res.data.price);
-      } catch (err) {
-        console.error("Failed to fetch price", err);
+        if (!cancelled) setCurrentPrice(res.data.price);
+      } catch {
+        // Symbole partiel (en cours de frappe) ou indisponible: on ignore.
       }
     };
-    fetchPrice();
+
+    // Debounce: évite un appel (et un 400) à chaque frappe dans le champ symbole.
+    const debounce = setTimeout(fetchPrice, 500);
     const interval = setInterval(fetchPrice, 5000);
-    return () => clearInterval(interval);
+    return () => {
+      cancelled = true;
+      clearTimeout(debounce);
+      clearInterval(interval);
+    };
   }, [assetSymbol]);
 
   useEffect(() => {
