@@ -8,7 +8,7 @@ export const BadgesPanel: React.FC = () => {
   useEffect(() => {
     const fetchBadges = async () => {
       try {
-        const { data } = await api.get('/badges/mine');
+        const { data } = await api.get('/api/badges');
         setBadges(data);
       } catch (err) {
         console.error("Impossible de charger les badges", err);
