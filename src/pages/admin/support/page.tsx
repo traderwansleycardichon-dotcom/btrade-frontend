@@ -35,9 +35,9 @@ export default function AdminSupportPage() {
     }
   };
 
-  const filteredTickets = tickets.filter(t => 
-    t.subject.toLowerCase().includes(search.toLowerCase()) || 
-    t.user.email.toLowerCase().includes(search.toLowerCase())
+  const filteredTickets = tickets.filter(t =>
+    (t.subject || '').toLowerCase().includes(search.toLowerCase()) ||
+    (t.user?.email || '').toLowerCase().includes(search.toLowerCase())
   );
 
   return (
@@ -110,8 +110,8 @@ export default function AdminSupportPage() {
               ) : filteredTickets.map(ticket => (
                 <tr key={ticket.id} className="hover:bg-surface/50 transition-colors">
                   <td className="px-6 py-4">
-                    <div className="text-sm font-bold">{ticket.user.fullName || 'Anonyme'}</div>
-                    <div className="text-[10px] text-txt-3">{ticket.user.email}</div>
+                    <div className="text-sm font-bold">{ticket.user?.fullName || 'Anonyme'}</div>
+                    <div className="text-[10px] text-txt-3">{ticket.user?.email || 'Utilisateur supprimé'}</div>
                   </td>
                   <td className="px-6 py-4">
                     <div className="text-sm font-medium">{ticket.subject}</div>
