@@ -60,7 +60,7 @@ export default function SystemUpdatesModal() {
               <Megaphone size={20} />
             </div>
             <div>
-              <h2 className="text-xl font-bold">Nouveautés sur BEHIND THE TRADES</h2>
+              <h2 className="text-xl font-bold">Nouveautés sur HAITIAN WALL STREET</h2>
               <p className="text-sm text-txt-3">Découvrez ce qui a changé depuis votre dernière connexion.</p>
             </div>
           </div>

@@ -123,13 +123,13 @@ const LoginPage: React.FC<{ defaultRegister?: boolean }> = ({ defaultRegister = 
         {/* Mobile Logo */}
         <div className="lg:hidden absolute top-8 left-8 flex items-center gap-2">
           {settings?.platform_logo ? (
-            <img src={settings.platform_logo} alt="Logo Behind The Trades" className="h-8 w-auto object-contain" />
+            <img src={settings.platform_logo} alt="Logo Haitian Wall Street" className="h-8 w-auto object-contain" />
           ) : (
             <>
               <div className="w-8 h-8 bg-accent rounded-lg flex items-center justify-center">
                  <span className="font-black text-white">B</span>
               </div>
-              <span className="font-black text-xl tracking-tighter">Behind The Trades</span>
+              <span className="font-black text-xl tracking-tighter">Haitian Wall Street</span>
             </>
           )}
         </div>

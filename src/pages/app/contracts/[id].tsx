@@ -144,7 +144,7 @@ export default function ContractSignaturePage() {
       <div className="bg-[#FAF9F6] rounded-xl overflow-hidden shadow-2xl border border-white/10 relative">
         {/* Dark Header for Logo */}
         <div className="bg-bg w-full py-4 flex justify-center items-center border-b border-white/10 relative z-20">
-          <img src={settings?.platform_logo || '/logo.svg'} alt="Behind The Trades" className="h-12 object-contain" />
+          <img src={settings?.platform_logo || '/logo.svg'} alt="Haitian Wall Street" className="h-12 object-contain" />
         </div>
 
         <div className="absolute top-20 left-0 w-full h-1 bg-gradient-to-r from-accent/20 via-accent to-accent/20"></div>

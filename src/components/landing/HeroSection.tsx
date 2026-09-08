@@ -48,7 +48,7 @@ export const HeroSection: React.FC = () => {
 
         {/* Subtitle */}
         <p className="mx-auto max-w-2xl text-center text-[17px] leading-relaxed text-white/65 mb-10">
-          Behind The Trades analyse chaque exécution, détecte vos biais et certifie votre
+          Haitian Wall Street analyse chaque exécution, détecte vos biais et certifie votre
           conformité Prop Firm — pour que vous gardiez votre compte financé,
           pas seulement vos espoirs.
         </p>
@@ -120,7 +120,7 @@ export const HeroSection: React.FC = () => {
             <div className="relative rounded-xl overflow-hidden border border-white/[0.06]">
               <img
                 src={DASH_SHOT}
-                alt="Aperçu du tableau de bord Behind The Trades"
+                alt="Aperçu du tableau de bord Haitian Wall Street"
                 className="w-full h-auto aspect-[16/9] object-cover"
                 loading="lazy"
               />

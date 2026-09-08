@@ -30,7 +30,7 @@ export default function UserContractsPage() {
       <div>
         <h1 className="text-2xl font-bold text-white mb-2">Mes Contrats</h1>
         <p className="text-white/60 text-sm">
-          Consultez et signez vos contrats BEHIND THE TRADES.
+          Consultez et signez vos contrats HAITIAN WALL STREET.
         </p>
       </div>
 

@@ -30,7 +30,7 @@ const FALLBACK_HANDLE = '@behindthetrades0';
 /** Données par défaut (snapshot) — utilisées tant que l'API n'a pas répondu */
 const FALLBACK: YoutubeFeed = {
   channelId: FALLBACK_CHANNEL_ID,
-  channelTitle: 'Behind The Trades',
+  channelTitle: 'Haitian Wall Street',
   channelUrl: `https://www.youtube.com/${FALLBACK_HANDLE}`,
   liveUrl: `https://www.youtube.com/${FALLBACK_HANDLE}/live`,
   streamsUrl: `https://www.youtube.com/${FALLBACK_HANDLE}/streams`,

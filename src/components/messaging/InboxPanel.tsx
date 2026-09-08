@@ -54,7 +54,7 @@ const ConvItem: React.FC<{
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between gap-1 mb-0.5">
           <span className={`text-xs truncate ${hasUnread ? 'font-bold text-txt' : 'font-medium text-txt-2'}`}>
-            {other?.fullName || other?.email || 'Support Behind The Trades'}
+            {other?.fullName || other?.email || 'Support Haitian Wall Street'}
             {conv.sujet && <span className="text-txt-3 font-normal ml-1 hidden sm:inline">- {conv.sujet}</span>}
           </span>
           <span className="text-[10px] text-txt-3 shrink-0">
@@ -400,7 +400,7 @@ export const InboxPanel: React.FC<InboxPanelProps> = ({ availableUsers = [], can
               <MessageSquare size={28} className="text-txt-3 mx-auto mb-2" />
               <p className="text-xs font-bold text-txt-2 mb-1">Aucun message</p>
               <p className="text-[11px] text-txt-3">
-                {canCompose ? 'Cliquez sur + pour initier une conversation.' : "L'équipe Behind The Trades vous contactera ici."}
+                {canCompose ? 'Cliquez sur + pour initier une conversation.' : "L'équipe Haitian Wall Street vous contactera ici."}
               </p>
             </div>
           ) : (
@@ -437,7 +437,7 @@ export const InboxPanel: React.FC<InboxPanelProps> = ({ availableUsers = [], can
             <p className="text-xs text-txt-3 max-w-xs mb-4">
               {canCompose
                 ? 'Choisissez une conversation à gauche ou créez-en une nouvelle.'
-                : 'Vos échanges avec le support Behind The Trades apparaîtront ici.'}
+                : 'Vos échanges avec le support Haitian Wall Street apparaîtront ici.'}
             </p>
             <div className="flex items-center gap-1.5 text-[10px] text-accent bg-accent/10 px-3 py-1.5 rounded-lg">
               <Clock size={12} />

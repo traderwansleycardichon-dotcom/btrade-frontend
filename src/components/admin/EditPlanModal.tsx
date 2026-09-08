@@ -104,13 +104,13 @@ export const EditPlanModal: React.FC<EditPlanModalProps> = ({ isOpen, onClose, u
           )}
         </div>
 
-        <div className="pt-4 border-t border-border">
+        <div className="pt-4 border-t border-border flex flex-col gap-3">
           <button
             onClick={async () => {
               setLoading(true);
               try {
-                await api.post(`/api/admin/users/${user.id}/gift-pro`, { durationMonths: 12 });
-                addToast(`1 an de PRO a été offert à ${user.email}.`, 'success');
+                await api.post(`/api/admin/users/${user.id}/gift-pro`, { durationMonths: 1 });
+                addToast(`1 mois de PRO a été offert à ${user.email}.`, 'success');
                 onSuccess();
                 onClose();
               } catch (err) {
@@ -123,13 +123,34 @@ export const EditPlanModal: React.FC<EditPlanModalProps> = ({ isOpen, onClose, u
             disabled={loading}
             className="w-full p-4 rounded-xl border border-win text-win bg-win/10 hover:bg-win/20 font-bold transition-all flex items-center justify-center gap-2"
           >
-            <Zap size={18} /> Offrir 1 an de PRO gratuit
+            <Zap size={18} /> Offrir 1 mois de PRO gratuit
+          </button>
+
+          <button
+            onClick={async () => {
+              setLoading(true);
+              try {
+                await api.post(`/api/admin/users/${user.id}/gift-pro`, { durationMonths: 6 });
+                addToast(`6 mois de PRO a été offert à ${user.email}.`, 'success');
+                onSuccess();
+                onClose();
+              } catch (err) {
+                console.error(err);
+                addToast('Erreur lors de l\'attribution du plan PRO gratuit.', 'error');
+              } finally {
+                setLoading(false);
+              }
+            }}
+            disabled={loading}
+            className="w-full p-4 rounded-xl border border-win text-win bg-win/10 hover:bg-win/20 font-bold transition-all flex items-center justify-center gap-2"
+          >
+            <Zap size={18} /> Offrir 6 mois de PRO gratuit
           </button>
         </div>
         
         <div className="p-4 rounded-xl bg-loss/5 border border-loss/20 text-xs text-txt-2">
           <span className="text-loss font-bold block mb-1">Attention</span>
-          Modifier le plan manuellement n'impacte pas les abonnements Stripe en cours. Cela force uniquement les droits d'accès sur la plateforme Behind The Trades 
+          Modifier le plan manuellement n'impacte pas les abonnements Stripe en cours. Cela force uniquement les droits d'accès sur la plateforme Haitian Wall Street 
         </div>
       </div>
     </Modal>

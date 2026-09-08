@@ -25,7 +25,8 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { useSettings } from '../../contexts/SettingsContext';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQueryClient, useQuery } from '@tanstack/react-query';
+import api from '../../lib/api';
 import { useSound } from '../../context/SoundContext';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
@@ -49,6 +50,15 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
   const [isStaffMode, setIsStaffMode] = React.useState(
     sessionStorage.getItem('btt_staff_mode') === 'true'
   );
+
+  const { data: pendingTicketsCount = 0 } = useQuery({
+    queryKey: ['adminSupportPendingCount'],
+    queryFn: async () => {
+      const { data } = await api.get('/api/admin/support/pending-count');
+      return data.count || 0;
+    },
+    refetchInterval: 30000 // Refresh every 30 seconds
+  });
 
   const handleSwitchToClientMode = () => {
     // Efface tout le cache React Query pour garantir que l'admin
@@ -118,7 +128,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
           <div className="flex items-center gap-3">
             {settings?.platform_logo ? (
               <>
-                <img src={settings.platform_logo} alt="Logo Behind The Trades" className="h-8 w-auto object-contain" />
+                <img src={settings.platform_logo} alt="Logo Haitian Wall Street" className="h-8 w-auto object-contain" />
                 <div>
                   <span className="text-[10px] font-black text-loss uppercase tracking-widest block leading-tight mt-1">Admin Control</span>
                 </div>
@@ -129,7 +139,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
                   <Shield size={20} className="text-white" />
                 </div>
                 <div>
-                  <span className="font-bold text-lg tracking-tight block leading-tight">Behind The Trades</span>
+                  <span className="font-bold text-lg tracking-tight block leading-tight">Haitian Wall Street</span>
                   <span className="text-[10px] font-black text-loss uppercase tracking-widest">Admin Control</span>
                 </div>
               </>
@@ -151,14 +161,19 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
               to={item.href}
               onClick={() => { if (window.innerWidth < 1024) onClose(); }}
               className={({ isActive }) => cn(
-                "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all group",
+                "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all group relative",
                 isActive 
                   ? "bg-loss/10 text-loss border border-loss/20" 
                   : "text-txt-2 hover:text-txt hover:bg-elevated border border-transparent"
               )}
             >
               <item.icon size={18} />
-              <span>{item.label}</span>
+              <span className="flex-1">{item.label}</span>
+              {item.href === '/admin/support' && pendingTicketsCount > 0 && (
+                <span className="bg-loss text-white text-[10px] font-black px-2 py-0.5 rounded-full shadow-lg shadow-loss/20 animate-pulse">
+                  {pendingTicketsCount}
+                </span>
+              )}
             </NavLink>
           ))}
         </nav>

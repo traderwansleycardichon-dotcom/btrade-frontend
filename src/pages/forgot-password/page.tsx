@@ -31,7 +31,7 @@ export default function ForgotPasswordPage() {
         {/* Logo */}
         <div className="flex justify-center mb-10">
           {settings?.platform_logo ? (
-            <img src={settings.platform_logo} alt="Behind The Trades" className="h-10 w-auto object-contain" />
+            <img src={settings.platform_logo} alt="Haitian Wall Street" className="h-10 w-auto object-contain" />
           ) : (
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 bg-accent rounded-lg flex items-center justify-center shadow-lg">

@@ -27,7 +27,7 @@ export const HeroPane: React.FC = () => {
           {settings?.platform_logo ? (
             <img
               src={settings.platform_logo}
-              alt="Logo Behind The Trades"
+              alt="Logo Haitian Wall Street"
               className="h-10 w-auto object-contain"
             />
           ) : (
@@ -62,7 +62,7 @@ export const HeroPane: React.FC = () => {
           </span>
         </h1>
         <p className="text-xl text-txt-2 mb-12 leading-relaxed">
-          Rejoignez les traders qui utilisent Behind The Trades pour automatiser
+          Rejoignez les traders qui utilisent Haitian Wall Street pour automatiser
           leur journal et optimiser leurs setups.
         </p>
 

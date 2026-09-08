@@ -64,8 +64,8 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchToLogin, ini
         <h2 className="text-3xl font-black mb-2 tracking-tight">Créer un compte</h2>
         <p className="text-txt-2 text-sm">
           {formData.plan === 'free' 
-            ? "Rejoignez la communauté Behind The Trades avec un essai gratuit de 7 jours."
-            : "Rejoignez la communauté Behind The Trades dès aujourd'hui."}
+            ? "Rejoignez la communauté Haitian Wall Street avec un essai gratuit de 7 jours."
+            : "Rejoignez la communauté Haitian Wall Street dès aujourd'hui."}
         </p>
       </div>
 

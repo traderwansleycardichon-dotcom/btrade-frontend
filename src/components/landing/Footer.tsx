@@ -14,13 +14,13 @@ export const Footer: React.FC = () => {
           <div className="col-span-1 md:col-span-2">
             <div className="flex items-center gap-3 mb-6">
               {settings?.platform_logo ? (
-                <img src={settings.platform_logo} alt="Logo Behind The Trades" className="h-10 w-auto object-contain" />
+                <img src={settings.platform_logo} alt="Logo Haitian Wall Street" className="h-10 w-auto object-contain" />
               ) : (
                 <>
                   <div className="w-8 h-8 bg-accent rounded-lg flex items-center justify-center">
                     <LineChart size={18} className="text-white" />
                   </div>
-                  <span className="font-black text-xl tracking-tight">Behind The Trades</span>
+                  <span className="font-black text-xl tracking-tight">Haitian Wall Street</span>
                 </>
               )}
             </div>
@@ -53,7 +53,7 @@ export const Footer: React.FC = () => {
 
         <div className="pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center gap-8">
           <div className="text-xs text-txt-3 font-bold uppercase tracking-widest">
-            © 2026 Behind The Trades Inc. Tous droits réservés.
+            © 2026 Haitian Wall Street Inc. Tous droits réservés.
           </div>
           
           <div className="flex gap-6">

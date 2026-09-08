@@ -285,7 +285,7 @@ const ModuleLessonsPage: React.FC = () => {
   return (
     <FeatureGate
       feature="hasAcademy"
-      fallbackTitle="Academy Behind The Trades Réservée aux Membres Pro"
+      fallbackTitle="Academy Haitian Wall Street Réservée aux Membres Pro"
       fallbackDesc="Accédez à des cours exclusifs, des masterclass sur le price action, des modules sur la psychologie du trading et des quiz pour valider vos compétences."
     >
       <ModuleLessonsHub />
