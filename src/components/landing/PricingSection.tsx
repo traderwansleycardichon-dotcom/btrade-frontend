@@ -38,7 +38,7 @@ const FALLBACK_PLANS: Plan[] = [
   {
     id: 'pro',
     name: 'Pro',
-    price: 29,
+    price: 550,
     recommended: true,
     description:
       'L’arsenal complet pour protéger un compte financé et passer vos évaluations.',
@@ -207,11 +207,11 @@ export const PricingSection: React.FC = () => {
                         >
                           ${plan.price}
                         </span>
-                        <span className="text-white/45 text-sm">/ mois</span>
+                        <span className="text-white/45 text-sm">{isFree ? '/ mois' : '/ an'}</span>
                       </div>
                       {!isFree && settings?.USD_TO_HTG_RATE && plan.price && (
                         <div className="text-xs font-bold text-accent mt-1">
-                          ≈ {Math.ceil(Number(plan.price) * Number(settings.USD_TO_HTG_RATE))} HTG / mois
+                          ≈ {Math.ceil(Number(plan.price) * Number(settings.USD_TO_HTG_RATE))} HTG / an
                         </div>
                       )}
                     </div>
