@@ -25,7 +25,7 @@
   --loss: #EF4444;
 }
 
-html.light, html.light body, .light {
+.light {
   --bg: #F9FAFB;
   --surface: #FFFFFF;
   --elevated: #F3F4F6;
@@ -56,8 +56,13 @@ html.light, html.light body, .light {
   }
 
   body {
-    @apply bg-bg text-txt font-sans antialiased selection:bg-accent/30;
+    @apply bg-bg text-txt font-sans antialiased;
     letter-spacing: -0.01em;
+  }
+  
+  ::selection {
+    background: color-mix(in srgb, var(--accent) 30%, transparent);
+    color: var(--txt);
   }
 
   /* Masquer globalement toutes les barres de défilement mais garder le scroll */
@@ -84,7 +89,8 @@ html.light, html.light body, .light {
 
 @layer components {
   .glass {
-    @apply bg-surface/50 backdrop-blur-2xl border border-white/5 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)];
+    @apply backdrop-blur-2xl border border-white/5 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)];
+    background-color: color-mix(in srgb, var(--surface) 50%, transparent);
   }
 
   /* Frosted glass — Apple Vision Pro / Arc browser style */
