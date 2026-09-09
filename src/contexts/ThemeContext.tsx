@@ -17,14 +17,21 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (theme === 'light') {
       document.documentElement.classList.add('light');
+      document.body.classList.add('light');
     } else {
       document.documentElement.classList.remove('light');
+      document.body.classList.remove('light');
     }
     localStorage.setItem('btt_theme', theme);
   }, [theme]);
 
   const toggleTheme = () => {
-    setTheme(t => (t === 'dark' ? 'light' : 'dark'));
+    console.log("toggleTheme clicked! Current theme:", theme);
+    setTheme(t => {
+      const newTheme = t === 'dark' ? 'light' : 'dark';
+      console.log("Setting new theme to:", newTheme);
+      return newTheme;
+    });
   };
 
   return (
