@@ -217,7 +217,7 @@ const FormationHub: React.FC = () => {
             <span className="w-5 h-px bg-accent/50" />
             <span className="text-[9px] font-mono font-bold text-txt-3 uppercase tracking-[0.35em]">Academy</span>
           </div>
-          <h1 className="text-4xl md:text-[52px] font-black tracking-[-0.03em] leading-[0.88] text-white">
+          <h1 className="text-4xl md:text-[52px] font-black tracking-[-0.03em] leading-[0.88] text-txt">
             Centre de<br />
             <span className="text-accent">Formation</span>
           </h1>
@@ -233,7 +233,7 @@ const FormationHub: React.FC = () => {
               placeholder="Rechercher un module..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full bg-transparent border border-border hover:border-white/20 focus:border-accent/40 rounded-lg py-2.5 pl-9 pr-4 text-xs focus:outline-none transition-colors text-txt placeholder:text-txt-3"
+              className="w-full bg-transparent border border-border hover:border-border focus:border-accent/40 rounded-lg py-2.5 pl-9 pr-4 text-xs focus:outline-none transition-colors text-txt placeholder:text-txt-3"
             />
           </div>
         </div>
@@ -307,7 +307,7 @@ const FormationHub: React.FC = () => {
                 </div>
 
                 {/* Cover thumbnail */}
-                <div className="shrink-0 w-20 h-14 md:w-24 md:h-16 rounded-lg overflow-hidden border border-white/10 group-hover:border-accent/30 transition-colors">
+                <div className="shrink-0 w-20 h-14 md:w-24 md:h-16 rounded-lg overflow-hidden border border-border group-hover:border-accent/30 transition-colors">
                   {mod.coverImage ? (
                     <img src={mod.coverImage} alt={mod.titre} className="w-full h-full object-cover" />
                   ) : (
@@ -324,8 +324,8 @@ const FormationHub: React.FC = () => {
                   <div className="flex flex-wrap items-center gap-2 mb-1">
                     <h3 className={`text-sm font-bold tracking-tight transition-colors duration-150 ${
                       isInProgress
-                        ? 'text-white group-hover:text-accent'
-                        : 'text-white/90 group-hover:text-white'
+                        ? 'text-txt group-hover:text-accent'
+                        : 'text-txt-2 group-hover:text-txt'
                     }`}>
                       {mod.titre}
                     </h3>
@@ -380,7 +380,7 @@ const FormationHub: React.FC = () => {
                       </button>
                       <button
                         onClick={(e) => { e.stopPropagation(); navigate(`/app/formation/${mod.slug}`); }}
-                        className="hidden sm:flex items-center gap-1.5 text-[11px] font-bold text-txt-3 border border-border hover:border-white/20 hover:text-txt-2 px-4 py-2 rounded-lg transition-colors"
+                        className="hidden sm:flex items-center gap-1.5 text-[11px] font-bold text-txt-3 border border-border hover:border-border hover:text-txt-2 px-4 py-2 rounded-lg transition-colors"
                       >
                         <Play size={10} /> Revoir
                       </button>
@@ -391,7 +391,7 @@ const FormationHub: React.FC = () => {
                       className={`flex items-center gap-1.5 text-[11px] font-bold px-4 py-2 rounded-lg transition-all duration-150 ${
                         isInProgress
                           ? 'bg-accent text-white hover:bg-accent-2 shadow-[0_0_20px_rgba(243,108,0,0.18)]'
-                          : 'text-txt-3 border border-border hover:border-white/20 hover:text-txt-2'
+                          : 'text-txt-3 border border-border hover:border-border hover:text-txt-2'
                       }`}
                     >
                       <Play size={10} fill={isInProgress ? 'currentColor' : 'none'} />
@@ -459,7 +459,7 @@ const FormationHub: React.FC = () => {
           </p>
           <div>
             <div className="text-5xl font-black font-mono leading-none mb-2">
-              <span className="text-white">{certifiedModules}</span>
+              <span className="text-txt">{certifiedModules}</span>
               <span className="text-txt-3">/{totalModules}</span>
             </div>
             <p className="text-xs text-txt-3 mb-4">modules certifiés</p>
@@ -483,7 +483,7 @@ const FormationHub: React.FC = () => {
           <div className="relative w-full max-w-lg bg-surface border border-border rounded-2xl p-6 space-y-4 shadow-2xl max-h-[85vh] overflow-y-auto text-left">
             <button
               onClick={() => setIsCertListOpen(false)}
-              className="absolute top-4 right-4 p-1.5 text-txt-3 hover:text-white rounded-lg hover:bg-white/5 transition-colors"
+              className="absolute top-4 right-4 p-1.5 text-txt-3 hover:text-txt rounded-lg hover:dark:bg-white/5 bg-black/5 transition-colors"
             >
               <X size={16} />
             </button>
@@ -511,7 +511,7 @@ const FormationHub: React.FC = () => {
                       {String(mod.ordre).padStart(2, '0')}
                     </span>
                     <div>
-                      <p className="text-xs font-bold text-white truncate max-w-[200px]">{mod.titre}</p>
+                      <p className="text-xs font-bold text-txt truncate max-w-[200px]">{mod.titre}</p>
                       <p className="text-[9px] font-mono text-win uppercase tracking-wider mt-0.5">100% complété</p>
                     </div>
                   </div>
@@ -532,7 +532,7 @@ const FormationHub: React.FC = () => {
           <div className="relative w-full max-w-3xl bg-surface border border-border rounded-2xl p-6 space-y-5 shadow-2xl flex flex-col items-center">
             <button
               onClick={() => setSelectedCertModuleId(null)}
-              className="absolute top-4 right-4 p-1.5 text-txt-3 hover:text-white rounded-lg hover:bg-white/5 transition-colors"
+              className="absolute top-4 right-4 p-1.5 text-txt-3 hover:text-txt rounded-lg hover:dark:bg-white/5 bg-black/5 transition-colors"
             >
               <X size={16} />
             </button>
@@ -549,7 +549,7 @@ const FormationHub: React.FC = () => {
               <>
                 {/* Certificate preview */}
                 <div className="w-full border border-accent/30 p-1 rounded-xl overflow-hidden shadow-2xl">
-                  <div className="border border-white/5 rounded-lg bg-[#11141B] relative text-center p-8 space-y-5 overflow-hidden">
+                  <div className="border border-border rounded-lg bg-[#11141B] relative text-center p-8 space-y-5 overflow-hidden">
                     <div className="absolute inset-0 bg-gradient-to-b from-accent/5 via-transparent to-accent/5 pointer-events-none" />
 
                     <div className="flex justify-between items-center relative z-10">
@@ -571,20 +571,20 @@ const FormationHub: React.FC = () => {
 
                     <div className="space-y-1 relative z-10">
                       <span className="text-[10px] italic text-txt-3">Ce certificat est décerné à</span>
-                      <h3 className="text-xl font-bold text-white tracking-tight border-b border-accent/30 pb-2 inline-block px-8">
+                      <h3 className="text-xl font-bold text-txt tracking-tight border-b border-accent/30 pb-2 inline-block px-8">
                         {certificateData.userName}
                       </h3>
                     </div>
 
                     <p className="text-[11px] text-txt-3 leading-relaxed max-w-lg mx-auto relative z-10">
                       Pour avoir complété avec succès l'ensemble des leçons, quiz (≥ 80%) et devoirs de la formation :<br />
-                      <strong className="text-white text-xs mt-1 inline-block">{certificateData.moduleTitle}</strong>
+                      <strong className="text-txt text-xs mt-1 inline-block">{certificateData.moduleTitle}</strong>
                     </p>
 
-                    <div className="flex justify-between items-end pt-4 px-6 border-t border-white/5 relative z-10">
+                    <div className="flex justify-between items-end pt-4 px-6 border-t border-border relative z-10">
                       <div className="text-left">
                         <span className="text-[8px] font-mono text-txt-3 block uppercase tracking-wider mb-1">Date d'obtention</span>
-                        <span className="text-xs text-white font-bold">
+                        <span className="text-xs text-txt font-bold">
                           {new Date(certificateData.completedAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
                         </span>
                       </div>
@@ -592,9 +592,9 @@ const FormationHub: React.FC = () => {
                         {settings?.certificate_signature_image ? (
                           <img src={settings.certificate_signature_image} alt="Signature" className="h-9 w-auto object-contain mb-1" />
                         ) : (
-                          <span className="font-serif italic text-sm text-white mb-1.5">{settings?.certificate_signer_name || 'Administration'}</span>
+                          <span className="font-serif italic text-sm text-txt mb-1.5">{settings?.certificate_signer_name || 'Administration'}</span>
                         )}
-                        <span className="text-[8px] font-mono text-txt-3 border-t border-white/10 pt-1 w-28 text-center">
+                        <span className="text-[8px] font-mono text-txt-3 border-t border-border pt-1 w-28 text-center">
                           {settings?.certificate_signer_name || 'Administration Platform'}
                         </span>
                       </div>
@@ -616,7 +616,7 @@ const FormationHub: React.FC = () => {
                   </button>
                   <button
                     onClick={() => setSelectedCertModuleId(null)}
-                    className="px-5 py-2.5 text-xs font-bold text-txt-3 hover:text-txt border border-border hover:border-white/20 rounded-xl transition-colors"
+                    className="px-5 py-2.5 text-xs font-bold text-txt-3 hover:text-txt border border-border hover:border-border rounded-xl transition-colors"
                   >
                     Fermer
                   </button>

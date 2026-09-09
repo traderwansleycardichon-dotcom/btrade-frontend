@@ -96,7 +96,7 @@ export function MacroEventsPanel() {
               const isPast = eventDate.getTime() < new Date().getTime();
 
               return (
-                <div key={event.id} className={`p-3 flex items-center gap-3 hover:bg-white/5 transition-colors ${isPast ? 'opacity-60' : ''}`}>
+                <div key={event.id} className={`p-3 flex items-center gap-3 hover:dark:bg-white/5 bg-black/5 transition-colors ${isPast ? 'opacity-60' : ''}`}>
                   <div className="flex flex-col items-center min-w-[50px]">
                     <span className="text-xs font-mono font-bold text-text">{format(eventDate, 'HH:mm')}</span>
                     <span className="text-[10px] text-text-muted font-bold">{event.pays}</span>

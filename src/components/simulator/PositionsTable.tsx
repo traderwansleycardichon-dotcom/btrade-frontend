@@ -116,7 +116,7 @@ export function PositionsTable({ trades, onTradeClosed }: Props) {
               </thead>
               <tbody>
                 {pendingTrades.map((trade) => (
-                  <tr key={trade.id} className="border-b border-border/50 hover:bg-white/5 transition-colors">
+                  <tr key={trade.id} className="border-b border-border/50 hover:dark:bg-white/5 bg-black/5 transition-colors">
                     <td className="p-3 font-bold">{trade.asset}</td>
                     <td className="p-3">
                       <span className={`px-2 py-0.5 rounded text-xs font-semibold ${trade.direction === 'long' ? 'bg-green-500/20 text-green-500' : 'bg-red-500/20 text-red-500'}`}>
@@ -169,7 +169,7 @@ export function PositionsTable({ trades, onTradeClosed }: Props) {
               </tr>
             ) : (
               openTrades.map((trade) => (
-                <tr key={trade.id} className="border-b border-border/50 hover:bg-white/5 transition-colors">
+                <tr key={trade.id} className="border-b border-border/50 hover:dark:bg-white/5 bg-black/5 transition-colors">
                   <td className="py-1.5 px-3 font-bold">{trade.asset}</td>
                   <td className="py-1.5 px-3 text-text-muted">{format(new Date(trade.openDate), 'dd MMM HH:mm', { locale: fr })}</td>
                   <td className="py-1.5 px-3">
@@ -271,10 +271,10 @@ export function PositionsTable({ trades, onTradeClosed }: Props) {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
           <div className="bg-[#1a1d27] border border-[#2a2e39] rounded-xl w-full max-w-md overflow-hidden shadow-2xl">
             <div className="p-4 border-b border-[#2a2e39] flex justify-between items-center bg-[#1e222d]">
-              <h3 className="font-bold text-white">Journal - {journalTrade.asset}</h3>
+              <h3 className="font-bold text-txt">Journal - {journalTrade.asset}</h3>
               <button 
                 onClick={() => setJournalTrade(null)}
-                className="text-gray-400 hover:text-white"
+                className="text-gray-400 hover:text-txt"
               >
                 ✕
               </button>
@@ -285,13 +285,13 @@ export function PositionsTable({ trades, onTradeClosed }: Props) {
                 value={journalNotes}
                 onChange={(e) => setJournalNotes(e.target.value)}
                 placeholder="Ex: Raison d'entrée, émotions, erreurs commises..."
-                className="w-full bg-[#0d1117] border border-[#2a2e39] rounded-lg p-3 text-sm text-white focus:outline-none focus:border-primary h-32 resize-none"
+                className="w-full bg-[#0d1117] border border-[#2a2e39] rounded-lg p-3 text-sm text-txt focus:outline-none focus:border-primary h-32 resize-none"
               />
             </div>
             <div className="p-4 border-t border-[#2a2e39] flex justify-end gap-3 bg-[#1e222d]">
               <button
                 onClick={() => setJournalTrade(null)}
-                className="px-4 py-2 rounded font-bold text-sm text-gray-400 hover:text-white transition-colors"
+                className="px-4 py-2 rounded font-bold text-sm text-gray-400 hover:text-txt transition-colors"
               >
                 Annuler
               </button>

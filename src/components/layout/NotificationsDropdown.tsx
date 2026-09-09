@@ -73,7 +73,7 @@ export const NotificationsDropdown: React.FC<NotificationsDropdownProps> = ({ is
           {unreadCount > 0 && (
             <button 
               onClick={() => markAllAsRead.mutate()}
-              className="text-[10px] font-bold text-accent hover:text-white uppercase tracking-widest transition-colors"
+              className="text-[10px] font-bold text-accent hover:text-txt uppercase tracking-widest transition-colors"
             >
               Tout marquer comme lu
             </button>

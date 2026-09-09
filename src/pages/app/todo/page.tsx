@@ -57,7 +57,7 @@ function SortableTaskItem({
   };
 
   return (
-    <div ref={setNodeRef} style={style} className="flex items-center gap-3 p-4 dark:bg-white/5 bg-black/5 border border-border rounded-xl group hover:dark:bg-white/10 bg-black/10 transition-colors">
+    <div ref={setNodeRef} style={style} className="flex items-center gap-3 p-4 dark:dark:bg-white/5 bg-black/5 bg-black/5 border border-border rounded-xl group hover:dark:dark:bg-white/10 bg-black/10 bg-black/10 transition-colors">
       <div 
         {...attributes} 
         {...listeners}
@@ -369,7 +369,7 @@ export default function TodoPage() {
         <div className="flex items-center gap-3">
           <button 
             onClick={() => setSelectedDate(subWeeks(selectedDate, 1))}
-            className="p-2 dark:bg-white/5 bg-black/5 border border-border rounded-xl hover:dark:bg-white/10 bg-black/10 transition-colors"
+            className="p-2 dark:dark:bg-white/5 bg-black/5 bg-black/5 border border-border rounded-xl hover:dark:dark:bg-white/10 bg-black/10 bg-black/10 transition-colors"
           >
             <ChevronLeft size={20} className="text-txt-2" />
           </button>
@@ -378,7 +378,7 @@ export default function TodoPage() {
           </span>
           <button 
             onClick={() => setSelectedDate(addWeeks(selectedDate, 1))}
-            className="p-2 dark:bg-white/5 bg-black/5 border border-border rounded-xl hover:dark:bg-white/10 bg-black/10 transition-colors"
+            className="p-2 dark:dark:bg-white/5 bg-black/5 bg-black/5 border border-border rounded-xl hover:dark:dark:bg-white/10 bg-black/10 bg-black/10 transition-colors"
           >
             <ChevronRight size={20} className="text-txt-2" />
           </button>
@@ -399,8 +399,8 @@ export default function TodoPage() {
               onClick={() => setSelectedDate(day)}
               className={`flex-1 min-w-[100px] p-3 rounded-2xl border transition-all ${
                 isSelected 
-                  ? 'bg-accent/10 border-accent/50 text-txt shadow-lg' 
-                  : 'dark:bg-white/5 bg-black/5 border-border text-txt-2 hover:dark:bg-white/10 bg-black/10 hover:border-border'
+                  ? 'bg-accent/10 border-accent/50 text-white shadow-lg' 
+                  : 'dark:dark:bg-white/5 bg-black/5 bg-black/5 border-border text-txt-2 hover:dark:dark:bg-white/10 bg-black/10 bg-black/10 hover:border-border'
               }`}
             >
               <div className="text-xs font-medium uppercase tracking-wider mb-1">
@@ -421,7 +421,7 @@ export default function TodoPage() {
                     {completedTasks}/{tasksForDay.length}
                   </span>
                 ) : (
-                  <span className="text-[10px] px-2 py-0.5 rounded-full dark:bg-white/5 bg-black/5 text-txt-3 font-medium">
+                  <span className="text-[10px] px-2 py-0.5 rounded-full dark:dark:bg-white/5 bg-black/5 bg-black/5 text-txt-3 font-medium">
                     Vide
                   </span>
                 )}
@@ -435,7 +435,7 @@ export default function TodoPage() {
       </div>
 
       {/* Daily Progress Info */}
-      <div className="flex items-center justify-between dark:bg-white/5 bg-black/5 border border-border rounded-2xl p-6">
+      <div className="flex items-center justify-between dark:dark:bg-white/5 bg-black/5 bg-black/5 border border-border rounded-2xl p-6">
         <div>
           <h2 className="text-xl font-medium text-txt capitalize">
             {format(selectedDate, 'EEEE, d MMMM', { locale: fr })}
@@ -484,7 +484,7 @@ export default function TodoPage() {
           value={newTaskTitle}
           onChange={(e) => setNewTaskTitle(e.target.value)}
           placeholder={`Ajouter une tâche pour ${format(selectedDate, 'EEEE', { locale: fr })}...`}
-          className="flex-1 px-4 py-4 dark:bg-white/5 bg-black/5 border border-border rounded-xl text-txt placeholder-white/30 focus:outline-none focus:border-accent transition-colors"
+          className="flex-1 px-4 py-4 dark:dark:bg-white/5 bg-black/5 bg-black/5 border border-border rounded-xl text-txt placeholder-white/30 focus:outline-none focus:border-accent transition-colors"
           disabled={isTrialLocked}
         />
         <button 
@@ -527,7 +527,7 @@ export default function TodoPage() {
       )}
 
       {/* Memo Section */}
-      <div className="mt-8 dark:bg-white/5 bg-black/5 border border-border rounded-2xl p-6">
+      <div className="mt-8 dark:dark:bg-white/5 bg-black/5 bg-black/5 border border-border rounded-2xl p-6">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-txt font-medium flex items-center gap-2">
             Journal du jour
@@ -566,7 +566,7 @@ export default function TodoPage() {
               </h2>
               <button 
                 onClick={() => setShowMemoHistory(false)}
-                className="p-2 hover:dark:bg-white/5 bg-black/5 rounded-full transition-colors"
+                className="p-2 hover:dark:dark:bg-white/5 bg-black/5 bg-black/5 rounded-full transition-colors"
               >
                 <X className="w-5 h-5 text-txt-2" />
               </button>
@@ -583,7 +583,7 @@ export default function TodoPage() {
                 </div>
               ) : (
                 memoHistory.map((m) => (
-                  <div key={m.id} className="dark:bg-white/5 bg-black/5 border border-border rounded-xl p-5">
+                  <div key={m.id} className="dark:dark:bg-white/5 bg-black/5 bg-black/5 border border-border rounded-xl p-5">
                     <div className="text-accent font-medium text-sm mb-3 pb-3 border-b border-border">
                       {format(new Date(m.date), 'EEEE d MMMM yyyy', { locale: fr })}
                     </div>

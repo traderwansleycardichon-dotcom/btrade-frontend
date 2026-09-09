@@ -214,7 +214,7 @@ const ObjectifModal: React.FC<{
           <h2 className="text-xs font-bold uppercase tracking-widest">
             {objectif ? "Modifier l'objectif" : 'Nouvel objectif'}
           </h2>
-          <button onClick={onClose} className="p-1 text-white/80 hover:text-white">
+          <button onClick={onClose} className="p-1 text-txt-2 hover:text-txt">
             <X size={14} />
           </button>
         </div>
@@ -274,7 +274,7 @@ const ObjectifModal: React.FC<{
           <button onClick={onClose} className="text-[11px] px-3 py-1.5 rounded mono bg-bg border border-border text-txt-2 hover:text-txt">
             Annuler
           </button>
-          <button onClick={submit} className="text-[11px] px-3 py-1.5 rounded mono text-white font-bold" style={{ background: form.couleur }}>
+          <button onClick={submit} className="text-[11px] px-3 py-1.5 rounded mono text-txt font-bold" style={{ background: form.couleur }}>
             {objectif ? 'Enregistrer' : 'Créer'}
           </button>
         </div>

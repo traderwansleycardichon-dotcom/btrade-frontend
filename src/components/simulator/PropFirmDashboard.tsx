@@ -63,7 +63,7 @@ export function PropFirmDashboard({ account, todayPnl, trades = [] }: Props) {
     <div className="bg-surface p-6 rounded-2xl border border-border shadow-sm mb-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
         <div>
-          <h2 className="text-xl font-bold text-white uppercase tracking-wider flex items-center gap-2">
+          <h2 className="text-xl font-bold text-txt uppercase tracking-wider flex items-center gap-2">
             {account.challengeLevel} Challenge <span className="text-sm text-gray-500 normal-case">#{(account.attemptNumber || 1).toString().padStart(3, '0')}</span>
           </h2>
           <div className="flex gap-2 items-center mt-2">
@@ -89,7 +89,7 @@ export function PropFirmDashboard({ account, todayPnl, trades = [] }: Props) {
             <div className="hidden md:block bg-background px-4 py-2 rounded-xl border border-border flex-1 max-w-[220px]">
               <div className="flex justify-between items-center mb-1">
                 <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Max Pos Size</span>
-                <span className="font-bold text-white text-xs">{currentOpenQuantity} / {maxPositionSize}</span>
+                <span className="font-bold text-txt text-xs">{currentOpenQuantity} / {maxPositionSize}</span>
               </div>
               <div className="w-full bg-gray-800 rounded-full h-1.5 mt-2">
                 <div className={`h-1.5 rounded-full transition-all ${positionSizeProgress > 80 ? 'bg-red-500' : 'bg-blue-500'}`} style={{ width: `${positionSizeProgress}%` }}></div>
@@ -125,7 +125,7 @@ export function PropFirmDashboard({ account, todayPnl, trades = [] }: Props) {
             <Target className="w-3.5 h-3.5 mr-1 shrink-0"/> Profit Target
           </div>
           <div className="flex justify-between items-baseline gap-2 mb-2">
-            <span className="text-xs font-bold text-white">${currentProfit.toLocaleString()}</span>
+            <span className="text-xs font-bold text-txt">${currentProfit.toLocaleString()}</span>
             <span className="text-[10px] text-gray-500">/ ${profitTarget.toLocaleString()}</span>
           </div>
           <div className="w-full bg-gray-800 rounded-full h-2">

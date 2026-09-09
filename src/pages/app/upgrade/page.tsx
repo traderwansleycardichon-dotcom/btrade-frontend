@@ -343,7 +343,7 @@ export default function UpgradePage() {
               <button
                 onClick={handleMoncashUpgrade}
                 disabled={loading !== null}
-                className="flex-1 py-3 bg-[#FF0000] text-white hover:bg-[#CC0000] rounded-xl font-bold transition-all text-sm flex justify-center items-center gap-2"
+                className="flex-1 py-3 bg-[#FF0000] text-txt hover:bg-[#CC0000] rounded-xl font-bold transition-all text-sm flex justify-center items-center gap-2"
               >
                 {loading === selectedPlanForMoncash.id ? <Loader2 size={16} className="animate-spin" /> : "Confirmer"}
               </button>

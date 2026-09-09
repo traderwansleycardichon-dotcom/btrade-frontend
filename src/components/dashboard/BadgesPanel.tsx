@@ -32,12 +32,12 @@ export const BadgesPanel: React.FC = () => {
           <div key={b.id} className="relative flex items-center gap-2 px-3 py-2 bg-gradient-to-br from-yellow-500/20 to-orange-500/10 border border-yellow-500/20 rounded-xl overflow-hidden group-hover:border-yellow-500/40 transition-colors" title={b.description}>
             <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
             <div className="flex flex-col">
-              <span className="text-xs font-bold text-white">{b.type.replace('_', ' ')}</span>
+              <span className="text-xs font-bold text-txt">{b.type.replace('_', ' ')}</span>
               {b.level > 1 && (
                 <span className="text-[9px] text-yellow-500 font-bold uppercase tracking-wider">Niveau {b.level}</span>
               )}
             </div>
-            <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="absolute inset-0 dark:bg-white/5 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity" />
           </div>
         ))}
       </div>

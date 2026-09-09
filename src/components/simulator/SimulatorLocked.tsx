@@ -32,7 +32,7 @@ export function SimulatorLocked({ onRetry }: Props) {
         
         <button
           onClick={handleRetry}
-          className="w-full bg-primary hover:bg-primary/90 text-white font-semibold py-3 px-6 rounded-xl flex items-center justify-center gap-2 transition-colors"
+          className="w-full bg-primary hover:bg-primary/90 text-txt font-semibold py-3 px-6 rounded-xl flex items-center justify-center gap-2 transition-colors"
         >
           <RefreshCw className="w-5 h-5" />
           Réessayer (Reset)

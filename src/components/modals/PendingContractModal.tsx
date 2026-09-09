@@ -34,8 +34,8 @@ export const PendingContractModal: React.FC = () => {
         <div className="w-20 h-20 bg-accent/10 rounded-full flex items-center justify-center mx-auto mb-6">
           <FileSignature size={40} className="text-accent animate-pulse" />
         </div>
-        <h3 className="text-2xl font-bold text-white mb-4">Contrat en attente</h3>
-        <p className="text-white/70 mb-8">
+        <h3 className="text-2xl font-bold text-txt mb-4">Contrat en attente</h3>
+        <p className="text-txt-2 mb-8">
           Vous avez {pendingContracts.length > 1 ? 'des contrats en attente de signature' : 'un contrat en attente de signature'}. 
           Veuillez consulter et signer ce document.
         </p>

@@ -366,7 +366,7 @@ const AccountsPage: React.FC = () => {
           <div className="flex gap-4 w-full">
             <button
               onClick={() => setIsUpgradeOpen(false)}
-              className="flex-1 py-3 rounded-xl border border-border font-bold hover:bg-white/5 transition-all text-xs"
+              className="flex-1 py-3 rounded-xl border border-border font-bold hover:dark:bg-white/5 bg-black/5 transition-all text-xs"
             >
               Plus tard
             </button>

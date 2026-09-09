@@ -135,7 +135,7 @@ export default function SimulatorPage() {
         </p>
         <button
           onClick={() => (window.location.href = "/app/upgrade")}
-          className="bg-primary hover:bg-primary/90 text-white px-8 py-3 rounded-lg font-semibold transition-colors shadow-lg shadow-primary/20"
+          className="bg-primary hover:bg-primary/90 text-txt px-8 py-3 rounded-lg font-semibold transition-colors shadow-lg shadow-primary/20"
         >
           Débloquer avec le Plan PRO
         </button>
@@ -157,7 +157,7 @@ export default function SimulatorPage() {
       <div className="h-[calc(100vh-4rem)] overflow-y-auto">
         <button
           onClick={() => setShowSelectorForced(false)}
-          className="m-6 text-gray-400 hover:text-white transition-colors"
+          className="m-6 text-gray-400 hover:text-txt transition-colors"
         >
           ← Retour au Dashboard
         </button>
@@ -206,7 +206,7 @@ export default function SimulatorPage() {
       />
 
       <div className="flex flex-wrap justify-between items-center gap-2">
-        <h1 className="text-2xl font-bold text-white">Dashboard Simulateur</h1>
+        <h1 className="text-2xl font-bold text-txt">Dashboard Simulateur</h1>
         <div className="flex items-center gap-2 flex-wrap">
           {account.status !== "active" && (
             <button
@@ -276,7 +276,7 @@ export default function SimulatorPage() {
                 }
                 setAssetSymbol(val);
               }}
-              className="bg-[#1e293b] border border-border rounded px-3 py-1 text-white text-sm focus:outline-none focus:border-primary uppercase w-64"
+              className="bg-[#1e293b] border border-border rounded px-3 py-1 text-txt text-sm focus:outline-none focus:border-primary uppercase w-64"
               placeholder="Chercher un indice ou taper..."
             />
             <datalist id="futures-symbols">
@@ -321,7 +321,7 @@ export default function SimulatorPage() {
           {account.status !== "active" && (
             <div className="absolute inset-0 bg-surface/80 backdrop-blur-sm z-10 flex flex-col items-center justify-center p-6 text-center border-l border-border">
               <History className="w-12 h-12 text-gray-500 mb-4" />
-              <h3 className="text-white font-bold text-lg mb-2">
+              <h3 className="text-txt font-bold text-lg mb-2">
                 Trading Désactivé
               </h3>
               <p className="text-gray-400 text-sm mb-6">

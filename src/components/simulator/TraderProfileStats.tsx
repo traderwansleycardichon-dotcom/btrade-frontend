@@ -16,7 +16,7 @@ export function TraderProfileStats({ stats }: StatsProps) {
 
   return (
     <div className="bg-surface border border-border rounded-2xl p-6">
-      <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
+      <h2 className="text-xl font-bold text-txt mb-6 flex items-center gap-2">
         <Activity className="w-6 h-6 text-accent" /> Statistiques Globales
       </h2>
       
@@ -26,7 +26,7 @@ export function TraderProfileStats({ stats }: StatsProps) {
             <Target className="w-3.5 h-3.5 shrink-0" />
             <span className="text-xs font-medium uppercase tracking-wider truncate">Total</span>
           </div>
-          <div className="text-xl font-black text-white">{stats.totalAttempts}</div>
+          <div className="text-xl font-black text-txt">{stats.totalAttempts}</div>
           <div className="text-xs text-gray-500 mt-1">Challenges démarrés</div>
         </div>
 

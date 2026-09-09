@@ -179,7 +179,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen = false, onMobileCl
           ) : (
             <>
               <div className="w-8 h-8 bg-accent rounded-lg flex items-center justify-center shrink-0 shadow-[0_0_15px_rgba(243,108,0,0.4)]">
-                <TrendingUp size={20} className="text-white" />
+                <TrendingUp size={20} className="text-txt" />
               </div>
               {!isCollapsed && <span className="font-bold text-lg tracking-tight">Haitian Wall Street</span>}
             </>
@@ -244,7 +244,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen = false, onMobileCl
                               <span className="text-[9px] font-black bg-accent text-white px-1.5 py-0.5 rounded leading-none animate-pulse">LIVE</span>
                             )}
                             {item.badge && (
-                              <span className="text-[10px] font-bold bg-border text-txt-2 group-hover:bg-accent group-hover:text-white px-1.5 py-0.5 rounded transition-colors shrink-0">
+                              <span className="text-[10px] font-bold bg-border text-txt-2 group-hover:bg-accent group-hover:text-txt px-1.5 py-0.5 rounded transition-colors shrink-0">
                                 {item.badge}
                               </span>
                             )}
@@ -265,7 +265,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen = false, onMobileCl
       {!isCollapsed && (
         <div className="p-4 border-t border-border">
           <div className="flex items-center gap-3 bg-elevated/50 p-2.5 rounded-xl border border-border/50 shadow-sm hover:shadow-md transition-all mb-4">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-accent to-accent-2 flex items-center justify-center font-bold text-lg text-white shadow-lg overflow-hidden border border-border/10 shrink-0">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-accent to-accent-2 flex items-center justify-center font-bold text-lg text-txt shadow-lg overflow-hidden border border-border/10 shrink-0">
               {user?.avatarUrl ? (
                 <img src={user.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
               ) : (
@@ -360,7 +360,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen = false, onMobileCl
           <div className="flex gap-4 w-full">
             <button
               onClick={() => setIsUpgradeModalOpen(false)}
-              className="flex-1 py-3 rounded-xl border border-border font-bold hover:bg-white/5 transition-all text-xs"
+              className="flex-1 py-3 rounded-xl border border-border font-bold hover:dark:bg-white/5 bg-black/5 transition-all text-xs"
             >
               Plus tard
             </button>

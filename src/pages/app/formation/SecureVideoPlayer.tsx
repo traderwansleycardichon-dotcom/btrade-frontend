@@ -298,7 +298,7 @@ export const SecureVideoPlayer: React.FC<SecureVideoPlayerProps> = ({ videoId })
             max={duration || 100}
             value={currentTime}
             onChange={handleSeekChange}
-            className="w-full h-1 bg-white/20 accent-accent hover:h-1.5 transition-all cursor-pointer rounded-lg outline-none appearance-none"
+            className="w-full h-1 dark:bg-white/20 bg-black/20 accent-accent hover:h-1.5 transition-all cursor-pointer rounded-lg outline-none appearance-none"
             style={{
               background: `linear-gradient(to right, var(--accent) 0%, var(--accent) ${
                 duration ? (currentTime / duration) * 100 : 0
@@ -313,7 +313,7 @@ export const SecureVideoPlayer: React.FC<SecureVideoPlayerProps> = ({ videoId })
             {/* Play / Pause */}
             <button 
               onClick={togglePlay}
-              className="p-1 text-white hover:text-accent transition-colors"
+              className="p-1 text-txt hover:text-accent transition-colors"
               title={isPlaying ? 'Pause' : 'Lire'}
             >
               {isPlaying ? <Pause size={15} fill="currentColor" /> : <Play size={15} fill="currentColor" />}
@@ -323,7 +323,7 @@ export const SecureVideoPlayer: React.FC<SecureVideoPlayerProps> = ({ videoId })
             <div className="flex items-center gap-1.5 group/volume">
               <button 
                 onClick={toggleMute}
-                className="p-1 text-white hover:text-accent transition-colors"
+                className="p-1 text-txt hover:text-accent transition-colors"
                 title={isMuted ? 'Activer le son' : 'Couper le son'}
               >
                 {isMuted ? <VolumeX size={15} /> : <Volume2 size={15} />}
@@ -334,7 +334,7 @@ export const SecureVideoPlayer: React.FC<SecureVideoPlayerProps> = ({ videoId })
                 max={100}
                 value={isMuted ? 0 : volume}
                 onChange={handleVolumeChange}
-                className="w-0 group-hover/volume:w-16 h-1 bg-white/20 accent-accent transition-all duration-200 cursor-pointer rounded-lg outline-none appearance-none"
+                className="w-0 group-hover/volume:w-16 h-1 dark:bg-white/20 bg-black/20 accent-accent transition-all duration-200 cursor-pointer rounded-lg outline-none appearance-none"
               />
             </div>
 
@@ -350,7 +350,7 @@ export const SecureVideoPlayer: React.FC<SecureVideoPlayerProps> = ({ videoId })
             {/* Fullscreen */}
             <button 
               onClick={toggleFullscreen}
-              className="p-1 text-white hover:text-accent transition-colors"
+              className="p-1 text-txt hover:text-accent transition-colors"
               title="Plein écran"
             >
               {isFullscreen ? <Minimize size={15} /> : <Maximize size={15} />}

@@ -91,7 +91,7 @@ export function ChallengeSelector({ onChallengeStarted }: { onChallengeStarted: 
   return (
     <div className="w-full max-w-[1600px] mx-auto py-6 px-4 sm:px-6 lg:px-8">
       <div className="text-center mb-8 md:mb-12">
-        <h1 className="text-3xl md:text-4xl font-bold text-white mb-3 md:mb-4">Choisissez votre Challenge</h1>
+        <h1 className="text-3xl md:text-4xl font-bold text-txt mb-3 md:mb-4">Choisissez votre Challenge</h1>
         <p className="text-gray-400 text-base md:text-lg max-w-3xl mx-auto px-2">
           Prouvez vos compétences en trading virtuel, respectez les règles de risque et débloquez un compte financé (virtuel). Le but est la discipline.
         </p>
@@ -105,7 +105,7 @@ export function ChallengeSelector({ onChallengeStarted }: { onChallengeStarted: 
             Vous avez échoué récemment. La discipline est primordiale en trading.<br/>
             Veuillez analyser vos erreurs avant de relancer un challenge.
           </p>
-          <div className="bg-background px-4 py-2 rounded-lg font-mono text-xl font-bold text-white border border-red-500/30">
+          <div className="bg-background px-4 py-2 rounded-lg font-mono text-xl font-bold text-txt border border-red-500/30">
             {timeLeft}
           </div>
         </div>
@@ -117,7 +117,7 @@ export function ChallengeSelector({ onChallengeStarted }: { onChallengeStarted: 
             <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center mb-4 sm:mb-6 bg-${tier.color}-500/10 text-${tier.color}-500`}>
               <Award className="w-6 h-6 sm:w-8 sm:h-8" />
             </div>
-            <h2 className="text-xl sm:text-2xl font-bold text-white mb-1">{tier.name}</h2>
+            <h2 className="text-xl sm:text-2xl font-bold text-txt mb-1">{tier.name}</h2>
             <div className="text-2xl sm:text-3xl font-black text-accent mb-4 sm:mb-6">{tier.capital}</div>
 
             <div className="space-y-4 flex-1">
@@ -135,7 +135,7 @@ export function ChallengeSelector({ onChallengeStarted }: { onChallengeStarted: 
               </div>
               <div className="flex items-center justify-between text-sm">
                 <div className="flex items-center text-gray-400"><Clock className="w-4 h-4 mr-2" /> Temps Limite</div>
-                <div className="font-semibold text-white">30 Jours</div>
+                <div className="font-semibold text-txt">30 Jours</div>
               </div>
             </div>
 

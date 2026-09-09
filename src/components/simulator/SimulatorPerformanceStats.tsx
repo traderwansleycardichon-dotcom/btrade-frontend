@@ -114,7 +114,7 @@ export function SimulatorPerformanceStats({ account, trades }: { account: any, t
             <div className="text-gray-400 text-xs mb-2 flex items-center gap-1">
               Trade Win % <HelpCircle className="w-3 h-3 text-gray-500" />
             </div>
-            <div className="text-2xl font-bold text-white">
+            <div className="text-2xl font-bold text-txt">
               {winRate.toFixed(2)}%
             </div>
           </div>
@@ -128,7 +128,7 @@ export function SimulatorPerformanceStats({ account, trades }: { account: any, t
               <div className="text-gray-400 text-xs mb-2 flex items-center gap-1">
                 Avg Win / Avg Loss <HelpCircle className="w-3 h-3 text-gray-500" />
               </div>
-              <div className="text-2xl font-bold text-white mb-2">
+              <div className="text-2xl font-bold text-txt mb-2">
                 {(avgLoss > 0 ? (avgWin / avgLoss) : (avgWin > 0 ? avgWin : 0)).toFixed(2)}
               </div>
             </div>
@@ -149,7 +149,7 @@ export function SimulatorPerformanceStats({ account, trades }: { account: any, t
           <div className="text-gray-400 text-xs mb-2 flex items-center gap-1">
             Day Win % <HelpCircle className="w-3 h-3 text-gray-500" />
           </div>
-          <div className="text-2xl font-bold text-white">
+          <div className="text-2xl font-bold text-txt">
             {totalDays > 0 ? `${dayWinRate.toFixed(2)}%` : 'No trades'}
           </div>
         </div>
@@ -160,7 +160,7 @@ export function SimulatorPerformanceStats({ account, trades }: { account: any, t
             <div className="text-gray-400 text-xs mb-2 flex items-center gap-1">
               Profit Factor <HelpCircle className="w-3 h-3 text-gray-500" />
             </div>
-            <div className="text-2xl font-bold text-white">
+            <div className="text-2xl font-bold text-txt">
               {profitFactor.toFixed(2)}
             </div>
           </div>
@@ -178,7 +178,7 @@ export function SimulatorPerformanceStats({ account, trades }: { account: any, t
           <div className="text-gray-400 text-xs mb-2 flex items-center gap-1">
             Best Day % of Total Profit <HelpCircle className="w-3 h-3 text-gray-500" />
           </div>
-          <div className="text-2xl font-bold text-white">
+          <div className="text-2xl font-bold text-txt">
             {totalPnl > 0 ? `${bestDayPercentage.toFixed(2)}%` : '0.00%'}
           </div>
         </div>

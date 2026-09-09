@@ -188,7 +188,7 @@ export const AddInvestmentModal: React.FC<AddInvestmentModalProps> = ({ isOpen, 
           <button 
             type="button"
             onClick={onClose}
-            className="flex-1 px-6 py-3 rounded-xl border border-border font-bold hover:bg-white/5 transition-all"
+            className="flex-1 px-6 py-3 rounded-xl border border-border font-bold hover:dark:bg-white/5 bg-black/5 transition-all"
           >
             Annuler
           </button>

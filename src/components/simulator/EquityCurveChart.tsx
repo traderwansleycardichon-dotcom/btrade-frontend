@@ -63,7 +63,7 @@ export function EquityCurveChart({ trades, initialBalance }: Props) {
       return (
         <div className="bg-[#1e293b] border border-[#2a2e39] p-3 rounded-lg shadow-xl z-50">
           <p className="text-gray-400 text-xs mb-1">{format(new Date(data.date), 'dd MMM HH:mm')}</p>
-          <p className="text-white font-bold">{data.trade}</p>
+          <p className="text-txt font-bold">{data.trade}</p>
           <p className="text-xl font-black mt-1" style={{ color: data.balance >= initialBalance ? '#22c55e' : '#ef4444' }}>
             ${data.balance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </p>

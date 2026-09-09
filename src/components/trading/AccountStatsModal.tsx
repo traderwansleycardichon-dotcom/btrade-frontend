@@ -61,7 +61,7 @@ export const AccountStatsModal: React.FC<AccountStatsModalProps> = ({ account, i
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Wins vs Losses */}
-            <div className="glass p-6 rounded-3xl border-white/5">
+            <div className="glass p-6 rounded-3xl border-border">
               <h4 className="text-[10px] font-black text-txt-3 uppercase tracking-widest mb-6">Distribution des Gains/Pertes</h4>
               <div className="space-y-6">
                 <div className="flex justify-between items-end">
@@ -104,18 +104,18 @@ export const AccountStatsModal: React.FC<AccountStatsModalProps> = ({ account, i
             </div>
 
             {/* Account Specifics */}
-            <div className="glass p-6 rounded-3xl border-white/5">
+            <div className="glass p-6 rounded-3xl border-border">
               <h4 className="text-[10px] font-black text-txt-3 uppercase tracking-widest mb-6">Objectifs de Compte</h4>
               <div className="space-y-4">
-                 <div className="flex justify-between items-center py-3 border-b border-white/5">
+                 <div className="flex justify-between items-center py-3 border-b border-border">
                    <span className="text-xs font-bold text-txt-2">Meilleur Trade</span>
                    <span className="font-mono font-bold text-win">+${stats.bestTrade?.toFixed(2) || '0.00'}</span>
                  </div>
-                 <div className="flex justify-between items-center py-3 border-b border-white/5">
+                 <div className="flex justify-between items-center py-3 border-b border-border">
                    <span className="text-xs font-bold text-txt-2">Pire Trade</span>
                    <span className="font-mono font-bold text-loss">-${Math.abs(stats.worstTrade || 0).toFixed(2)}</span>
                  </div>
-                 <div className="flex justify-between items-center py-3 border-b border-white/5">
+                 <div className="flex justify-between items-center py-3 border-b border-border">
                    <span className="text-xs font-bold text-txt-2">Expectancy</span>
                    <span className="font-mono font-bold text-accent">{stats.expectancy?.toFixed(2) || '0.00'} R</span>
                  </div>
@@ -143,9 +143,9 @@ export const AccountStatsModal: React.FC<AccountStatsModalProps> = ({ account, i
 };
 
 const StatCard = ({ label, value, icon: Icon, color }: any) => (
-  <div className="glass p-4 rounded-2xl border-white/5">
+  <div className="glass p-4 rounded-2xl border-border">
     <div className="flex items-center gap-2 mb-2">
-      <div className={`p-1.5 rounded-lg bg-white/5 ${color}`}>
+      <div className={`p-1.5 rounded-lg dark:bg-white/5 bg-black/5 ${color}`}>
         <Icon size={14} />
       </div>
       <span className="text-[9px] font-black text-txt-3 uppercase tracking-widest">{label}</span>

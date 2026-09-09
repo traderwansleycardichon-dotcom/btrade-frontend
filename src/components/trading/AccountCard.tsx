@@ -82,7 +82,7 @@ export const AccountCard: React.FC<AccountCardProps> = ({ account }) => {
                 {currentDrawdown > 0 ? currentDrawdown.toFixed(2) : 0}% / {maxDrawdown}%
               </span>
             </div>
-            <div className="h-1 bg-white/5 rounded-full overflow-hidden">
+            <div className="h-1 dark:bg-white/5 bg-black/5 rounded-full overflow-hidden">
               <div 
                 className={cn(
                   "h-full rounded-full transition-all duration-1000",
@@ -99,7 +99,7 @@ export const AccountCard: React.FC<AccountCardProps> = ({ account }) => {
                 <span className="text-txt-3">Profit Target</span>
                 <span className="text-win">{pnlPct > 0 ? pnlPct.toFixed(2) : 0}% / {profitTarget}%</span>
               </div>
-              <div className="h-1 bg-white/5 rounded-full overflow-hidden">
+              <div className="h-1 dark:bg-white/5 bg-black/5 rounded-full overflow-hidden">
                 <div 
                   className="h-full rounded-full bg-win shadow-[0_0_10px_rgba(16,185,129,0.5)] transition-all duration-1000"
                   style={{ width: `${Math.min((pnlPct / profitTarget) * 100, 100)}%` }}
@@ -121,7 +121,7 @@ export const AccountCard: React.FC<AccountCardProps> = ({ account }) => {
           ) : (
             <button 
               onClick={() => setIsStatsOpen(true)}
-              className="flex-1 py-3 bg-white/5 border border-white/5 text-txt-2 hover:text-white text-[10px] font-black uppercase tracking-widest rounded-2xl transition-all flex items-center justify-center gap-2"
+              className="flex-1 py-3 dark:bg-white/5 bg-black/5 border border-border text-txt-2 hover:text-txt text-[10px] font-black uppercase tracking-widest rounded-2xl transition-all flex items-center justify-center gap-2"
             >
               <TrendingUp size={14} />
               Statistics

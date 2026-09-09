@@ -54,7 +54,7 @@ export const TiJohnReminderModal: React.FC = () => {
               />
               <button
                 onClick={handleClose}
-                className="absolute top-4 right-4 p-2 bg-black/50 hover:bg-black/80 backdrop-blur text-white rounded-full transition-colors z-10"
+                className="absolute top-4 right-4 p-2 bg-black/50 hover:bg-black/80 backdrop-blur text-txt rounded-full transition-colors z-10"
               >
                 <X size={20} />
               </button>

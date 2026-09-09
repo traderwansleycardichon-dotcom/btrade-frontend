@@ -85,11 +85,11 @@ function parseMarkdown(text: string | null | undefined): string {
   
   // Headers
   html = html.replace(/^### (.*?)$/gm, '<h5 class="text-sm font-bold text-accent mt-4 mb-2">$1</h5>');
-  html = html.replace(/^## (.*?)$/gm, '<h4 class="text-base font-bold text-white mt-5 mb-3 border-b border-border pb-1">$1</h4>');
-  html = html.replace(/^# (.*?)$/gm, '<h3 class="text-lg font-bold text-white mt-6 mb-4">$1</h3>');
+  html = html.replace(/^## (.*?)$/gm, '<h4 class="text-base font-bold text-txt mt-5 mb-3 border-b border-border pb-1">$1</h4>');
+  html = html.replace(/^# (.*?)$/gm, '<h3 class="text-lg font-bold text-txt mt-6 mb-4">$1</h3>');
   
   // Bold
-  html = html.replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-white">$1</strong>');
+  html = html.replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-txt">$1</strong>');
   
   // Italic
   html = html.replace(/\*(.*?)\*/g, '<em class="italic">$1</em>');
@@ -336,7 +336,7 @@ const LessonPlayer: React.FC = () => {
         <div className="lg:col-span-3 space-y-4">
           
           {/* Header Card */}
-          <div className="relative overflow-hidden glass-frost p-6 rounded-2xl border border-white/10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 shadow-xl">
+          <div className="relative overflow-hidden glass-frost p-6 rounded-2xl border border-border flex flex-col md:flex-row justify-between items-start md:items-center gap-4 shadow-xl">
             <div className="absolute inset-0 bg-gradient-to-r from-accent/10 via-transparent to-transparent opacity-50 pointer-events-none" />
             
             <div className="relative z-10 space-y-2">
@@ -367,18 +367,18 @@ const LessonPlayer: React.FC = () => {
           </div>
 
           {/* Navigation Tabs (Segmented Control style) */}
-          <div className="flex p-1.5 bg-surface/80 backdrop-blur-xl rounded-2xl border border-white/5">
+          <div className="flex p-1.5 bg-surface/80 backdrop-blur-xl rounded-2xl border border-border">
             <button
               onClick={() => setActiveTab('lecture')}
               className={`flex-1 py-3 text-xs font-bold flex items-center justify-center gap-2 transition-all duration-300 rounded-xl ${
                 activeTab === 'lecture' 
                   ? 'bg-accent text-white shadow-[0_0_20px_rgba(243,108,0,0.3)]' 
-                  : 'text-txt-3 hover:text-txt hover:bg-white/5'
+                  : 'text-txt-3 hover:text-txt hover:dark:bg-white/5 bg-black/5'
               }`}
             >
               <BookOpen size={14} />
               1. Lecture
-              {isLectureDone && <CheckCircle size={12} className="text-white/70 fill-white/10" />}
+              {isLectureDone && <CheckCircle size={12} className="text-txt-2 fill-white/10" />}
             </button>
 
             <button
@@ -390,12 +390,12 @@ const LessonPlayer: React.FC = () => {
                 activeTab === 'quiz' 
                   ? 'bg-accent text-white shadow-[0_0_20px_rgba(243,108,0,0.3)]' 
                   : 'text-txt-3'
-              } ${!isLectureDone ? 'opacity-40 cursor-not-allowed' : 'hover:text-txt hover:bg-white/5'}`}
+              } ${!isLectureDone ? 'opacity-40 cursor-not-allowed' : 'hover:text-txt hover:dark:bg-white/5 bg-black/5'}`}
             >
               <HelpCircle size={14} />
               2. Quiz
               {!isLectureDone && <Lock size={12} className="text-txt-3" />}
-              {isLectureDone && isQuizPassed && <CheckCircle size={12} className={activeTab === 'quiz' ? 'text-white/70' : 'text-win'} />}
+              {isLectureDone && isQuizPassed && <CheckCircle size={12} className={activeTab === 'quiz' ? 'text-txt-2' : 'text-win'} />}
             </button>
 
             <button
@@ -407,17 +407,17 @@ const LessonPlayer: React.FC = () => {
                 activeTab === 'devoir' 
                   ? 'bg-accent text-white shadow-[0_0_20px_rgba(243,108,0,0.3)]' 
                   : 'text-txt-3'
-              } ${!isQuizPassed ? 'opacity-40 cursor-not-allowed' : 'hover:text-txt hover:bg-white/5'}`}
+              } ${!isQuizPassed ? 'opacity-40 cursor-not-allowed' : 'hover:text-txt hover:dark:bg-white/5 bg-black/5'}`}
             >
               <FileText size={14} />
               3. Devoir
               {!isQuizPassed && <Lock size={12} className="text-txt-3" />}
-              {isQuizPassed && isDevoirDone && <CheckCircle size={12} className={activeTab === 'devoir' ? 'text-white/70' : 'text-win'} />}
+              {isQuizPassed && isDevoirDone && <CheckCircle size={12} className={activeTab === 'devoir' ? 'text-txt-2' : 'text-win'} />}
             </button>
           </div>
 
           {/* Tab Content Box */}
-          <div className="glass-frost p-8 rounded-2xl border border-white/5 bg-surface/20 min-h-[400px] flex flex-col justify-between shadow-2xl relative">
+          <div className="glass-frost p-8 rounded-2xl border border-border bg-surface/20 min-h-[400px] flex flex-col justify-between shadow-2xl relative">
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-32 bg-accent/5 blur-[50px] pointer-events-none rounded-full" />
             
             {/* TABS CONTENT */}
@@ -431,10 +431,10 @@ const LessonPlayer: React.FC = () => {
                       {cleanContenu.trim().length > 10 && (
                         <button
                           onClick={() => setIsVideoVisible(false)}
-                          className="absolute top-3 right-3 z-30 p-1.5 bg-black/60 hover:bg-black/90 text-white rounded-full hover:scale-105 transition-all border border-white/10 flex items-center justify-center"
+                          className="absolute top-3 right-3 z-30 p-1.5 bg-black/60 hover:bg-black/90 text-txt rounded-full hover:scale-105 transition-all border border-border flex items-center justify-center"
                           title="Masquer la vidéo pour lire le cours"
                         >
-                          <XCircle size={14} className="text-white/70 hover:text-white" />
+                          <XCircle size={14} className="text-txt-2 hover:text-txt" />
                         </button>
                       )}
                     </div>
@@ -796,10 +796,10 @@ const LessonPlayer: React.FC = () => {
 
         {/* Right Side: Lessons Sidebar Checklist */}
         <div className="space-y-4">
-          <div className="glass-frost p-5 rounded-2xl border border-white/5 space-y-4 shadow-xl relative overflow-hidden">
+          <div className="glass-frost p-5 rounded-2xl border border-border space-y-4 shadow-xl relative overflow-hidden">
             <div className="absolute top-0 right-0 w-32 h-32 bg-accent/5 blur-3xl rounded-full pointer-events-none" />
             
-            <h3 className="relative z-10 text-[11px] font-bold uppercase tracking-widest text-txt-2 pb-3 border-b border-white/10 flex items-center gap-2">
+            <h3 className="relative z-10 text-[11px] font-bold uppercase tracking-widest text-txt-2 pb-3 border-b border-border flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-accent" />
               Sommaire du Module
             </h3>
@@ -846,7 +846,7 @@ const LessonPlayer: React.FC = () => {
                     </div>
                     
                     <div className="min-w-0 flex-1 space-y-1">
-                      <p className={`text-[11px] leading-snug truncate ${isLocked ? 'text-txt-3' : isActive ? 'text-white' : 'text-txt-2'}`}>
+                      <p className={`text-[11px] leading-snug truncate ${isLocked ? 'text-txt-3' : isActive ? 'text-txt' : 'text-txt-2'}`}>
                         {l.titre}
                       </p>
                       

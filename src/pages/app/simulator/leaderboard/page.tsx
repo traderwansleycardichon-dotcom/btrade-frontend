@@ -34,7 +34,7 @@ export default function SimulatorLeaderboardPage() {
           <Trophy className="w-5 h-5" />
           Hall of Fame
         </div>
-        <h1 className="text-4xl font-bold text-white tracking-tight">Simulator Leaderboard</h1>
+        <h1 className="text-4xl font-bold text-txt tracking-tight">Simulator Leaderboard</h1>
         <p className="text-lg text-slate-400">
           The top performing traders in the HAITIAN WALL STREET simulation challenge. Rankings are based on ROI, Risk Management, Consistency, and Psychology.
         </p>
@@ -47,7 +47,7 @@ export default function SimulatorLeaderboardPage() {
           <div className="bg-slate-800/80 rounded-2xl p-6 border border-slate-700/50 flex flex-col items-center text-center relative transform hover:-translate-y-2 transition-transform">
             <div className="absolute -top-6 w-12 h-12 bg-slate-400 text-slate-900 rounded-full flex items-center justify-center font-bold text-xl border-4 border-slate-900 shadow-lg">2</div>
             <img src={rankings[1]?.avatarUrl || `https://ui-avatars.com/api/?name=${rankings[1]?.username}&background=random`} alt="avatar" className="w-20 h-20 rounded-full mb-4 border-4 border-slate-400/20" />
-            <h3 className="text-xl font-bold text-white">{rankings[1]?.username}</h3>
+            <h3 className="text-xl font-bold text-txt">{rankings[1]?.username}</h3>
             <p className="text-emerald-400 font-medium mt-1">{rankings[1]?.roi?.toFixed(2)}% ROI</p>
             <div className="mt-4 px-4 py-1.5 bg-slate-900/50 rounded-lg text-sm text-slate-300 font-medium capitalize">
               {rankings[1]?.level}
@@ -57,7 +57,7 @@ export default function SimulatorLeaderboardPage() {
                 {rankings[1].badges.map((b: any, i: number) => (
                   <div key={i} className="text-slate-400 tooltip-trigger relative group/badge p-1 bg-slate-800 rounded">
                     <Award className="w-3.5 h-3.5" />
-                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 w-max px-2 py-1 bg-slate-900 text-[10px] text-white rounded opacity-0 group-hover/badge:opacity-100 pointer-events-none z-10">
+                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 w-max px-2 py-1 bg-slate-900 text-[10px] text-txt rounded opacity-0 group-hover/badge:opacity-100 pointer-events-none z-10">
                       {b.type.replace('_', ' ')}
                     </div>
                   </div>
@@ -70,7 +70,7 @@ export default function SimulatorLeaderboardPage() {
           <div className="bg-gradient-to-b from-yellow-500/20 to-slate-800/80 rounded-2xl p-8 border border-yellow-500/30 flex flex-col items-center text-center relative transform hover:-translate-y-2 transition-transform z-10 md:-translate-y-8">
             <div className="absolute -top-6 w-16 h-16 bg-yellow-500 text-yellow-900 rounded-full flex items-center justify-center font-bold text-3xl border-4 border-slate-900 shadow-lg shadow-yellow-500/20">1</div>
             <img src={rankings[0]?.avatarUrl || `https://ui-avatars.com/api/?name=${rankings[0]?.username}&background=random`} alt="avatar" className="w-24 h-24 rounded-full mb-4 border-4 border-yellow-500/30" />
-            <h3 className="text-2xl font-bold text-white">{rankings[0]?.username}</h3>
+            <h3 className="text-2xl font-bold text-txt">{rankings[0]?.username}</h3>
             <p className="text-emerald-400 font-bold text-lg mt-1">{rankings[0]?.roi?.toFixed(2)}% ROI</p>
             <div className="mt-4 px-4 py-1.5 bg-yellow-500/20 text-yellow-500 rounded-lg text-sm font-bold capitalize flex items-center gap-2">
               <Star className="w-4 h-4" fill="currentColor" /> {rankings[0]?.level}
@@ -80,7 +80,7 @@ export default function SimulatorLeaderboardPage() {
                 {rankings[0].badges.map((b: any, i: number) => (
                   <div key={i} className="text-yellow-500 tooltip-trigger relative group/badge p-1 bg-yellow-500/10 rounded">
                     <Award className="w-4 h-4" />
-                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 w-max px-2 py-1 bg-slate-900 text-[10px] text-white rounded opacity-0 group-hover/badge:opacity-100 pointer-events-none z-10">
+                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 w-max px-2 py-1 bg-slate-900 text-[10px] text-txt rounded opacity-0 group-hover/badge:opacity-100 pointer-events-none z-10">
                       {b.type.replace('_', ' ')}
                     </div>
                   </div>
@@ -93,7 +93,7 @@ export default function SimulatorLeaderboardPage() {
           <div className="bg-slate-800/80 rounded-2xl p-6 border border-slate-700/50 flex flex-col items-center text-center relative transform hover:-translate-y-2 transition-transform">
             <div className="absolute -top-6 w-12 h-12 bg-amber-700 text-amber-100 rounded-full flex items-center justify-center font-bold text-xl border-4 border-slate-900 shadow-lg">3</div>
             <img src={rankings[2]?.avatarUrl || `https://ui-avatars.com/api/?name=${rankings[2]?.username}&background=random`} alt="avatar" className="w-20 h-20 rounded-full mb-4 border-4 border-amber-700/20" />
-            <h3 className="text-xl font-bold text-white">{rankings[2]?.username}</h3>
+            <h3 className="text-xl font-bold text-txt">{rankings[2]?.username}</h3>
             <p className="text-emerald-400 font-medium mt-1">{rankings[2]?.roi?.toFixed(2)}% ROI</p>
             <div className="mt-4 px-4 py-1.5 bg-slate-900/50 rounded-lg text-sm text-slate-300 font-medium capitalize">
               {rankings[2]?.level}
@@ -103,7 +103,7 @@ export default function SimulatorLeaderboardPage() {
                 {rankings[2].badges.map((b: any, i: number) => (
                   <div key={i} className="text-amber-500 tooltip-trigger relative group/badge p-1 bg-amber-900/20 rounded">
                     <Award className="w-3.5 h-3.5" />
-                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 w-max px-2 py-1 bg-slate-900 text-[10px] text-white rounded opacity-0 group-hover/badge:opacity-100 pointer-events-none z-10">
+                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 w-max px-2 py-1 bg-slate-900 text-[10px] text-txt rounded opacity-0 group-hover/badge:opacity-100 pointer-events-none z-10">
                       {b.type.replace('_', ' ')}
                     </div>
                   </div>
@@ -143,7 +143,7 @@ export default function SimulatorLeaderboardPage() {
                   <td className="p-5">
                     <div className="flex items-center gap-3">
                       <img src={trader.avatarUrl || `https://ui-avatars.com/api/?name=${trader.username}&background=random`} alt="avatar" className="w-10 h-10 rounded-full bg-slate-700 border border-slate-600" />
-                      <span className="text-white font-medium group-hover:text-emerald-400 transition-colors">{trader.username}</span>
+                      <span className="text-txt font-medium group-hover:text-emerald-400 transition-colors">{trader.username}</span>
                     </div>
                   </td>
                   <td className="p-5">
@@ -156,7 +156,7 @@ export default function SimulatorLeaderboardPage() {
                   <td className="p-5">
                     <div className="flex items-center justify-center gap-2">
                       <Target className="w-4 h-4 text-emerald-400" />
-                      <span className="text-white font-bold">{Math.round(trader.rankingScore)}</span>
+                      <span className="text-txt font-bold">{Math.round(trader.rankingScore)}</span>
                     </div>
                   </td>
                   <td className="p-5 text-center">
@@ -168,7 +168,7 @@ export default function SimulatorLeaderboardPage() {
                             className="bg-gradient-to-br from-yellow-500/20 to-orange-500/10 border border-yellow-500/30 p-1.5 rounded-lg tooltip-trigger relative group/badge"
                           >
                             <Award className="w-4 h-4 text-yellow-500" />
-                            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max px-2 py-1 bg-slate-900 border border-slate-700 text-xs text-white rounded opacity-0 group-hover/badge:opacity-100 pointer-events-none transition-opacity z-10">
+                            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max px-2 py-1 bg-slate-900 border border-slate-700 text-xs text-txt rounded opacity-0 group-hover/badge:opacity-100 pointer-events-none transition-opacity z-10">
                               {b.type.replace('_', ' ')}
                             </div>
                           </div>

@@ -89,7 +89,7 @@ export default function ContractSignaturePage() {
     return (
       <div className="text-center py-12">
         <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-        <h2 className="text-xl font-bold text-white mb-2">Contrat introuvable</h2>
+        <h2 className="text-xl font-bold text-txt mb-2">Contrat introuvable</h2>
         <button onClick={() => navigate('/app/contracts')} className="text-accent hover:underline">
           Retour aux contrats
         </button>
@@ -110,13 +110,13 @@ export default function ContractSignaturePage() {
       <div className="flex items-center gap-4">
         <button 
           onClick={() => navigate('/app/contracts')}
-          className="p-2 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 transition-colors text-white/60"
+          className="p-2 dark:bg-white/5 bg-black/5 border border-border rounded-lg hover:dark:bg-white/10 bg-black/10 transition-colors text-txt-2"
         >
           <ArrowLeft size={16} />
         </button>
         <div>
-          <h1 className="text-2xl font-bold text-white">{contract.template.title}</h1>
-          <p className="text-white/60 text-sm">
+          <h1 className="text-2xl font-bold text-txt">{contract.template.title}</h1>
+          <p className="text-txt-2 text-sm">
             {isSigned ? 'Signé le ' + new Date(contract.signedAt).toLocaleString('fr-FR') : 'Veuillez lire et signer ci-dessous'}
           </p>
         </div>
@@ -141,9 +141,9 @@ export default function ContractSignaturePage() {
       )}
 
       {/* Contract Document View */}
-      <div className="bg-[#FAF9F6] rounded-xl overflow-hidden shadow-2xl border border-white/10 relative">
+      <div className="bg-[#FAF9F6] rounded-xl overflow-hidden shadow-2xl border border-border relative">
         {/* Dark Header for Logo */}
-        <div className="bg-bg w-full py-4 flex justify-center items-center border-b border-white/10 relative z-20">
+        <div className="bg-bg w-full py-4 flex justify-center items-center border-b border-border relative z-20">
           <img src={settings?.platform_logo || '/logo.svg'} alt="Haitian Wall Street" className="h-12 object-contain" />
         </div>
 

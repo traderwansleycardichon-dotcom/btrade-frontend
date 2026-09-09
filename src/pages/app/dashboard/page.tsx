@@ -486,7 +486,7 @@ const MiniCalendar: React.FC<{ trades: any[]; onSeeAll: () => void }> = ({ trade
               }
             >
               <span className={`leading-none ${
-                isWin ? 'text-white font-bold'
+                isWin ? 'text-txt font-bold'
                   : c.today ? 'text-accent font-bold'
                   : hasTrade ? 'text-loss font-bold'
                   : 'text-txt-3'

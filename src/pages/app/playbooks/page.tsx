@@ -192,7 +192,7 @@ const PlaybookCard: React.FC<{
           />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center">
-            <span className="text-5xl font-black text-white/30 mono">
+            <span className="text-5xl font-black text-txt-3 mono">
               {(p.titre || '?').slice(0, 2).toUpperCase()}
             </span>
           </div>
@@ -202,14 +202,14 @@ const PlaybookCard: React.FC<{
         <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
           <button
             onClick={onToggle}
-            className="p-1.5 rounded bg-black/40 backdrop-blur hover:bg-black/70 text-white"
+            className="p-1.5 rounded bg-black/40 backdrop-blur hover:bg-black/70 text-txt"
             title={p.actif ? 'Archiver' : 'Activer'}
           >
             {p.actif ? <Archive size={12} /> : <ArchiveRestore size={12} />}
           </button>
           <button
             onClick={onEdit}
-            className="p-1.5 rounded bg-black/40 backdrop-blur hover:bg-black/70 text-white"
+            className="p-1.5 rounded bg-black/40 backdrop-blur hover:bg-black/70 text-txt"
             title="Modifier"
           >
             <Pencil size={12} />
@@ -225,7 +225,7 @@ const PlaybookCard: React.FC<{
 
         {/* Badge statut */}
         {!p.actif && (
-          <span className="absolute top-2 left-2 text-[9px] uppercase tracking-widest font-bold bg-black/60 text-white px-2 py-0.5 rounded">
+          <span className="absolute top-2 left-2 text-[9px] uppercase tracking-widest font-bold bg-black/60 text-txt px-2 py-0.5 rounded">
             Archivé
           </span>
         )}
@@ -329,7 +329,7 @@ const PlaybookFormModal: React.FC<{
           <h2 className="text-xs font-bold uppercase tracking-widest">
             {playbook ? 'Modifier le playbook' : 'Nouveau playbook'}
           </h2>
-          <button onClick={onClose} className="p-1 text-white/80 hover:text-white">
+          <button onClick={onClose} className="p-1 text-txt-2 hover:text-txt">
             <X size={14} />
           </button>
         </div>
@@ -475,7 +475,7 @@ const PlaybookFormModal: React.FC<{
           </button>
           <button
             onClick={submit}
-            className="text-[11px] px-3 py-1.5 rounded mono text-white font-bold"
+            className="text-[11px] px-3 py-1.5 rounded mono text-txt font-bold"
             style={{ background: form.couleur }}
           >
             {playbook ? 'Enregistrer' : 'Créer'}

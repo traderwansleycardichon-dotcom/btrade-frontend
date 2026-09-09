@@ -46,7 +46,7 @@ export function TodoSummaryModal() {
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-background/80 backdrop-blur-sm p-4">
-      <div className="relative w-full max-w-md bg-[#1a1b1e] border border-white/10 rounded-2xl p-6 overflow-hidden">
+      <div className="relative w-full max-w-md bg-[#1a1b1e] border border-border rounded-2xl p-6 overflow-hidden">
         
         {/* Lottie Confetti Animation in Background */}
         {confettiData && isSuccess && (
@@ -57,7 +57,7 @@ export function TodoSummaryModal() {
 
         <button 
           onClick={() => setIsOpen(false)}
-          className="absolute top-4 right-4 text-white/40 hover:text-white z-10 transition-colors"
+          className="absolute top-4 right-4 text-txt-2 hover:text-txt z-10 transition-colors"
         >
           <X className="h-5 w-5" />
         </button>
@@ -67,18 +67,18 @@ export function TodoSummaryModal() {
             <Trophy className="h-8 w-8 text-accent" />
           </div>
 
-          <h2 className="text-2xl font-bold text-white mb-2">
+          <h2 className="text-2xl font-bold text-txt mb-2">
             {summary.type === 'weekly' ? 'Bilan de la Semaine' : 'Bilan de la Journée'}
           </h2>
           
-          <p className="text-white/60 mb-6">
-            Vous avez complété <strong className="text-white">{summary.completed}</strong> tâches sur {summary.total}.
+          <p className="text-txt-2 mb-6">
+            Vous avez complété <strong className="text-txt">{summary.completed}</strong> tâches sur {summary.total}.
           </p>
 
           <div className="flex items-center gap-4 mb-6">
             <div className="text-left">
               <div className="text-3xl font-bold text-accent">{Math.round(summary.score)}%</div>
-              <div className="text-xs text-white/40 uppercase tracking-wider">Taux de réussite</div>
+              <div className="text-xs text-txt-2 uppercase tracking-wider">Taux de réussite</div>
             </div>
             {isSuccess && (
               <div className="bg-green-500/10 text-green-400 px-3 py-1 rounded-full text-sm font-medium">
@@ -88,12 +88,12 @@ export function TodoSummaryModal() {
           </div>
 
           {summary.aiAdvice && (
-            <div className="bg-white/5 border border-white/10 rounded-xl p-4 text-left w-full mt-2">
+            <div className="dark:bg-white/5 bg-black/5 border border-border rounded-xl p-4 text-left w-full mt-2">
               <div className="flex items-center gap-2 mb-2">
                 <Sparkles className="h-4 w-4 text-accent" />
-                <span className="text-sm font-semibold text-white">Conseil IA</span>
+                <span className="text-sm font-semibold text-txt">Conseil IA</span>
               </div>
-              <p className="text-sm text-white/70 leading-relaxed italic">
+              <p className="text-sm text-txt-2 leading-relaxed italic">
                 "{summary.aiAdvice}"
               </p>
             </div>

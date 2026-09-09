@@ -39,7 +39,7 @@ export function DeepAnalyticsPanel() {
 
   return (
     <div className="bg-surface border border-border rounded-xl p-5 mb-6">
-      <h2 className="text-xl font-bold text-white mb-6">Deep Analytics</h2>
+      <h2 className="text-xl font-bold text-txt mb-6">Deep Analytics</h2>
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Performance par jour */}

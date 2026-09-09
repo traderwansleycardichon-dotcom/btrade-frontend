@@ -135,7 +135,7 @@ const ModuleLessonsHub: React.FC = () => {
             </span>
           </div>
 
-          <h1 className="text-3xl md:text-4xl font-black tracking-[-0.025em] leading-tight text-white mb-3">
+          <h1 className="text-3xl md:text-4xl font-black tracking-[-0.025em] leading-tight text-txt mb-3">
             {module.titre}
           </h1>
           <p className="text-sm text-txt-3 leading-relaxed max-w-2xl mb-6">
@@ -215,7 +215,7 @@ const ModuleLessonsHub: React.FC = () => {
                       ? 'border-border bg-elevated flex items-center justify-center'
                       : isCompleted
                         ? 'border-win/20 bg-win/5 flex items-center justify-center'
-                        : 'border-white/10 group-hover:border-accent/30'
+                        : 'border-border group-hover:border-accent/30'
                     }
                   `}>
                     {lesson.thumbnail && !isLocked ? (
@@ -237,8 +237,8 @@ const ModuleLessonsHub: React.FC = () => {
                       isLocked
                         ? 'text-txt-3'
                         : isInProgress
-                          ? 'text-white group-hover:text-accent'
-                          : 'text-white/90 group-hover:text-white'
+                          ? 'text-txt group-hover:text-accent'
+                          : 'text-txt-2 group-hover:text-txt'
                     }`}>
                       {lesson.titre}
                     </h4>
@@ -266,7 +266,7 @@ const ModuleLessonsHub: React.FC = () => {
                         <Play size={10} fill="currentColor" /> Reprendre
                       </button>
                     ) : (
-                      <button className="flex items-center gap-1.5 text-[11px] font-bold text-txt-3 border border-border group-hover:border-white/20 group-hover:text-txt-2 px-4 py-2 rounded-lg transition-colors">
+                      <button className="flex items-center gap-1.5 text-[11px] font-bold text-txt-3 border border-border group-hover:border-border group-hover:text-txt-2 px-4 py-2 rounded-lg transition-colors">
                         <Play size={10} /> Commencer
                       </button>
                     )}

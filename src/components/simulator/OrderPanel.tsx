@@ -174,7 +174,7 @@ export function OrderPanel({
         <h3 className="text-xs font-bold text-gray-400 tracking-wider uppercase">
           {assetSymbol.split(":").pop()}
         </h3>
-        <p className="text-sm font-mono font-medium text-white mt-1">
+        <p className="text-sm font-mono font-medium text-txt mt-1">
           {currentPrice
             ? currentPrice.toLocaleString(undefined, {
                 minimumFractionDigits: 2,
@@ -192,7 +192,7 @@ export function OrderPanel({
             onClick={() => setOrderType("market")}
             className={`flex-1 py-1.5 text-[10px] font-bold uppercase tracking-wider transition-colors ${
               orderType === "market"
-                ? "bg-[#2a2e39] text-white"
+                ? "bg-[#2a2e39] text-txt"
                 : "bg-transparent text-gray-500 hover:text-gray-300"
             }`}
           >
@@ -203,7 +203,7 @@ export function OrderPanel({
             onClick={() => setOrderType("limit")}
             className={`flex-1 py-1.5 text-[10px] font-bold uppercase tracking-wider transition-colors ${
               orderType === "limit"
-                ? "bg-[#2a2e39] text-white"
+                ? "bg-[#2a2e39] text-txt"
                 : "bg-transparent text-gray-500 hover:text-gray-300"
             }`}
           >
@@ -223,7 +223,7 @@ export function OrderPanel({
               step="0.01"
               value={limitPrice || ""}
               onChange={(e) => setLimitPrice(Number(e.target.value))}
-              className="w-full bg-[#1e222d] border border-primary/50 rounded-lg px-3 py-2 text-sm text-white text-center focus:outline-none focus:border-primary"
+              className="w-full bg-[#1e222d] border border-primary/50 rounded-lg px-3 py-2 text-sm text-txt text-center focus:outline-none focus:border-primary"
               placeholder="0.00"
             />
           </div>
@@ -236,7 +236,7 @@ export function OrderPanel({
               type="button"
               onClick={() => setQtyMode("lots")}
               className={`flex-1 py-1 text-[10px] font-bold uppercase tracking-wider rounded ${
-                qtyMode === "lots" ? "bg-[#2a2e39] text-white" : "text-gray-500 hover:text-gray-300"
+                qtyMode === "lots" ? "bg-[#2a2e39] text-txt" : "text-gray-500 hover:text-gray-300"
               }`}
             >
               Lots
@@ -245,7 +245,7 @@ export function OrderPanel({
               type="button"
               onClick={() => setQtyMode("risk")}
               className={`flex-1 py-1 text-[10px] font-bold uppercase tracking-wider rounded ${
-                qtyMode === "risk" ? "bg-[#2a2e39] text-white" : "text-gray-500 hover:text-gray-300"
+                qtyMode === "risk" ? "bg-[#2a2e39] text-txt" : "text-gray-500 hover:text-gray-300"
               }`}
             >
               Risque %
@@ -261,7 +261,7 @@ export function OrderPanel({
                 <button
                   type="button"
                   onClick={() => adjustQty(-1)}
-                  className="p-2 text-gray-400 hover:text-white hover:bg-[#2a2e39] rounded-md transition-colors"
+                  className="p-2 text-gray-400 hover:text-txt hover:bg-[#2a2e39] rounded-md transition-colors"
                 >
                   <Minus size={16} />
                 </button>
@@ -270,12 +270,12 @@ export function OrderPanel({
                   step="0.1"
                   value={quantity}
                   onChange={(e) => setQuantity(Number(e.target.value))}
-                  className="flex-1 bg-transparent text-center text-sm font-bold text-white focus:outline-none"
+                  className="flex-1 bg-transparent text-center text-sm font-bold text-txt focus:outline-none"
                 />
                 <button
                   type="button"
                   onClick={() => adjustQty(1)}
-                  className="p-2 text-gray-400 hover:text-white hover:bg-[#2a2e39] rounded-md transition-colors"
+                  className="p-2 text-gray-400 hover:text-txt hover:bg-[#2a2e39] rounded-md transition-colors"
                 >
                   <Plus size={16} />
                 </button>
@@ -301,7 +301,7 @@ export function OrderPanel({
                   step="0.1"
                   value={riskPercent}
                   onChange={(e) => setRiskPercent(Number(e.target.value) || 0)}
-                  className="w-20 bg-[#2a2e39] text-white rounded p-1.5 text-right focus:outline-none"
+                  className="w-20 bg-[#2a2e39] text-txt rounded p-1.5 text-right focus:outline-none"
                 />
               </div>
               <div className="flex justify-between items-center text-xs">
@@ -312,7 +312,7 @@ export function OrderPanel({
                   value={riskSlPrice || ""}
                   onChange={(e) => setRiskSlPrice(Number(e.target.value) || 0)}
                   placeholder="0.00"
-                  className="w-20 bg-[#2a2e39] text-white rounded p-1.5 text-right focus:outline-none"
+                  className="w-20 bg-[#2a2e39] text-txt rounded p-1.5 text-right focus:outline-none"
                 />
               </div>
               <div className="pt-2 border-t border-[#2a2e39] flex justify-between items-center">
@@ -343,7 +343,7 @@ export function OrderPanel({
                 value={tpPrice || ""}
                 onChange={(e) => setTpPrice(Number(e.target.value) || 0)}
                 placeholder="0.00"
-                className="w-16 bg-[#2a2e39] text-white rounded p-1 text-right focus:outline-none disabled:opacity-50"
+                className="w-16 bg-[#2a2e39] text-txt rounded p-1 text-right focus:outline-none disabled:opacity-50"
                 disabled={!activeTrade}
               />
             </div>
@@ -356,7 +356,7 @@ export function OrderPanel({
                 value={slPrice || ""}
                 onChange={(e) => setSlPrice(Number(e.target.value) || 0)}
                 placeholder="0.00"
-                className="w-16 bg-[#2a2e39] text-white rounded p-1 text-right focus:outline-none disabled:opacity-50"
+                className="w-16 bg-[#2a2e39] text-txt rounded p-1 text-right focus:outline-none disabled:opacity-50"
                 disabled={!activeTrade}
               />
             </div>
@@ -385,7 +385,7 @@ export function OrderPanel({
                   value={trailingDistance}
                   onChange={(e) => setTrailingDistance(Number(e.target.value) || 0)}
                   placeholder="Points"
-                  className="w-16 bg-[#2a2e39] text-white rounded p-1 text-right focus:outline-none disabled:opacity-50"
+                  className="w-16 bg-[#2a2e39] text-txt rounded p-1 text-right focus:outline-none disabled:opacity-50"
                   disabled={!activeTrade}
                 />
               </div>
@@ -455,7 +455,7 @@ export function OrderPanel({
                     <span className="text-gray-400 text-xs font-bold">
                       Prix d'Entrée
                     </span>
-                    <span className="text-white font-mono text-sm">
+                    <span className="text-txt font-mono text-sm">
                       {Number(activeTrade.entryPrice).toLocaleString()}
                     </span>
                   </div>
@@ -467,7 +467,7 @@ export function OrderPanel({
                       <span className={`text-[10px] font-bold ${colorClass}`}>
                         {pointsMoved > 0 ? "+" : ""}{pointsMoved.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} pts
                       </span>
-                      <span className="text-white font-mono text-sm">
+                      <span className="text-txt font-mono text-sm">
                         {currentPriceNum
                           ? currentPriceNum.toLocaleString(undefined, {
                               minimumFractionDigits: 2,
@@ -549,7 +549,7 @@ export function OrderPanel({
             <button
               onClick={() => executeTrade("long")}
               disabled={loading !== null}
-              className={`flex-1 flex items-center justify-center py-2 rounded-lg border-2 transition-all ${loading === "long" ? "bg-[#00bfa5]/20 border-[#00bfa5]/50 text-[#00bfa5] opacity-50" : "bg-[#00bfa5]/10 border-[#00bfa5]/30 hover:bg-[#00bfa5] hover:border-[#00bfa5] text-[#00bfa5] hover:text-white"}`}
+              className={`flex-1 flex items-center justify-center py-2 rounded-lg border-2 transition-all ${loading === "long" ? "bg-[#00bfa5]/20 border-[#00bfa5]/50 text-[#00bfa5] opacity-50" : "bg-[#00bfa5]/10 border-[#00bfa5]/30 hover:bg-[#00bfa5] hover:border-[#00bfa5] text-[#00bfa5] hover:text-txt"}`}
             >
               <span className="font-black text-xs">BUY</span>
             </button>
