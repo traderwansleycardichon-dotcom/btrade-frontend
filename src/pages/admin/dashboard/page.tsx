@@ -13,15 +13,18 @@ import { BazikWalletCard } from '../../../components/admin/BazikWalletCard';
 function CTODashboard() {
   const [health, setHealth] = useState<any>(null);
   const [logs, setLogs] = useState<any[]>([]);
+  const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     Promise.all([
       api.get('/api/admin/system/health'),
       api.get('/api/admin/system/logs'),
-    ]).then(([h, l]) => {
+      api.get('/api/admin/stats')
+    ]).then(([h, l, s]) => {
       setHealth(h.data.data);
       setLogs(l.data.data || []);
+      setStats(s.data.data);
     }).catch(console.error).finally(() => setLoading(false));
   }, []);
 
@@ -35,6 +38,14 @@ function CTODashboard() {
           Dashboard Technique — CTO
         </h1>
         <p className="text-txt-2 text-sm">Supervision en temps réel de l'infrastructure Haitian Wall Street</p>
+      </div>
+
+      {/* User Stats */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <KpiCard label="Utilisateurs PRO" value={stats?.billing?.proUsersCount || 0} loading={loading} />
+        <KpiCard label="Comptes Locked" value={stats?.billing?.lockedUsers || 0} loading={loading} colorClass="text-loss" />
+        <KpiCard label="Administrateurs (CTO/Admin)" value={(stats?.billing?.ctoUsers || 0) + (stats?.billing?.adminUsers || 0)} loading={loading} colorClass="text-purple-400" />
+        <KpiCard label="Staff / Support" value={stats?.billing?.staffUsers || 0} loading={loading} colorClass="text-blue-400" />
       </div>
 
       {/* Health KPIs */}
@@ -211,28 +222,16 @@ export default function AdminDashboardPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <KpiCard 
-          label="Total Utilisateurs" 
-          value={stats?.totalUsers || 0} 
-          loading={loading}
-        />
-        <KpiCard 
-          label="Total Comptes" 
-          value={stats?.totalAccounts || 0} 
-          loading={loading}
-        />
-        <KpiCard 
-          label="Trades Enregistrés" 
-          value={stats?.totalTrades || 0} 
-          loading={loading}
-        />
-        <KpiCard 
-          label="Capital sous gestion" 
-          value={stats?.totalCapital?.toLocaleString() || '0'} 
-          currency="$"
-          loading={loading}
-          colorClass="text-accent"
-        />
+        <KpiCard label="Total Utilisateurs" value={stats?.totalUsers || 0} loading={loading} />
+        <KpiCard label="Utilisateurs PRO" value={stats?.billing?.proUsersCount || 0} loading={loading} colorClass="text-win" />
+        <KpiCard label="Comptes Locked" value={stats?.billing?.lockedUsers || 0} loading={loading} colorClass="text-loss" />
+        <KpiCard label="Admin / CTO / Staff" value={(stats?.billing?.adminUsers || 0) + (stats?.billing?.ctoUsers || 0) + (stats?.billing?.staffUsers || 0)} loading={loading} colorClass="text-purple-400" />
+      </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <KpiCard label="Total Comptes Trading" value={stats?.totalAccounts || 0} loading={loading} />
+        <KpiCard label="Trades Enregistrés" value={stats?.totalTrades || 0} loading={loading} />
+        <KpiCard label="Capital sous gestion" value={stats?.totalCapital?.toLocaleString() || '0'} currency="$" loading={loading} colorClass="text-accent" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-8">
