@@ -11,21 +11,33 @@
 @tailwind utilities;
 
 :root {
-  --bg: #0A0B0E;
-  --surface: #11141B;
+  --bg: #06070A;
+  --surface: #0A0B0E;
   --elevated: #181C25;
   --accent: #F36C00;
-  --accent-2: #E65C00;
-  --text: #F5F6F8;
-  --text-2: #B4BAC6;
+  --accent-2: #FF8A3D;
   --txt: #FFFFFF;
-  --txt-2: #B4BAC6;
-  --txt-3: #6B7280;
-  --muted: #6B7280;
+  --txt-2: #6B7280;
+  --txt-3: #4B5563;
   --border: #1F2530;
   --border-hover: #2A3140;
-  --success: #10B981;
-  --danger: #EF4444;
+  --win: #10B981;
+  --loss: #EF4444;
+}
+
+.light {
+  --bg: #F9FAFB;
+  --surface: #FFFFFF;
+  --elevated: #F3F4F6;
+  --accent: #F36C00;
+  --accent-2: #FF8A3D;
+  --txt: #111827;
+  --txt-2: #4B5563;
+  --txt-3: #9CA3AF;
+  --border: #E5E7EB;
+  --border-hover: #D1D5DB;
+  --win: #059669;
+  --loss: #DC2626;
 }
 
 *, *::before, *::after {
@@ -332,12 +344,12 @@
 .elevated { background: var(--elevated); }
 
 .chip { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; letter-spacing: .02em; }
-.chip-buy { background: rgba(16,185,129,.12); color: #34D399; border: 1px solid rgba(16,185,129,.25); }
-.chip-sell { background: rgba(239,68,68,.12); color: #F87171; border: 1px solid rgba(239,68,68,.25); }
-.chip-win { background: rgba(16,185,129,.12); color: #34D399; }
-.chip-loss { background: rgba(239,68,68,.12); color: #F87171; }
+.chip-buy { background: color-mix(in srgb, var(--win) 12%, transparent); color: var(--win); border: 1px solid color-mix(in srgb, var(--win) 25%, transparent); }
+.chip-sell { background: color-mix(in srgb, var(--loss) 12%, transparent); color: var(--loss); border: 1px solid color-mix(in srgb, var(--loss) 25%, transparent); }
+.chip-win { background: color-mix(in srgb, var(--win) 12%, transparent); color: var(--win); }
+.chip-loss { background: color-mix(in srgb, var(--loss) 12%, transparent); color: var(--loss); }
 .chip-be { background: var(--elevated); color: var(--txt-2); }
-.chip-orange { background: rgba(243,108,0,.12); color: var(--accent); border: 1px solid rgba(243,108,0,.3); }
+.chip-orange { background: color-mix(in srgb, var(--accent) 12%, transparent); color: var(--accent); border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent); }
 .chip-dot::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: currentColor; display: inline-block; }
 
 .table-row { transition: background .15s ease; }

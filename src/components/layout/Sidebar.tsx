@@ -38,10 +38,11 @@ import { useMultiAccountTrades } from '../../hooks/useMultiAccountTrades';
 import { usePlan } from '../../hooks/usePlan';
 import { useSettings } from '../../contexts/SettingsContext';
 import { Modal } from '../ui/Modal';
-import { Flame, BarChart2 } from 'lucide-react';
+import { Flame, BarChart2, Sun, Moon } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
 import { useQueryClient } from '@tanstack/react-query';
 import { twMerge } from 'tailwind-merge';
+import { useTheme } from '../../contexts/ThemeContext';
 import { LucideIcon } from 'lucide-react';
 
 function cn(...inputs: ClassValue[]) {
@@ -77,6 +78,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen = false, onMobileCl
   const { user, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
+  const { theme, toggleTheme } = useTheme();
   const { isFree } = usePlan();
   const { settings } = useSettings();
   const queryClient = useQueryClient();
@@ -274,6 +276,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen = false, onMobileCl
               <div className="text-sm font-bold truncate">{user?.fullName || 'Utilisateur'}</div>
               <div className="text-[10px] font-bold text-accent uppercase tracking-tighter">Plan {user?.plan || 'Free'}</div>
             </div>
+            <button 
+              onClick={toggleTheme}
+              className="p-2 text-txt-2 hover:text-txt transition-colors"
+              title={theme === 'dark' ? 'Passer au mode clair' : 'Passer au mode sombre'}
+            >
+              {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+            </button>
             <button 
               onClick={logout}
               className="p-2 text-txt-2 hover:text-loss transition-colors"

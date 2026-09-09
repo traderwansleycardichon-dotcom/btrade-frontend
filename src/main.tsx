@@ -183,13 +183,17 @@ const router = createBrowserRouter([
   } as any
 });
 
+import { ThemeProvider } from './contexts/ThemeContext';
+
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
       <SoundProvider>
         <SettingsProvider>
-          <Toaster position="top-right" toastOptions={{ className: 'bg-surface border border-border text-text' }} />
-          <RouterProvider router={router} future={{ v7_startTransition: true }} />
+          <ThemeProvider>
+            <Toaster position="top-right" toastOptions={{ className: 'bg-surface border border-border text-text' }} />
+            <RouterProvider router={router} future={{ v7_startTransition: true }} />
+          </ThemeProvider>
         </SettingsProvider>
       </SoundProvider>
     </QueryClientProvider>

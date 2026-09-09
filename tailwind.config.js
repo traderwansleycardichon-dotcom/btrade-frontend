@@ -7,17 +7,17 @@ export default {
   theme: {
     extend: {
       colors: {
-        'bg': '#06070A',
-        'surface': '#0A0B0E',
-        'elevated': '#181C25',
-        'accent': '#F36C00',
-        'accent-2': '#FF8A3D',
-        'txt': '#FFFFFF',
-        'txt-2': '#6B7280',
-        'txt-3': '#4B5563',
-        'border': '#1F2530',
-        'win': '#10B981',
-        'loss': '#EF4444',
+        'bg': 'var(--bg)',
+        'surface': 'var(--surface)',
+        'elevated': 'var(--elevated)',
+        'accent': 'var(--accent)',
+        'accent-2': 'var(--accent-2)',
+        'txt': 'var(--txt)',
+        'txt-2': 'var(--txt-2)',
+        'txt-3': 'var(--txt-3)',
+        'border': 'var(--border)',
+        'win': 'var(--win)',
+        'loss': 'var(--loss)',
       },
       fontFamily: {
         'sans': ['"SF Pro Display"', 'Inter', 'system-ui', 'sans-serif'],
