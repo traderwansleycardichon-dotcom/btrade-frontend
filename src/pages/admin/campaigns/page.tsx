@@ -79,6 +79,27 @@ export default function AdminCampaignsPage() {
     }
   };
 
+  const handleResend = async (c: EmailCampaign) => {
+    const label = { all: 'tous les utilisateurs', pro: 'utilisateurs PRO', free: 'utilisateurs FREE' }[c.segment as 'all'|'pro'|'free'];
+    if (!window.confirm(`Voulez-vous Renvoyer cette campagne ("${c.subject}") à ${label} ?`)) return;
+    setSending(true);
+    try {
+      const res = await api.post('/api/admin/emails/campaign', {
+        templateId: c.templateId,
+        subjectOverride: c.subject,
+        segment: c.segment,
+      });
+      addToast(`Campagne renvoyée à ${res.data.data.sentCount} destinataires`);
+      fetchData();
+    } catch (err: any) {
+      addToast(err.response?.data?.error || 'Erreur envoi campagne', 'error');
+    } finally {
+      setSending(false);
+    }
+  };
+
+  if (loading) return <div className="p-8 text-txt-2">Chargement...</div>;
+
   return (
     <div className="space-y-8 animate-[fadeIn_0.5s_ease-out]">
       <div>
@@ -122,49 +143,46 @@ export default function AdminCampaignsPage() {
 
           <div>
             <label className="block text-[10px] font-bold text-txt-3 uppercase tracking-widest mb-2">Segment</label>
-            <div className="flex gap-2">
-              {(['all', 'pro', 'free'] as const).map(seg => (
-                <button
-                  key={seg}
-                  type="button"
-                  onClick={() => setForm(p => ({ ...p, segment: seg }))}
-                  className={`flex-1 py-2.5 rounded-xl text-sm font-bold border transition-colors ${
-                    form.segment === seg
-                      ? 'bg-accent text-white border-accent'
-                      : 'border-border text-txt-2 hover:bg-elevated'
-                  }`}
-                >
-                  {seg === 'all' ? 'Tout le monde' : seg === 'pro' ? 'PRO seulement' : 'FREE seulement'}
-                </button>
+            <div className="flex gap-4">
+              {['all', 'pro', 'free'].map(s => (
+                <label key={s} className="flex items-center gap-2 cursor-pointer text-sm">
+                  <input
+                    type="radio"
+                    name="segment"
+                    value={s}
+                    checked={form.segment === s}
+                    onChange={e => setForm(p => ({ ...p, segment: e.target.value as any }))}
+                    className="accent-accent"
+                  />
+                  {s.toUpperCase()}
+                </label>
               ))}
             </div>
           </div>
 
           <button
             type="submit"
-            disabled={sending || !form.templateId}
-            className="flex items-center gap-2 px-8 py-3 bg-loss text-white rounded-xl font-bold hover:bg-loss/80 transition-colors disabled:opacity-50"
+            disabled={sending}
+            className="mt-4 px-6 py-3 bg-accent text-white font-bold rounded-xl hover:bg-accent-2 transition-colors disabled:opacity-50 flex items-center gap-2"
           >
-            {sending ? <RefreshCw size={16} className="animate-spin" /> : <Send size={16} />}
-            {sending ? 'Envoi en cours...' : 'Envoyer la campagne'}
+            {sending ? <RefreshCw className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
+            Envoyer la campagne
           </button>
         </form>
       </div>
 
-      {/* History */}
+      {/* Historique */}
       <div className="glass rounded-3xl border border-border overflow-hidden">
-        <div className="px-8 py-5 border-b border-border">
-          <h3 className="font-bold text-lg">Historique des campagnes</h3>
+        <div className="p-8 border-b border-border bg-surface/50">
+          <h3 className="font-bold text-lg">Historique des envois</h3>
         </div>
-        {loading ? (
-          <div className="p-8 text-center text-txt-3">Chargement...</div>
-        ) : campaigns.length === 0 ? (
-          <div className="p-8 text-center text-txt-3 italic">Aucune campagne envoyée pour le moment.</div>
+        {campaigns.length === 0 ? (
+          <p className="p-8 text-txt-2 text-sm text-center">Aucune campagne envoyée pour le moment.</p>
         ) : (
-          <div className="divide-y divide-border/50">
+          <div className="divide-y divide-border">
             {campaigns.map(c => (
               <div key={c.id} className="px-8 py-4 flex items-center justify-between hover:bg-surface/50 transition-colors">
-                <div>
+                <div className="flex-1">
                   <p className="font-bold text-sm">{c.subject}</p>
                   <p className="text-txt-2 text-xs mt-0.5">
                     Template: <span className="text-txt">{TEMPLATE_LABELS[c.templateId] || c.templateId}</span>
@@ -172,10 +190,20 @@ export default function AdminCampaignsPage() {
                     Segment: <span className="text-txt">{c.segment === 'all' ? 'Tout le monde' : c.segment.toUpperCase()}</span>
                   </p>
                 </div>
-                <div className="text-right shrink-0 ml-6">
+                <div className="text-right shrink-0 mx-6">
                   <p className="text-accent font-black text-lg">{c.sentCount}</p>
                   <p className="text-txt-3 text-xs">destinataires</p>
                   <p className="text-txt-3 text-[10px]">{new Date(c.sentAt).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })}</p>
+                </div>
+                <div className="shrink-0">
+                  <button 
+                    onClick={() => handleResend(c)}
+                    disabled={sending}
+                    className="flex items-center gap-2 px-4 py-2 bg-elevated hover:bg-white/5 border border-border hover:border-accent text-txt text-xs font-bold rounded-lg transition-colors disabled:opacity-50"
+                  >
+                    <RefreshCw className={`w-3 h-3 ${sending ? 'animate-spin' : ''}`} />
+                    Renvoyer
+                  </button>
                 </div>
               </div>
             ))}
