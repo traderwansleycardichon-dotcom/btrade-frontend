@@ -25,7 +25,7 @@
   --loss: #EF4444;
 }
 
-.light {
+:root.light {
   --bg: #F9FAFB;
   --surface: #FFFFFF;
   --elevated: #F3F4F6;
