@@ -15,6 +15,7 @@ function CTODashboard() {
   const [logs, setLogs] = useState<any[]>([]);
   const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [expandedLogId, setExpandedLogId] = useState<string | number | null>(null);
 
   useEffect(() => {
     Promise.all([
@@ -122,24 +123,40 @@ function CTODashboard() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/40">
-                {logs.map((log: any, i: number) => (
-                  <tr key={log.id || i} className="hover:bg-elevated/30 transition-colors">
-                    <td className="px-4 py-2 font-mono text-txt-3 whitespace-nowrap">
-                      {new Date(log.createdAt).toLocaleString('fr-FR')}
-                    </td>
-                    <td className="px-4 py-2">
-                      <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold uppercase ${
-                        log.level === 'error' ? 'bg-loss/20 text-loss' :
-                        log.level === 'warn' ? 'bg-yellow-500/20 text-yellow-400' :
-                        'bg-win/10 text-win'
-                      }`}>
-                        {log.level || 'info'}
-                      </span>
-                    </td>
-                    <td className="px-4 py-2 text-txt-3">{log.type || '—'}</td>
-                    <td className="px-4 py-2 text-txt max-w-xs truncate">{log.message}</td>
-                  </tr>
-                ))}
+                {logs.map((log: any, i: number) => {
+                  const isExpanded = expandedLogId === (log.id || i);
+                  return (
+                    <tr 
+                      key={log.id || i} 
+                      className="hover:bg-elevated/30 transition-colors cursor-pointer"
+                      onClick={() => setExpandedLogId(isExpanded ? null : (log.id || i))}
+                    >
+                      <td className="px-4 py-2 font-mono text-txt-3 whitespace-nowrap align-top">
+                        {new Date(log.createdAt).toLocaleString('fr-FR')}
+                      </td>
+                      <td className="px-4 py-2 align-top">
+                        <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold uppercase ${
+                          log.level === 'error' ? 'bg-loss/20 text-loss' :
+                          log.level === 'warn' ? 'bg-yellow-500/20 text-yellow-400' :
+                          'bg-win/10 text-win'
+                        }`}>
+                          {log.level || 'info'}
+                        </span>
+                      </td>
+                      <td className="px-4 py-2 text-txt-3 align-top">{log.type || '—'}</td>
+                      <td className="px-4 py-2 text-txt max-w-xs lg:max-w-md xl:max-w-2xl align-top">
+                        <div className={isExpanded ? "whitespace-pre-wrap break-words" : "truncate"}>
+                          {log.message}
+                        </div>
+                        {isExpanded && log.metadata && (
+                          <pre className="mt-2 p-2 bg-black/30 rounded text-[10px] overflow-x-auto text-txt-3">
+                            {JSON.stringify(log.metadata, null, 2)}
+                          </pre>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           )}
