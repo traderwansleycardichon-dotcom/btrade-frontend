@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Mail, Edit2, Send, CheckCircle, XCircle, RefreshCw, X, Plus, Trash2 } from 'lucide-react';
 import api from '../../../lib/api';
+import { CustomEmailEditor, CustomEmailPreview } from '../../../components/admin/CustomEmailEditor';
 import { useToast } from '../../../hooks/useToast';
 
 interface EmailTemplate {
@@ -9,6 +10,7 @@ interface EmailTemplate {
   subject: string;
   body: string;
   isActive: boolean;
+  isCustom: boolean;
   updatedAt: string;
 }
 
@@ -48,6 +50,8 @@ export default function AdminEmailsPage() {
     subjectOverride: '',
     segment: 'all' as 'all' | 'pro' | 'free',
   });
+
+  const selectedCampaignTemplate = templates.find(template => template.id === campaignForm.templateId);
 
   const fetchTemplates = async () => {
     setLoading(true);
@@ -153,8 +157,8 @@ export default function AdminEmailsPage() {
     <div className="space-y-6 animate-[fadeIn_0.5s_ease-out]">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-black mb-1">Emails Automatiques</h1>
-          <p className="text-txt-2 text-sm">Gérez les templates d'emails envoyés automatiquement aux utilisateurs.</p>
+          <h1 className="text-2xl font-black mb-1">Emails</h1>
+          <p className="text-txt-2 text-sm">Gérez vos emails automatiques et vos messages personnalisés aux couleurs de Haitian Wall Street.</p>
         </div>
         <div className="flex items-center gap-2">
           <button
@@ -196,7 +200,7 @@ export default function AdminEmailsPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {templates.map(tpl => {
-            const meta = TEMPLATE_LABELS[tpl.id] ?? { label: tpl.name, desc: '' };
+            const meta = TEMPLATE_LABELS[tpl.id] ?? { label: tpl.name, desc: tpl.isCustom ? 'Email personnalisé · Présentation premium' : '' };
             return (
               <div key={tpl.id} className={`glass rounded-3xl border p-6 transition-all ${tpl.isActive ? 'border-border' : 'border-border/30 opacity-60'}`}>
                 <div className="flex items-start justify-between mb-3">
@@ -242,7 +246,7 @@ export default function AdminEmailsPage() {
                       : <Send size={12} />}
                     Tester
                   </button>
-                  {!['welcome','payment_success','renewal_success','gift_subscription','new_course'].includes(tpl.id) && (
+                  {tpl.isCustom && (
                     <button
                       onClick={() => handleDelete(tpl.id, meta.label)}
                       className="flex items-center gap-1.5 px-3 py-1.5 bg-loss/10 text-loss border border-loss/20 rounded-xl text-xs font-bold hover:bg-loss/20 transition-all"
@@ -302,6 +306,14 @@ export default function AdminEmailsPage() {
                   ))}
                 </div>
               </div>
+              {selectedCampaignTemplate?.isCustom && (
+                <CustomEmailPreview
+                  templateId={selectedCampaignTemplate.id}
+                  subject={selectedCampaignTemplate.subject}
+                  body={selectedCampaignTemplate.body}
+                  subjectOverride={campaignForm.subjectOverride.trim() || undefined}
+                />
+              )}
               <button
                 type="submit"
                 disabled={sending || !campaignForm.templateId}
@@ -393,17 +405,11 @@ export default function AdminEmailsPage() {
                 <span className="font-mono text-accent ml-2">{'{{amount}}'}</span>
                 <span className="font-mono text-accent ml-2">{'{{periodEnd}}'}</span>
               </div>
-              <div>
-                <label className="block text-xs font-bold text-txt-2 uppercase tracking-widest mb-2">Corps (HTML)</label>
-                <textarea
-                  value={createForm.body}
-                  onChange={e => setCreateForm(p => ({ ...p, body: e.target.value }))}
-                  rows={14}
-                  placeholder="<div>Votre contenu HTML ici...</div>"
-                  required
-                  className="w-full bg-elevated border border-border rounded-xl px-4 py-3 text-xs font-mono focus:outline-none focus:border-accent transition-all resize-y"
-                />
-              </div>
+              <CustomEmailEditor
+                subject={createForm.subject}
+                body={createForm.body}
+                onChange={body => setCreateForm(form => ({ ...form, body }))}
+              />
               <div className="flex gap-3 pt-2">
                 <button type="button" onClick={() => setIsCreateOpen(false)} className="flex-1 py-3 bg-elevated border border-border rounded-xl font-bold hover:bg-border transition-all text-sm">
                   Annuler
@@ -452,16 +458,24 @@ export default function AdminEmailsPage() {
                 <span className="font-mono text-accent ml-2">{'{{loginUrl}}'}</span>
               </div>
 
-              {/* Body HTML */}
-              <div>
-                <label className="block text-xs font-bold text-txt-2 uppercase tracking-widest mb-2">Corps (HTML)</label>
-                <textarea
-                  value={editing.body}
-                  onChange={e => setEditing({ ...editing, body: e.target.value })}
-                  rows={16}
-                  className="w-full bg-elevated border border-border rounded-xl px-4 py-3 text-xs font-mono focus:outline-none focus:border-accent transition-all resize-y"
+              {editing.isCustom ? (
+                <CustomEmailEditor
+                  templateId={editing.id}
+                  subject={editing.subject}
+                  body={editing.body}
+                  onChange={body => setEditing({ ...editing, body })}
                 />
-              </div>
+              ) : (
+                <div>
+                  <label className="block text-xs font-bold text-txt-2 uppercase tracking-widest mb-2">Corps (HTML)</label>
+                  <textarea
+                    value={editing.body}
+                    onChange={e => setEditing({ ...editing, body: e.target.value })}
+                    rows={16}
+                    className="w-full bg-elevated border border-border rounded-xl px-4 py-3 text-xs font-mono focus:outline-none focus:border-accent transition-all resize-y"
+                  />
+                </div>
+              )}
             </div>
 
             <div className="flex gap-3 p-6 pt-0">
