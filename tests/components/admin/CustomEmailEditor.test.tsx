@@ -22,25 +22,49 @@ describe('custom email editor', () => {
     expect(screen.getByTitle('Aperçu de votre email')).toHaveAttribute('srcdoc', '<html><body>Preview</body></html>');
   });
 
-  it('inserts a named button without making the admin write HTML', () => {
+  it('builds the button from the admin title and link without making them write HTML', () => {
     const onChange = vi.fn();
-    render(<CustomEmailEditor subject="Live" body="Bonjou" onChange={onChange} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Ajouter un bouton' }));
-    fireEvent.change(screen.getByLabelText('Texte du bouton'), { target: { value: 'Rejoindre le live' } });
+    const { rerender } = render(<CustomEmailEditor subject="Live" body="Bonjou" onChange={onChange} />);
+    fireEvent.change(screen.getByLabelText('Texte du bouton'), { target: { value: 'Voir la session' } });
+    expect(onChange).toHaveBeenLastCalledWith('Bonjou');
+    rerender(<CustomEmailEditor subject="Live" body="Bonjou" onChange={onChange} />);
     fireEvent.change(screen.getByLabelText('Lien du bouton'), { target: { value: 'https://example.com/live' } });
-    fireEvent.click(screen.getByRole('button', { name: 'Insérer le bouton' }));
-    expect(onChange).toHaveBeenCalledWith('Bonjou\n\n[Rejoindre le live](https://example.com/live)');
+    expect(onChange).toHaveBeenLastCalledWith('Bonjou\n\n[Voir la session](https://example.com/live)');
   });
 
-  it('rejects unsafe button URLs', () => {
+  it('pre-fills the fields from a saved template and replaces its button instead of duplicating it', () => {
     const onChange = vi.fn();
-    render(<CustomEmailEditor subject="Live" body="Bonjou" onChange={onChange} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Ajouter un bouton' }));
+    render(<CustomEmailEditor subject="Live" body={'Mèsi [voir ici](https://old.example.com) nan mesaj la\n\n[Ansyen tit](https://old.example.com/live)'} onChange={onChange} />);
+    expect(screen.getByLabelText('Texte du bouton')).toHaveValue('Ansyen tit');
+    expect(screen.getByLabelText('Lien du bouton')).toHaveValue('https://old.example.com/live');
+    fireEvent.change(screen.getByLabelText('Texte du bouton'), { target: { value: 'Nouvo tit' } });
+    expect(onChange).toHaveBeenLastCalledWith('Mèsi [voir ici](https://old.example.com) nan mesaj la\n\n[Nouvo tit](https://old.example.com/live)');
+  });
+
+  it('keeps an HTML body in HTML when the admin sets the button', () => {
+    const onChange = vi.fn();
+    const { rerender } = render(<CustomEmailEditor subject="Live" body="<p>Bonjou</p>" onChange={onChange} />);
+    fireEvent.change(screen.getByLabelText('Texte du bouton'), { target: { value: 'Voir' } });
+    rerender(<CustomEmailEditor subject="Live" body="<p>Bonjou</p>" onChange={onChange} />);
+    fireEvent.change(screen.getByLabelText('Lien du bouton'), { target: { value: 'https://example.com/live' } });
+    expect(onChange).toHaveBeenLastCalledWith('<p>Bonjou</p>\n\n<p><a href="https://example.com/live">Voir</a></p>');
+  });
+
+  it('rejects unsafe button URLs and leaves the message without a button', () => {
+    const onChange = vi.fn();
+    const { rerender } = render(<CustomEmailEditor subject="Live" body="Bonjou" onChange={onChange} />);
     fireEvent.change(screen.getByLabelText('Texte du bouton'), { target: { value: 'Live' } });
+    rerender(<CustomEmailEditor subject="Live" body="Bonjou" onChange={onChange} />);
     fireEvent.change(screen.getByLabelText('Lien du bouton'), { target: { value: 'javascript:alert(1)' } });
-    fireEvent.click(screen.getByRole('button', { name: 'Insérer le bouton' }));
-    expect(onChange).not.toHaveBeenCalled();
+    expect(onChange).toHaveBeenLastCalledWith('Bonjou');
     expect(screen.getByRole('alert')).toHaveTextContent('https://');
+  });
+
+  it('removes the button when the admin clears the link', () => {
+    const onChange = vi.fn();
+    render(<CustomEmailEditor subject="Live" body={'Bonjou\n\n[Voir](https://example.com/live)'} onChange={onChange} />);
+    fireEvent.change(screen.getByLabelText('Lien du bouton'), { target: { value: '' } });
+    expect(onChange).toHaveBeenLastCalledWith('Bonjou');
   });
 
   it('shows a failed preview instead of a misleading old render', async () => {

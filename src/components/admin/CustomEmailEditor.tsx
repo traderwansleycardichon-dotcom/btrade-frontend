@@ -56,36 +56,59 @@ export function CustomEmailPreview({ templateId = '', subject, body, subjectOver
 }
 
 const escapeHtml = (value: string) => value.replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[character]!));
+const unescapeHtml = (value: string) => value.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&amp;/g, '&');
+
+// The button lives on its own trailing line so an inline link inside a sentence is never rewritten.
+const HTML_BUTTON = /(?:^|\r?\n)[ \t]*<p>\s*<a href="([^"]*)"\s*>([^<]*)<\/a>\s*<\/p>[ \t]*$/i;
+const TEXT_BUTTON = /(?:^|\r?\n)[ \t]*\[([^\]\r\n]+)\]\(([^()\s]+)\)[ \t]*$/;
+
+const isHtmlBody = (body: string) => /<\/?[a-z][^>]*>/i.test(body);
+
+const safeUrl = (value: string) => {
+  try {
+    const parsed = new URL(value);
+    if (!['https:', 'http:', 'mailto:', 'tel:'].includes(parsed.protocol) || parsed.username || parsed.password) return null;
+    return parsed.href;
+  } catch { return null; }
+};
+
+function findButton(body: string) {
+  const html = HTML_BUTTON.exec(body);
+  if (html) return { label: unescapeHtml(html[2]), url: unescapeHtml(html[1]), start: html.index };
+  const text = TEXT_BUTTON.exec(body);
+  if (text) return { label: text[1], url: text[2], start: text.index };
+  return null;
+}
+
+function writeButton(body: string, label: string, url: string) {
+  const found = findButton(body);
+  const base = (found ? body.slice(0, found.start) : body).replace(/\s+$/, '');
+  const target = safeUrl(url.trim());
+  if (!target || !label.trim() || /[[\]\r\n]/.test(label)) return base;
+  const href = target.replace(/\(/g, '%28').replace(/\)/g, '%29');
+  const button = isHtmlBody(base)
+    ? `<p><a href="${escapeHtml(href)}">${escapeHtml(label)}</a></p>`
+    : `[${label}](${href})`;
+  return `${base}${base ? '\n\n' : ''}${button}`;
+}
 
 export function CustomEmailEditor({ onChange, ...previewProps }: PreviewProps & { onChange: (body: string) => void }) {
   const id = useId();
-  const [showLink, setShowLink] = useState(false);
-  const [label, setLabel] = useState('');
-  const [url, setUrl] = useState('');
-  const [error, setError] = useState('');
+  const existing = findButton(previewProps.body);
+  const [button, setButton] = useState({ label: existing?.label ?? '', url: existing?.url ?? '' });
 
-  const insertLink = () => {
-    try {
-      const parsed = new URL(url.trim());
-      if (!['https:', 'http:', 'mailto:', 'tel:'].includes(parsed.protocol) || parsed.username || parsed.password) throw new Error('url');
-      if (!label.trim() || /[\[\]\r\n]/.test(label)) {
-        setError('Ajoutez un texte de bouton sans crochets ni saut de ligne.');
-        return;
-      }
-      const target = parsed.href.replace(/\(/g, '%28').replace(/\)/g, '%29');
-      const isHtml = /<\/?[a-z][^>]*>/i.test(previewProps.body);
-      const link = isHtml
-        ? `<p><a href="${escapeHtml(target)}">${escapeHtml(label.trim())}</a></p>`
-        : `[${label.trim()}](${target})`;
-      onChange(`${previewProps.body}${previewProps.body ? '\n\n' : ''}${link}`);
-      setShowLink(false);
-      setLabel('');
-      setUrl('');
-      setError('');
-    } catch {
-      setError('Utilisez un lien valide commençant par https://, http://, mailto: ou tel:.');
-    }
+  const update = (next: { label: string; url: string }) => {
+    setButton(next);
+    onChange(writeButton(previewProps.body, next.label, next.url));
   };
+
+  const label = button.label.trim();
+  const url = button.url.trim();
+  const error = /[[\]\r\n]/.test(button.label) ? 'Le texte du bouton ne peut pas contenir de crochets ni de saut de ligne.'
+    : url && !safeUrl(url) ? 'Utilisez un lien valide commençant par https://, http://, mailto: ou tel:.'
+    : url && !label ? 'Ajoutez le texte qui sera affiché sur le bouton.'
+    : label && !url ? 'Ajoutez le lien vers lequel le bouton doit mener.'
+    : '';
 
   return (
     <div className="space-y-5">
@@ -94,23 +117,25 @@ export function CustomEmailEditor({ onChange, ...previewProps }: PreviewProps & 
         <p className="mt-1">Écrivez votre message : les paragraphes sont conservés et vos liens deviennent des boutons aux couleurs de Haitian Wall Street. Le HTML simple est aussi accepté.</p>
       </div>
       <div>
-        <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
-          <label htmlFor={`${id}-body`} className="text-xs font-bold text-txt-2 uppercase tracking-widest">Votre message</label>
-          <button type="button" onClick={() => setShowLink(value => !value)} aria-expanded={showLink} className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-accent/10 text-accent text-xs font-bold"><Link2 size={14} /> Ajouter un bouton</button>
-        </div>
-        <textarea id={`${id}-body`} value={previewProps.body} onChange={event => onChange(event.target.value)} rows={10} maxLength={100000} required placeholder={'Bonjour {{fullName}},\n\nÉcrivez votre message ici…\n\nCollez un lien ou ajoutez un bouton.'} className="w-full bg-elevated border border-border rounded-xl px-4 py-3 text-sm leading-relaxed focus:outline-none focus:border-accent transition-all resize-y" />
-        <p className="mt-1 text-[11px] text-txt-3">Pour un bouton nommé : [Rejoindre le live](https://…). Le texte entre crochets sera visible sur le bouton.</p>
+        <label htmlFor={`${id}-body`} className="block text-xs font-bold text-txt-2 uppercase tracking-widest mb-2">Votre message</label>
+        <textarea id={`${id}-body`} value={previewProps.body} onChange={event => onChange(event.target.value)} rows={10} maxLength={100000} required placeholder={'Bonjour {{fullName}},\n\nÉcrivez votre message ici…'} className="w-full bg-elevated border border-border rounded-xl px-4 py-3 text-sm leading-relaxed focus:outline-none focus:border-accent transition-all resize-y" />
       </div>
-      {showLink && (
-        <div className="p-4 rounded-xl bg-elevated border border-border space-y-3">
-          <div className="grid sm:grid-cols-2 gap-3">
-            <div><label htmlFor={`${id}-label`} className="block text-xs font-bold mb-2">Texte du bouton</label><input id={`${id}-label`} value={label} onChange={event => setLabel(event.target.value)} maxLength={120} placeholder="Rejoindre le live" className="w-full bg-surface border border-border rounded-xl px-3 py-2 text-sm" /></div>
-            <div><label htmlFor={`${id}-url`} className="block text-xs font-bold mb-2">Lien du bouton</label><input id={`${id}-url`} type="text" value={url} onChange={event => setUrl(event.target.value)} placeholder="https://…" className="w-full bg-surface border border-border rounded-xl px-3 py-2 text-sm" /></div>
+      <div className="p-4 rounded-xl bg-elevated border border-border space-y-3">
+        <p className="flex items-center gap-1.5 text-xs font-bold text-txt-2 uppercase tracking-widest"><Link2 size={14} /> Bouton de l’email</p>
+        <div className="grid sm:grid-cols-2 gap-3">
+          <div>
+            <label htmlFor={`${id}-label`} className="block text-xs font-bold mb-2">Texte du bouton</label>
+            <input id={`${id}-label`} value={button.label} onChange={event => update({ ...button, label: event.target.value })} maxLength={120} placeholder="Votre texte" className="w-full bg-surface border border-border rounded-xl px-3 py-2 text-sm" />
           </div>
-          {error && <p role="alert" className="text-xs text-loss">{error}</p>}
-          <button type="button" onClick={insertLink} className="px-4 py-2 bg-accent text-white rounded-xl text-xs font-bold">Insérer le bouton</button>
+          <div>
+            <label htmlFor={`${id}-url`} className="block text-xs font-bold mb-2">Lien du bouton</label>
+            <input id={`${id}-url`} type="text" value={button.url} onChange={event => update({ ...button, url: event.target.value })} placeholder="https://…" className="w-full bg-surface border border-border rounded-xl px-3 py-2 text-sm" />
+          </div>
         </div>
-      )}
+        {error
+          ? <p role="alert" className="text-xs text-loss">{error}</p>
+          : <p className="text-[11px] text-txt-3">Le bouton est ajouté à la fin du message. Laissez les deux champs vides pour un email sans bouton.</p>}
+      </div>
       <CustomEmailPreview {...previewProps} />
     </div>
   );
