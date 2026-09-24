@@ -113,9 +113,9 @@ const SettingsPage: React.FC = () => {
         { 
           label: 'Plan Actuel', 
           value: user?.role === 'admin' ? 'PRO (Privilège Admin)' : (user?.plan ? user.plan.toUpperCase() : 'FREE'), 
-          badge: (user?.plan === 'pro' || user?.role === 'admin') ? 'PRO' : undefined 
+          badge: (user?.plan === 'pro' || user?.plan === 'vip' || user?.role === 'admin') ? 'PRO' : undefined 
         },
-        ...((user?.plan === 'pro' && user?.role !== 'admin') ? [
+        ...((user?.plan === 'pro' || user?.plan === 'vip' && user?.role !== 'admin') ? [
           { label: 'Prochain prélèvement', value: subscription?.currentPeriodEnd ? formatExactDate(subscription.currentPeriodEnd) : 'À venir' },
           ...(subscription?.stripeSubId ? [{ label: 'Mode de paiement', value: '•••• 4242' }] : []),
           { label: 'Gérer mon abonnement', value: 'Mettre à jour / Renouveler', action: () => navigate('/app/upgrade') }
@@ -175,7 +175,7 @@ const SettingsPage: React.FC = () => {
         </div>
         <div>
           <h2 className="text-3xl font-black tracking-tight">{user?.fullName || 'Utilisateur'}</h2>
-          <p className="text-txt-2">Membre Haitian Wall Street depuis {formatJoinedDate(user?.createdAt)} • <span className="text-accent font-bold">Plan {user?.plan ? user.plan.toUpperCase() : 'FREE'}</span></p>
+          <p className="text-txt-2">Membre Behind The Trades depuis {formatJoinedDate(user?.createdAt)} • <span className="text-accent font-bold">Plan {user?.plan ? user.plan.toUpperCase() : 'FREE'}</span></p>
         </div>
       </div>
 

@@ -30,17 +30,17 @@ export const Navbar: React.FC = () => {
       >
         <div className="h-14 px-4 sm:px-6 flex items-center justify-between">
           {/* Logo */}
-          <Link to="/" className="flex items-center group" aria-label="Haitian Wall Street — Journal">
+          <Link to="/" className="flex items-center group" aria-label="Behind The Trades — Journal">
             {settings?.platform_logo ? (
               <img
                 src={settings.platform_logo}
-                alt="Haitian Wall Street — Journal"
+                alt="Behind The Trades — Journal"
                 className="h-10 w-auto object-contain drop-shadow-[0_0_15px_rgba(243,108,0,0.3)] transition-transform group-hover:scale-105"
               />
             ) : (
               <img
                 src="/logo.svg"
-                alt="Haitian Wall Street — Journal"
+                alt="Behind The Trades — Journal"
                 className="h-10 w-10 drop-shadow-[0_0_15px_rgba(243,108,0,0.3)] transition-transform group-hover:scale-105"
               />
             )}

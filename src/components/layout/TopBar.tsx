@@ -50,7 +50,7 @@ export const TopBar: React.FC<TopBarProps> = ({ onOpenMenu }) => {
     if (path.includes('/formation')) return 'Academy';
     if (path.includes('/settings')) return 'Paramètres';
     if (path.includes('/reports')) return 'Analyses';
-    return 'Haitian Wall Street';
+    return 'Behind The Trades';
   };
 
   return (
@@ -99,7 +99,7 @@ export const TopBar: React.FC<TopBarProps> = ({ onOpenMenu }) => {
         {settings.discord_link && (
           <button
             onClick={() => {
-              if (user?.plan === 'pro') {
+              if (user?.plan === 'pro' || user?.plan === 'vip') {
                 window.open(settings.discord_link, '_blank', 'noopener,noreferrer');
               } else {
                 setIsDiscordModalOpen(true);

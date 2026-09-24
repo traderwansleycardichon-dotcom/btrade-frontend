@@ -7,8 +7,8 @@ const faqs = [
     a: 'Oui. Importez vos historiques en CSV ou utilisez notre auto-sync pour le suivi temps réel de vos trades.',
   },
   {
-    q: 'Les Prop Firms acceptent Haitian Wall Street ?',
-    a: "Haitian Wall Street est un outil d'analyse externe. Il ne touche pas à vos exécutions et est utilisé sans souci par les traders FTMO, MyFundedFX, FundedNext et autres.",
+    q: 'Les Prop Firms acceptent Behind The Trades ?',
+    a: "Behind The Trades est un outil d'analyse externe. Il ne touche pas à vos exécutions et est utilisé sans souci par les traders FTMO, MyFundedFX, FundedNext et autres.",
   },
   {
     q: 'Y a-t-il un essai gratuit ?',

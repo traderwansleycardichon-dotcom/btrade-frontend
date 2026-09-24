@@ -30,7 +30,7 @@ const relativeDate = (iso: string | null): string => {
 const cleanTitle = (raw: string): string => {
   if (!raw) return '';
   const cut = raw.split(/,\s*This is not financial advice|,\s*This is not/i)[0];
-  return cut.replace(/Haitian Wall Street\s*\|\s*/i, '').trim() || raw.trim();
+  return cut.replace(/Behind The Trades\s*\|\s*/i, '').trim() || raw.trim();
 };
 
 // ─── Thumbnail avec fallback maxres → hq ─────────────────────────────────
@@ -125,7 +125,7 @@ export const YoutubeSection: React.FC = () => {
             </h2>
             <p className="text-white/55 mt-3 max-w-xl">
               Analyses marché en direct, debriefs institutionnels et lecture des
-              flux temps réel — sur la chaîne {feed.channelTitle || 'Haitian Wall Street'}.
+              flux temps réel — sur la chaîne {feed.channelTitle || 'Behind The Trades'}.
             </p>
           </div>
           <a

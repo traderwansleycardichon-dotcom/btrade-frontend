@@ -35,7 +35,7 @@ const LandingPage: React.FC = () => {
               {settings?.platform_logo ? (
                 <img
                   src={settings.platform_logo}
-                  alt="Haitian Wall Street — Journal"
+                  alt="Behind The Trades — Journal"
                   className="h-12 w-auto object-contain drop-shadow-[0_0_15px_rgba(243,108,0,0.3)]"
                 />
               ) : (
@@ -43,7 +43,7 @@ const LandingPage: React.FC = () => {
                   <div className="w-10 h-10 bg-accent rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(243,108,0,0.3)]">
                      <LineChart size={20} className="text-white" />
                   </div>
-                  <span className="font-black text-2xl tracking-tighter">Haitian Wall Street</span>
+                  <span className="font-black text-2xl tracking-tighter">Behind The Trades</span>
                 </>
               )}
             </div>
@@ -79,7 +79,7 @@ const LandingPage: React.FC = () => {
 
         <div className="border-t border-white/[0.04]">
           <div className="mx-auto max-w-6xl px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px] text-white/35">
-            <span>© {new Date().getFullYear()} Haitian Wall Street Analytics. Tous droits réservés.</span>
+            <span>© {new Date().getFullYear()} Behind The Trades Analytics. Tous droits réservés.</span>
             <span>Fait avec rigueur pour les traders sérieux.</span>
           </div>
         </div>

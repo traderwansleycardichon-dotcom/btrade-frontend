@@ -65,7 +65,7 @@ interface NavGroup {
 
 /**
  * Sidebar Component
- * Gère la navigation principale de l'application Haitian Wall Street 
+ * Gère la navigation principale de l'application Behind The Trades 
  * Les liens sont regroupés par sections logiques pour une meilleure UX.
  */
 
@@ -175,13 +175,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen = false, onMobileCl
       <div className={`p-5 lg:p-6 flex items-center gap-3 ${isCollapsed ? 'justify-center' : 'justify-between'}`}>
         <div className="flex items-center gap-3 overflow-hidden whitespace-nowrap">
           {settings?.platform_logo ? (
-            <img src={settings.platform_logo} alt="Logo Haitian Wall Street" className="h-8 w-auto object-contain shrink-0" />
+            <img src={settings.platform_logo} alt="Logo Behind The Trades" className="h-8 w-auto object-contain shrink-0" />
           ) : (
             <>
               <div className="w-8 h-8 bg-accent rounded-lg flex items-center justify-center shrink-0 shadow-[0_0_15px_rgba(243,108,0,0.4)]">
                 <TrendingUp size={20} className="text-txt" />
               </div>
-              {!isCollapsed && <span className="font-bold text-lg tracking-tight">Haitian Wall Street</span>}
+              {!isCollapsed && <span className="font-bold text-lg tracking-tight">Behind The Trades</span>}
             </>
           )}
         </div>
@@ -322,7 +322,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen = false, onMobileCl
       <Modal
         isOpen={isUpgradeModalOpen}
         onClose={() => setIsUpgradeModalOpen(false)}
-        title="💎 Fonctionnalité Premium Haitian Wall Street"
+        title="💎 Fonctionnalité Premium Behind The Trades"
         size="md"
       >
         <div className="flex flex-col items-center text-center p-2">

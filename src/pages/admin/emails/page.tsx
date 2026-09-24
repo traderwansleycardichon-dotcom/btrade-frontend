@@ -158,7 +158,7 @@ export default function AdminEmailsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-black mb-1">Emails</h1>
-          <p className="text-txt-2 text-sm">Gérez vos emails automatiques et vos messages personnalisés aux couleurs de Haitian Wall Street.</p>
+          <p className="text-txt-2 text-sm">Gérez vos emails automatiques et vos messages personnalisés aux couleurs de Behind The Trades.</p>
         </div>
         <div className="flex items-center gap-2">
           <button

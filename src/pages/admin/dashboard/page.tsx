@@ -38,7 +38,7 @@ function CTODashboard() {
           <Server className="text-purple-400" />
           Dashboard Technique — CTO
         </h1>
-        <p className="text-txt-2 text-sm">Supervision en temps réel de l'infrastructure Haitian Wall Street</p>
+        <p className="text-txt-2 text-sm">Supervision en temps réel de l'infrastructure Behind The Trades</p>
       </div>
 
       {/* User Stats */}

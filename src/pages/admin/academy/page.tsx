@@ -375,7 +375,7 @@ export const AdminAcademyPage = () => {
                       {/* Plan */}
                       <td className="p-4">
                         <span className={`text-[10px] font-bold px-2 py-0.5 rounded capitalize ${
-                          user.plan === 'pro' 
+                          user.plan === 'pro' || user.plan === 'vip' 
                             ? 'bg-win/10 text-win border border-win/20' 
                             : 'bg-txt-3/10 text-txt-2 border border-border'
                         }`}>

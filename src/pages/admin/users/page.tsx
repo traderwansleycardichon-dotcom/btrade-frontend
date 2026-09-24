@@ -178,7 +178,7 @@ export default function AdminUsersPage() {
                             <Lock size={10} /> LOCKED
                           </span>
                         ) : (
-                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase ${user.plan === 'pro' ? 'bg-win/10 text-win' : 'bg-elevated text-txt-2'}`}>
+                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase ${user.plan === 'pro' || user.plan === 'vip' ? 'bg-win/10 text-win' : 'bg-elevated text-txt-2'}`}>
                             {user.plan}
                           </span>
                         )}

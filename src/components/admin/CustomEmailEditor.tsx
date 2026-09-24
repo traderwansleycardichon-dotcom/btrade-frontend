@@ -1,5 +1,5 @@
 import { useEffect, useId, useState } from 'react';
-import { Eye, Link2, Monitor, Smartphone, RefreshCw } from 'lucide-react';
+import { Eye, Link2, Monitor, Smartphone, RefreshCw, Image as ImageIcon } from 'lucide-react';
 import api from '../../lib/api';
 
 interface PreviewProps {
@@ -62,6 +62,10 @@ const unescapeHtml = (value: string) => value.replace(/&lt;/g, '<').replace(/&gt
 const HTML_BUTTON = /(?:^|\r?\n)[ \t]*<p>\s*<a href="([^"]*)"\s*>([^<]*)<\/a>\s*<\/p>[ \t]*$/i;
 const TEXT_BUTTON = /(?:^|\r?\n)[ \t]*\[([^\]\r\n]+)\]\(([^()\s]+)\)[ \t]*$/;
 
+// The image lives at the very beginning of the body
+const HTML_IMAGE = /^\s*<p>\s*<img\s+src="([^"]+)"\s+alt="Banner"[^>]*>\s*<\/p>\s*/i;
+const TEXT_IMAGE = /^\s*!\[Banner\]\(([^)\s]+)\)\s*/i;
+
 const isHtmlBody = (body: string) => /<\/?[a-z][^>]*>/i.test(body);
 
 const safeUrl = (value: string) => {
@@ -92,14 +96,43 @@ function writeButton(body: string, label: string, url: string) {
   return `${base}${base ? '\n\n' : ''}${button}`;
 }
 
+function findImage(body: string) {
+  const html = HTML_IMAGE.exec(body);
+  if (html) return { url: unescapeHtml(html[1]), end: html[0].length };
+  const text = TEXT_IMAGE.exec(body);
+  if (text) return { url: text[1], end: text[0].length };
+  return null;
+}
+
+function writeImage(body: string, url: string) {
+  const found = findImage(body);
+  const base = (found ? body.slice(found.end) : body).replace(/^\s+/, '');
+  const target = safeUrl(url.trim());
+  if (!target) return base;
+  const href = target.replace(/\(/g, '%28').replace(/\)/g, '%29');
+  const image = isHtmlBody(base)
+    ? `<p><img src="${escapeHtml(href)}" alt="Banner" style="max-width: 100%; border-radius: 8px; margin-bottom: 24px; display: block;" /></p>`
+    : `![Banner](${href})`;
+  return `${image}\n\n${base}`;
+}
+
 export function CustomEmailEditor({ onChange, ...previewProps }: PreviewProps & { onChange: (body: string) => void }) {
   const id = useId();
   const existing = findButton(previewProps.body);
+  const existingImg = findImage(previewProps.body);
   const [button, setButton] = useState({ label: existing?.label ?? '', url: existing?.url ?? '' });
+  const [imageUrl, setImageUrl] = useState(existingImg?.url ?? '');
 
   const update = (next: { label: string; url: string }) => {
     setButton(next);
-    onChange(writeButton(previewProps.body, next.label, next.url));
+    let currentBody = writeImage(previewProps.body, imageUrl);
+    onChange(writeButton(currentBody, next.label, next.url));
+  };
+
+  const updateImage = (url: string) => {
+    setImageUrl(url);
+    let baseBody = writeButton(previewProps.body, button.label, button.url);
+    onChange(writeImage(baseBody, url));
   };
 
   const label = button.label.trim();
@@ -114,7 +147,15 @@ export function CustomEmailEditor({ onChange, ...previewProps }: PreviewProps & 
     <div className="space-y-5">
       <div className="rounded-xl border border-accent/20 bg-accent/5 p-4 text-xs text-txt-2 leading-relaxed">
         <span className="font-bold text-accent">Email personnalisé premium</span>
-        <p className="mt-1">Écrivez votre message : les paragraphes sont conservés et vos liens deviennent des boutons aux couleurs de Haitian Wall Street. Le HTML simple est aussi accepté.</p>
+        <p className="mt-1">Écrivez votre message : les paragraphes sont conservés et vos liens deviennent des boutons aux couleurs de Behind The Trades. Le HTML simple est aussi accepté.</p>
+      </div>
+      <div className="p-4 rounded-xl bg-elevated border border-border space-y-3">
+        <p className="flex items-center gap-1.5 text-xs font-bold text-txt-2 uppercase tracking-widest"><ImageIcon size={14} /> Image d'en-tête (Optionnel)</p>
+        <div>
+          <label htmlFor={`${id}-image`} className="block text-xs font-bold mb-2">Lien de l'image (URL)</label>
+          <input id={`${id}-image`} type="text" value={imageUrl} onChange={event => updateImage(event.target.value)} placeholder="https://..." className="w-full bg-surface border border-border rounded-xl px-3 py-2 text-sm" />
+        </div>
+        <p className="text-[11px] text-txt-3">Cette image s'affichera tout en haut de l'email, parfaite pour une bannière.</p>
       </div>
       <div>
         <label htmlFor={`${id}-body`} className="block text-xs font-bold text-txt-2 uppercase tracking-widest mb-2">Votre message</label>

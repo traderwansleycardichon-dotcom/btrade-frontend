@@ -8,6 +8,8 @@ import { TicketThreadModal } from '../../../components/support/TicketThreadModal
 import { SlotPicker, CoachingSlot } from '../../../components/coaching/SlotPicker';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { ProGate } from '../../../components/ui/ProGate';
+import { usePlan } from '../../../hooks/usePlan';
 
 interface CoachingRequest {
   id: string;
@@ -49,8 +51,11 @@ export default function CoachingPage() {
   const [slotsLoading, setSlotsLoading] = useState(false);
 
   const { addToast } = useToast();
+  const { isVip } = usePlan();
 
-  useEffect(() => { fetchRequests(); }, []);
+  useEffect(() => { 
+    if (isVip) fetchRequests(); 
+  }, [isVip]);
 
   const fetchRequests = () => {
     setLoading(true);
@@ -100,6 +105,15 @@ export default function CoachingPage() {
       setSubmitting(false);
     }
   };
+
+  if (!isVip) {
+    return (
+      <ProGate 
+        title="Coaching VIP" 
+        description="Accédez aux sessions de coaching privées 1-on-1 en souscrivant au plan VIP Incubator."
+      />
+    );
+  }
 
   return (
     <div className="space-y-8 animate-[fadeIn_0.5s_ease-out]">

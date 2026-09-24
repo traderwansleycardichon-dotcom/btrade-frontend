@@ -15,10 +15,11 @@ const LoginPage: React.FC<{ defaultRegister?: boolean }> = ({ defaultRegister = 
   const { settings } = useSettings();
   const navigate = useNavigate();
   const [params] = useSearchParams();
-  const queryPlan = params.get('plan');
+  const queryTier = params.get('tier') || params.get('plan');
+  const queryInterval = params.get('interval');
   const queryGateway = params.get('gateway');
   const queryCheckout = params.get('checkout');
-  const [isRegister, setIsRegister] = React.useState(defaultRegister || queryPlan !== null);
+  const [isRegister, setIsRegister] = React.useState(defaultRegister || queryTier !== null);
 
   React.useEffect(() => {
     if (queryCheckout === 'success') {
@@ -82,21 +83,34 @@ const LoginPage: React.FC<{ defaultRegister?: boolean }> = ({ defaultRegister = 
         return;
       }
 
-      // Reprise du checkout si un plan payant attendait
-      const pending =
-        queryPlan ||
-        (typeof window !== 'undefined' ? sessionStorage.getItem('btt_pending_plan') : null);
-      if (pending && pending !== 'free' && user.plan !== pending) {
-        try { sessionStorage.removeItem('btt_pending_plan'); } catch {}
+      // Reprise du checkout si une offre payante attendait la connexion.
+      const pendingTier =
+        queryTier ||
+        (typeof window !== 'undefined' ? sessionStorage.getItem('btt_pending_tier') : null);
+      const pendingInterval =
+        queryInterval ||
+        (typeof window !== 'undefined' ? sessionStorage.getItem('btt_pending_interval') : null) ||
+        'ANNUAL';
+
+      if (pendingTier && pendingTier !== 'free') {
+        try {
+          sessionStorage.removeItem('btt_pending_tier');
+          sessionStorage.removeItem('btt_pending_interval');
+        } catch {
+          // stockage indisponible : sans importance, la reprise est ponctuelle
+        }
         (async () => {
           try {
-            const res = await api.post('/api/billing/create-checkout-session', { planId: pending });
+            const res = await api.post('/api/billing/create-checkout-session', {
+              tier: pendingTier.toUpperCase(),
+              billingInterval: pendingInterval.toUpperCase(),
+            });
             if (res.data?.url) {
               window.location.href = res.data.url;
               return;
             }
           } catch (err) {
-            console.error('Reprise checkout impossible:', err);
+            console.error('Reprise du paiement impossible :', err);
           }
           navigate('/app/dashboard', { replace: true });
         })();
@@ -105,7 +119,7 @@ const LoginPage: React.FC<{ defaultRegister?: boolean }> = ({ defaultRegister = 
 
       navigate('/app/dashboard', { replace: true });
     }
-  }, [isAuthenticated, isLoading, navigate, user, refreshUser, queryPlan]);
+  }, [isAuthenticated, isLoading, navigate, user, refreshUser, queryTier, queryInterval]);
 
   if (isLoading && isAuthenticated) {
     return (
@@ -123,21 +137,22 @@ const LoginPage: React.FC<{ defaultRegister?: boolean }> = ({ defaultRegister = 
         {/* Mobile Logo */}
         <div className="lg:hidden absolute top-8 left-8 flex items-center gap-2">
           {settings?.platform_logo ? (
-            <img src={settings.platform_logo} alt="Logo Haitian Wall Street" className="h-8 w-auto object-contain" />
+            <img src={settings.platform_logo} alt="Logo Behind The Trades" className="h-8 w-auto object-contain" />
           ) : (
             <>
               <div className="w-8 h-8 bg-accent rounded-lg flex items-center justify-center">
                  <span className="font-black text-white">B</span>
               </div>
-              <span className="font-black text-xl tracking-tighter">Haitian Wall Street</span>
+              <span className="font-black text-xl tracking-tighter">Behind The Trades</span>
             </>
           )}
         </div>
 
         {isRegister ? (
-          <RegisterForm 
-            onSwitchToLogin={() => setIsRegister(false)} 
-            initialPlan={queryPlan}
+          <RegisterForm
+            onSwitchToLogin={() => setIsRegister(false)}
+            initialTier={queryTier}
+            initialInterval={queryInterval}
             initialGateway={queryGateway}
           />
         ) : (

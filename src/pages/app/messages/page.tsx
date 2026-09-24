@@ -7,7 +7,7 @@ const MessagesPage: React.FC = () => {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="font-bold text-lg">Messages</h2>
-          <p className="text-xs text-txt-3 mt-0.5">Vos échanges avec l'équipe Haitian Wall Street</p>
+          <p className="text-xs text-txt-3 mt-0.5">Vos échanges avec l'équipe Behind The Trades</p>
         </div>
       </div>
       <div className="h-[calc(100%-4rem)]">

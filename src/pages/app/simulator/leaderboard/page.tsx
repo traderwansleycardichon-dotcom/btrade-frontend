@@ -36,7 +36,7 @@ export default function SimulatorLeaderboardPage() {
         </div>
         <h1 className="text-4xl font-bold text-txt tracking-tight">Simulator Leaderboard</h1>
         <p className="text-lg text-slate-400">
-          The top performing traders in the HAITIAN WALL STREET simulation challenge. Rankings are based on ROI, Risk Management, Consistency, and Psychology.
+          The top performing traders in the BEHIND THE TRADES simulation challenge. Rankings are based on ROI, Risk Management, Consistency, and Psychology.
         </p>
       </div>
 

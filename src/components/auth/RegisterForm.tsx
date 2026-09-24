@@ -7,17 +7,36 @@ import { useToast } from '../../hooks/useToast';
 
 interface RegisterFormProps {
   onSwitchToLogin: () => void;
-  initialPlan?: string | null;
+  initialTier?: string | null;
+  initialInterval?: string | null;
   initialGateway?: string | null;
 }
 
-export const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchToLogin, initialPlan, initialGateway }) => {
+const TIER_LABEL: Record<string, string> = {
+  PRO: 'Haitian Wall Street Pro',
+  VIP: 'Haitian Wall Street VIP Incubator',
+};
+
+const INTERVAL_LABEL: Record<string, string> = {
+  MONTHLY: 'mensuelle',
+  ANNUAL: 'annuelle',
+};
+
+export const RegisterForm: React.FC<RegisterFormProps> = ({
+  onSwitchToLogin,
+  initialTier,
+  initialInterval,
+  initialGateway,
+}) => {
+  const tier = initialTier ? initialTier.toUpperCase() : null;
+  const billingInterval = (initialInterval || 'ANNUAL').toUpperCase();
+  const isPaid = tier === 'PRO' || tier === 'VIP';
+
   const [formData, setFormData] = useState({
     email: '',
     password: '',
     full_name: '',
-    plan: initialPlan || 'free',
-    gateway: initialGateway || 'stripe'
+    gateway: initialGateway || 'stripe',
   });
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
@@ -28,10 +47,11 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchToLogin, ini
     setLoading(true);
 
     try {
-      const { data } = await api.post('/api/auth/register', formData);
+      const payload = isPaid ? { ...formData, tier, billingInterval } : formData;
+      const { data } = await api.post('/api/auth/register', payload);
 
       if (data.checkoutUrl) {
-        addToast('Redirection vers le paiement...', 'success');
+        addToast('Redirection vers le paiement', 'success');
         if (data.pendingId) {
           sessionStorage.setItem(`btt_pending_${formData.gateway}`, data.pendingId);
         }
@@ -39,9 +59,12 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchToLogin, ini
         return;
       }
 
-      // Plan payant mais checkoutUrl manquant — cas anormal
-      if (formData.plan !== 'free') {
-        addToast('Erreur : URL de paiement non reçue. Vérifiez la configuration Stripe.', 'error');
+      // Offre payante sans URL de paiement : anomalie, on ne crée rien.
+      if (isPaid) {
+        addToast(
+          "Le paiement n'a pas pu être initialisé. Aucun compte n'a été créé.",
+          'error'
+        );
         setLoading(false);
         return;
       }
@@ -63,23 +86,23 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchToLogin, ini
       <div className="text-center">
         <h2 className="text-3xl font-black mb-2 tracking-tight">Créer un compte</h2>
         <p className="text-txt-2 text-sm">
-          {formData.plan === 'free' 
-            ? "Rejoignez la communauté Haitian Wall Street avec un essai gratuit de 7 jours."
-            : "Rejoignez la communauté Haitian Wall Street dès aujourd'hui."}
+          {isPaid
+            ? 'Rejoignez BEHIND THE TRADES dès aujourd\'hui.'
+            : 'Rejoignez BEHIND THE TRADES avec un essai gratuit de 7 jours.'}
         </p>
       </div>
 
-      {formData.plan !== 'free' && (
+      {isPaid && (
         <div className="flex items-center gap-3 p-4 rounded-2xl bg-accent/10 border border-accent/20">
           <div className="w-9 h-9 rounded-xl bg-accent/20 flex items-center justify-center shrink-0">
             <Sparkles size={16} className="text-accent" />
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-xs font-black text-accent uppercase tracking-wider">
-              Plan {formData.plan.toUpperCase()} sélectionné
+              {TIER_LABEL[tier as string]}
             </p>
             <p className="text-[11px] text-txt-2 mt-0.5">
-              Vous serez redirigé vers{' '}
+              Facturation {INTERVAL_LABEL[billingInterval]}. Vous serez redirigé vers{' '}
               {formData.gateway === 'moncash' ? 'MonCash' : 'Stripe'} pour finaliser le paiement.
             </p>
           </div>
