@@ -79,7 +79,7 @@ export const HeroSection: React.FC = () => {
         <div className="flex flex-wrap justify-center items-center gap-x-8 gap-y-3 text-[12px] text-white/45 mb-20">
           <span className="inline-flex items-center gap-2">
             <ShieldCheck size={14} className="text-emerald-400/80" />
-            14 jours d'essai, sans carte
+            7 jours d'essai, sans carte
           </span>
           <span className="inline-flex items-center gap-2">
             <TrendingUp size={14} className="text-accent/80" />
