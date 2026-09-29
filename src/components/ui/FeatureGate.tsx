@@ -64,7 +64,7 @@ export const FeatureGate: React.FC<FeatureGateProps> = ({
           initial={{ y: 10, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.3, duration: 0.3 }}
-          onClick={() => navigate('/upgrade')}
+          onClick={() => navigate('/app/upgrade')}
           className="px-4 py-2 text-xs font-bold text-white bg-accent hover:bg-accent/90 rounded-xl transition-all shadow-md hover:scale-105"
         >
           Débloquer le plan Pro

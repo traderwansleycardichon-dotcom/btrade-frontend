@@ -9,6 +9,7 @@ import { useSound } from '../../context/SoundContext';
 import { ImportTradesModal } from '../trading/ImportTradesModal';
 import { useSettings } from '../../contexts/SettingsContext';
 import { useAuth } from '../../hooks/useAuth';
+import { isPaidPlan } from '../../lib/membership';
 import { DiscordUpgradeModal } from '../modals/DiscordUpgradeModal';
 
 interface TopBarProps {
@@ -95,11 +96,11 @@ export const TopBar: React.FC<TopBarProps> = ({ onOpenMenu }) => {
           </a>
         )}
 
-        {/* Discord — PRO seulement */}
+        {/* Discord, réservé aux membres payants */}
         {settings.discord_link && (
           <button
             onClick={() => {
-              if (user?.plan === 'pro') {
+              if (isPaidPlan(user?.plan)) {
                 window.open(settings.discord_link, '_blank', 'noopener,noreferrer');
               } else {
                 setIsDiscordModalOpen(true);

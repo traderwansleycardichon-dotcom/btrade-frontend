@@ -7,6 +7,7 @@ import { Modal } from '../../../components/ui/Modal';
 import { ImageUpload } from '../../../components/ui/ImageUpload';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../../../lib/api';
+import { isPaidPlan, planName } from '../../../lib/membership';
 
 interface NavItem {
   label: string;
@@ -112,10 +113,14 @@ const SettingsPage: React.FC = () => {
       items: [
         { 
           label: 'Plan Actuel', 
-          value: user?.role === 'admin' ? 'PRO (Privilège Admin)' : (user?.plan ? user.plan.toUpperCase() : 'FREE'), 
-          badge: (user?.plan === 'pro' || user?.role === 'admin') ? 'PRO' : undefined 
+          value: user?.role === 'admin' ? 'Accès complet (privilège admin)' : planName(user?.plan), 
+          badge: isPaidPlan(user?.plan)
+            ? planName(user?.plan).toUpperCase()
+            : user?.role === 'admin'
+              ? 'ADMIN'
+              : undefined 
         },
-        ...((user?.plan === 'pro' && user?.role !== 'admin') ? [
+        ...((isPaidPlan(user?.plan) && user?.role !== 'admin') ? [
           { label: 'Prochain prélèvement', value: subscription?.currentPeriodEnd ? formatExactDate(subscription.currentPeriodEnd) : 'À venir' },
           ...(subscription?.stripeSubId ? [{ label: 'Mode de paiement', value: '•••• 4242' }] : []),
           { label: 'Gérer mon abonnement', value: 'Mettre à jour / Renouveler', action: () => navigate('/app/upgrade') }

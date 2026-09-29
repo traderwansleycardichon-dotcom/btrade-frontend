@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../../../hooks/useAuth";
 import api from "../../../lib/api";
+import { isPaidPlan } from "../../../lib/membership";
 import { AdvancedRealTimeChart } from "react-ts-tradingview-widgets";
 import { OrderPanel } from "../../../components/simulator/OrderPanel";
 import { PositionsTable } from "../../../components/simulator/PositionsTable";
@@ -115,11 +116,10 @@ export default function SimulatorPage() {
     );
   }
 
-  // Vérification PRO
+  // Accès réservé aux membres payants (Pro ou VIP Incubator)
   if (
     !user ||
-    (user.plan !== "pro" &&
-      (user.plan as string) !== "lifetime" &&
+    (!isPaidPlan(user.plan) &&
       user.role !== "admin" &&
       user.role !== "superadmin")
   ) {

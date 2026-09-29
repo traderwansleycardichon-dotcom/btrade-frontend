@@ -8,16 +8,27 @@ import { useToast } from '../../hooks/useToast';
 interface RegisterFormProps {
   onSwitchToLogin: () => void;
   initialPlan?: string | null;
-  initialGateway?: string | null;
+  initialInterval?: string | null;
 }
 
-export const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchToLogin, initialPlan, initialGateway }) => {
+/** Noms lisibles des formules, pour ne pas afficher "VIP_INCUBATOR". */
+const PLAN_LABELS: Record<string, string> = {
+  pro: 'Pro',
+  vip_incubator: 'VIP Incubator',
+};
+
+const normalizeInterval = (raw?: string | null): 'MONTHLY' | 'YEARLY' =>
+  String(raw ?? '').toUpperCase() === 'YEARLY' ? 'YEARLY' : 'MONTHLY';
+
+export const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchToLogin, initialPlan, initialInterval }) => {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
     full_name: '',
     plan: initialPlan || 'free',
-    gateway: initialGateway || 'stripe'
+    // Stripe est le seul processeur de paiement actif côté serveur.
+    gateway: 'stripe',
+    billingInterval: normalizeInterval(initialInterval)
   });
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
@@ -76,11 +87,11 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchToLogin, ini
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-xs font-black text-accent uppercase tracking-wider">
-              Plan {formData.plan.toUpperCase()} sélectionné
+              Plan {PLAN_LABELS[formData.plan] || formData.plan} sélectionné
+              {formData.billingInterval === 'YEARLY' ? ' (annuel)' : ' (mensuel)'}
             </p>
             <p className="text-[11px] text-txt-2 mt-0.5">
-              Vous serez redirigé vers{' '}
-              {formData.gateway === 'moncash' ? 'MonCash' : 'Stripe'} pour finaliser le paiement.
+              Vous serez redirigé vers Stripe pour finaliser le paiement.
             </p>
           </div>
           <CreditCard size={16} className="text-accent shrink-0" />

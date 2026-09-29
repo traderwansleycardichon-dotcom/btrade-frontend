@@ -5,6 +5,7 @@ import { fr } from 'date-fns/locale';
 import api from '../../../lib/api';
 import { useToast } from '../../../hooks/useToast';
 import { EditPlanModal } from '../../../components/admin/EditPlanModal';
+import { isPaidPlan, planName } from '../../../lib/membership';
 import { InviteStaffModal } from '../../../components/admin/InviteStaffModal';
 import { InviteCTOModal } from '../../../components/admin/InviteCTOModal';
 import { ChangeRoleModal } from '../../../components/admin/ChangeRoleModal';
@@ -178,8 +179,8 @@ export default function AdminUsersPage() {
                             <Lock size={10} /> LOCKED
                           </span>
                         ) : (
-                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase ${user.plan === 'pro' ? 'bg-win/10 text-win' : 'bg-elevated text-txt-2'}`}>
-                            {user.plan}
+                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase ${isPaidPlan(user.plan) ? 'bg-win/10 text-win' : 'bg-elevated text-txt-2'}`}>
+                            {planName(user.plan)}
                           </span>
                         )}
                       </div>

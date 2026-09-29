@@ -16,7 +16,7 @@ const LoginPage: React.FC<{ defaultRegister?: boolean }> = ({ defaultRegister = 
   const navigate = useNavigate();
   const [params] = useSearchParams();
   const queryPlan = params.get('plan');
-  const queryGateway = params.get('gateway');
+  const queryInterval = params.get('interval');
   const queryCheckout = params.get('checkout');
   const [isRegister, setIsRegister] = React.useState(defaultRegister || queryPlan !== null);
 
@@ -24,7 +24,6 @@ const LoginPage: React.FC<{ defaultRegister?: boolean }> = ({ defaultRegister = 
     if (queryCheckout === 'success') {
       window.history.replaceState({}, document.title, '/login');
 
-      const moncashPendingId = sessionStorage.getItem('btt_pending_moncash');
       const stripePendingId  = sessionStorage.getItem('btt_pending_stripe');
       const stripeSessionId  = params.get('session_id');
 
@@ -47,12 +46,7 @@ const LoginPage: React.FC<{ defaultRegister?: boolean }> = ({ defaultRegister = 
         }
       };
 
-      if (moncashPendingId) {
-        sessionStorage.removeItem('btt_pending_moncash');
-        api.post('/api/auth/verify-moncash-payment', { pendingId: moncashPendingId })
-          .then(handleVerifyResult)
-          .catch(handleVerifyError);
-      } else if (stripePendingId && stripeSessionId) {
+      if (stripePendingId && stripeSessionId) {
         sessionStorage.removeItem('btt_pending_stripe');
         api.post('/api/auth/verify-stripe-payment', { pendingId: stripePendingId, sessionId: stripeSessionId })
           .then(handleVerifyResult)
@@ -87,10 +81,22 @@ const LoginPage: React.FC<{ defaultRegister?: boolean }> = ({ defaultRegister = 
         queryPlan ||
         (typeof window !== 'undefined' ? sessionStorage.getItem('btt_pending_plan') : null);
       if (pending && pending !== 'free' && user.plan !== pending) {
-        try { sessionStorage.removeItem('btt_pending_plan'); } catch {}
+        const pendingInterval =
+          queryInterval ||
+          (typeof window !== 'undefined' ? sessionStorage.getItem('btt_pending_interval') : null);
+        const billingInterval =
+          String(pendingInterval ?? '').toUpperCase() === 'YEARLY' ? 'YEARLY' : 'MONTHLY';
+        try {
+          sessionStorage.removeItem('btt_pending_plan');
+          sessionStorage.removeItem('btt_pending_interval');
+        } catch {}
         (async () => {
           try {
-            const res = await api.post('/api/billing/create-checkout-session', { planId: pending });
+            const res = await api.post('/api/billing/create-checkout-session', {
+              plan: pending,
+              planId: pending,
+              billingInterval,
+            });
             if (res.data?.url) {
               window.location.href = res.data.url;
               return;
@@ -105,7 +111,7 @@ const LoginPage: React.FC<{ defaultRegister?: boolean }> = ({ defaultRegister = 
 
       navigate('/app/dashboard', { replace: true });
     }
-  }, [isAuthenticated, isLoading, navigate, user, refreshUser, queryPlan]);
+  }, [isAuthenticated, isLoading, navigate, user, refreshUser, queryPlan, queryInterval]);
 
   if (isLoading && isAuthenticated) {
     return (
@@ -138,7 +144,7 @@ const LoginPage: React.FC<{ defaultRegister?: boolean }> = ({ defaultRegister = 
           <RegisterForm 
             onSwitchToLogin={() => setIsRegister(false)} 
             initialPlan={queryPlan}
-            initialGateway={queryGateway}
+            initialInterval={queryInterval}
           />
         ) : (
           <LoginForm onSwitchToRegister={() => setIsRegister(true)} />

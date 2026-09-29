@@ -6,7 +6,7 @@ interface User {
   id: string;
   email: string;
   fullName: string;
-  plan: 'free' | 'pro' | 'locked';
+  plan: 'free' | 'pro' | 'vip_incubator' | 'locked';
   role?: string;
   onboarded: boolean;
   avatarUrl?: string;
