@@ -203,6 +203,42 @@ export const readPlansPayload = (body: any): PlansPayload | null => {
 };
 
 /**
+ * Palier gratuit.
+ *
+ * Il n'est pas dans MEMBERSHIP_CATALOG côté serveur, parce qu'il n'a ni prix
+ * ni objet Stripe : c'est l'accès accordé à la création du compte. La durée et
+ * les limites décrites ici sont celles réellement appliquées par le serveur :
+ * `trialEnd` à +7 jours (users.repo.js), verrouillage du compte par le cron
+ * quotidien, 1 seul compte de trading actif (accounts.routes.js), et cours,
+ * communauté, masterclasses, simulateur et VIP réservés aux plans payants.
+ */
+export const FREE_PLAN: MembershipPlan = {
+  plan: 'free',
+  name: 'Découverte',
+  tagline:
+    "7 jours pour tester le journal sur vos propres trades, sans carte bancaire. Ensuite, un abonnement est nécessaire pour garder l'accès.",
+  recommended: false,
+  inherits: null,
+  prices: {
+    MONTHLY: { amount: 0, currency: 'usd', available: true },
+    YEARLY: { amount: 0, currency: 'usd', available: true },
+  },
+  yearlySaving: null,
+  featureGroups: [
+    {
+      title: 'Inclus pendant 7 jours',
+      items: [
+        'Journal de trading complet',
+        'Notes de psychologie de trading',
+        '1 compte de trading actif',
+        'Aucune carte bancaire demandée',
+      ],
+    },
+  ],
+  cta: { label: 'Créer un compte gratuit', action: 'subscribe', disabled: false },
+};
+
+/**
  * Catalogue de secours, copie de core/config/membership.js. Il sert uniquement
  * quand l'API publique ne répond pas, pour que la page ne montre jamais une
  * seule formule ni un prix inventé.

@@ -84,14 +84,32 @@ const mockGet = (billingResponse: unknown | Error) => {
 describe('PricingSection', () => {
   beforeEach(() => vi.clearAllMocks());
 
-  it('affiche toutes les formules du catalogue, pas une seule', async () => {
+  it('affiche les trois paliers, pas une seule formule', async () => {
     mockGet(plansPayload);
     render(<PricingSection />);
 
     await waitFor(() => expect(screen.getByText('Haitian Wall Street Pro')).toBeInTheDocument());
     expect(screen.getByText('Haitian Wall Street VIP Incubator')).toBeInTheDocument();
+    // Le palier gratuit ne vient pas de l'API : il n'a ni prix ni objet Stripe.
+    expect(screen.getByText('Découverte')).toBeInTheDocument();
+    expect(screen.getByText('$0')).toBeInTheDocument();
+    expect(screen.getByText('/ 7 jours')).toBeInTheDocument();
     expect(screen.getByText('$119')).toBeInTheDocument();
     expect(screen.getByText('$350')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Créer un compte gratuit/ })).toBeEnabled();
+  });
+
+  it('garde le palier gratuit à 0 quand on bascule sur l\'annuel', async () => {
+    mockGet(plansPayload);
+    render(<PricingSection />);
+
+    await waitFor(() => expect(screen.getByText('$119')).toBeInTheDocument());
+    await userEvent.click(screen.getByRole('button', { name: /Annuel/i }));
+
+    expect(screen.getByText('$0')).toBeInTheDocument();
+    expect(screen.getByText('/ 7 jours')).toBeInTheDocument();
+    // Aucune équivalence mensuelle ni économie annoncée sur un palier non facturé.
+    expect(screen.queryByText('soit $0 par mois')).not.toBeInTheDocument();
   });
 
   it('bascule sur les prix annuels', async () => {
@@ -112,6 +130,7 @@ describe('PricingSection', () => {
 
     await waitFor(() => expect(screen.getByText('Haitian Wall Street Pro')).toBeInTheDocument());
     expect(screen.getByText('Haitian Wall Street VIP Incubator')).toBeInTheDocument();
+    expect(screen.getByText('Découverte')).toBeInTheDocument();
   });
 
   it('ignore une réponse dans un format inattendu plutôt que de vider la grille', async () => {
@@ -120,6 +139,7 @@ describe('PricingSection', () => {
 
     await waitFor(() => expect(screen.getByText('Haitian Wall Street Pro')).toBeInTheDocument());
     expect(screen.getByText('Haitian Wall Street VIP Incubator')).toBeInTheDocument();
+    expect(screen.getByText('Découverte')).toBeInTheDocument();
     expect(screen.queryByText('$550')).not.toBeInTheDocument();
   });
 });

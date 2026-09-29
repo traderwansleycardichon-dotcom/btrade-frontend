@@ -5,6 +5,7 @@ import api from '../../lib/api';
 import {
   BillingInterval,
   FALLBACK_PLANS,
+  FREE_PLAN,
   MONTHLY,
   MembershipPlan,
   PlanPrice,
@@ -12,6 +13,7 @@ import {
   formatHtg,
   formatUsd,
   intervalLabel,
+  normalizePlan,
   intervalSuffix,
   readPlansPayload,
   shortName,
@@ -26,7 +28,7 @@ const BG_CTA = 'https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?aut
 const VISIBLE_GROUPS = 2;
 
 export const PricingSection: React.FC = () => {
-  const [plans, setPlans] = useState<MembershipPlan[]>(FALLBACK_PLANS);
+  const [paidPlans, setPaidPlans] = useState<MembershipPlan[]>(FALLBACK_PLANS);
   const [billingInterval, setBillingInterval] = useState<BillingInterval>(MONTHLY);
   const [loading, setLoading] = useState(true);
   const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
@@ -43,7 +45,7 @@ export const PricingSection: React.FC = () => {
         const { data } = await api.get('/api/billing/plans');
         const payload = readPlansPayload(data);
         if (!cancelled && payload) {
-          setPlans(payload.plans);
+          setPaidPlans(payload.plans);
           setBillingInterval(payload.defaultInterval);
         }
       } catch {
@@ -58,6 +60,10 @@ export const PricingSection: React.FC = () => {
   }, []);
 
   const rate = Number(settings?.USD_TO_HTG_RATE) || 0;
+  const viewerPlan = normalizePlan(user?.plan);
+
+  // Le palier gratuit n'est pas facturé, donc il ne vient pas du catalogue serveur.
+  const plans = useMemo(() => [FREE_PLAN, ...paidPlans], [paidPlans]);
 
   // La meilleure économie annuelle du catalogue, pour l'étiquette du sélecteur.
   const bestYearlySaving = useMemo(
@@ -70,6 +76,16 @@ export const PricingSection: React.FC = () => {
   );
 
   const resolveCta = (plan: MembershipPlan, price: PlanPrice) => {
+    if (plan.plan === 'free') {
+      if (!isAuthenticated) {
+        return { label: 'Créer un compte gratuit', disabled: false, action: 'subscribe' as const };
+      }
+      return {
+        label: viewerPlan === 'free' ? 'Votre plan actuel' : 'Déjà inclus dans votre abonnement',
+        disabled: true,
+        action: 'manage' as const,
+      };
+    }
     if (plan.cta.isCurrent) {
       return { label: 'Votre plan actuel', disabled: true, action: 'manage' as const };
     }
@@ -92,6 +108,16 @@ export const PricingSection: React.FC = () => {
   };
 
   const handleSubscribe = async (plan: MembershipPlan, action: 'subscribe' | 'upgrade' | 'resume' | 'manage') => {
+    // Palier gratuit : simple inscription, aucun paiement à reprendre.
+    if (plan.plan === 'free') {
+      try {
+        sessionStorage.removeItem('btt_pending_plan');
+        sessionStorage.removeItem('btt_pending_interval');
+      } catch {}
+      navigate('/register');
+      return;
+    }
+
     // Visiteur : on mémorise le plan choisi et on reprend le paiement après inscription.
     if (!isAuthenticated) {
       try {
@@ -133,7 +159,7 @@ export const PricingSection: React.FC = () => {
     }
   };
 
-  const gridCols = plans.length >= 3 ? 'lg:grid-cols-3' : 'md:grid-cols-2';
+  const gridCols = plans.length >= 3 ? 'md:grid-cols-2 lg:grid-cols-3' : 'md:grid-cols-2';
   const gridWidth = plans.length >= 3 ? 'max-w-6xl' : 'max-w-4xl';
 
   return (
@@ -143,11 +169,11 @@ export const PricingSection: React.FC = () => {
         <div className="mx-auto max-w-6xl px-6">
           <div className="text-center mb-12 max-w-2xl mx-auto">
             <h2 className="text-4xl md:text-5xl font-semibold tracking-[-0.025em] text-white mb-4">
-              Deux formules, un seul objectif.
+              Commencez gratuitement, montez quand vous êtes prêt.
             </h2>
             <p className="text-white/55">
-              La plateforme complète avec Pro, ou l'accompagnement individuel avec le VIP Incubator.
-              Sans engagement, annulez quand vous voulez.
+              7 jours pour tester, la plateforme complète avec Pro, ou l'accompagnement individuel
+              avec le VIP Incubator. Sans engagement, annulez quand vous voulez.
             </p>
           </div>
 
@@ -186,6 +212,7 @@ export const PricingSection: React.FC = () => {
           <div className={`grid grid-cols-1 ${gridCols} gap-6 ${gridWidth} mx-auto items-start`}>
             {plans.map((plan) => {
               const featured = plan.recommended;
+              const isFree = plan.plan === 'free';
               const price = plan.prices[billingInterval];
               const cta = resolveCta(plan, price);
               const isBusy = checkoutLoading === plan.plan;
@@ -193,7 +220,9 @@ export const PricingSection: React.FC = () => {
               const groups = isOpen ? plan.featureGroups : plan.featureGroups.slice(0, VISIBLE_GROUPS);
               const hiddenGroups = plan.featureGroups.length - VISIBLE_GROUPS;
               const monthlyEquivalent =
-                billingInterval === YEARLY && price.amount !== null ? Math.round(price.amount / 12) : null;
+                !isFree && billingInterval === YEARLY && price.amount !== null
+                  ? Math.round(price.amount / 12)
+                  : null;
 
               return (
                 <article
@@ -224,7 +253,9 @@ export const PricingSection: React.FC = () => {
                         {price.amount !== null ? formatUsd(price.amount) : 'Sur demande'}
                       </span>
                       {price.amount !== null && (
-                        <span className="text-white/45 text-sm">{intervalSuffix(billingInterval)}</span>
+                        <span className="text-white/45 text-sm">
+                          {isFree ? '/ 7 jours' : intervalSuffix(billingInterval)}
+                        </span>
                       )}
                     </div>
                     {monthlyEquivalent !== null && (
@@ -232,12 +263,12 @@ export const PricingSection: React.FC = () => {
                         soit {formatUsd(monthlyEquivalent)} par mois
                       </div>
                     )}
-                    {price.amount !== null && rate > 0 && (
+                    {!isFree && price.amount !== null && rate > 0 && (
                       <div className="text-xs font-semibold text-accent mt-1">
                         ≈ {formatHtg(price.amount, rate)} {intervalSuffix(billingInterval)}
                       </div>
                     )}
-                    {billingInterval === YEARLY && plan.yearlySaving && (
+                    {!isFree && billingInterval === YEARLY && plan.yearlySaving && (
                       <div className="text-xs text-white/45 mt-1">
                         {formatUsd(plan.yearlySaving.savingAmount)} économisés sur douze mois
                       </div>
@@ -316,15 +347,6 @@ export const PricingSection: React.FC = () => {
             })}
           </div>
 
-          {!isAuthenticated && (
-            <p className="mt-10 text-center text-[13px] text-white/45">
-              Vous préférez essayer d'abord ?{' '}
-              <Link to="/register" className="text-white/80 hover:text-white underline underline-offset-4">
-                Créez un compte gratuit
-              </Link>{' '}
-              et profitez de 7 jours d'accès avant de choisir votre formule.
-            </p>
-          )}
         </div>
       </section>
 
