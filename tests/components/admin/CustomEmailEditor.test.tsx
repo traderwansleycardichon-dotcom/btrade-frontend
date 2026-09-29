@@ -88,3 +88,45 @@ describe('custom email editor', () => {
     expect(screen.getByTitle('Aperçu de votre email')).toHaveAttribute('srcdoc', '<html><body>Preview</body></html>');
   });
 });
+
+describe('header image', () => {
+  it('writes the banner on the first line so the recipient sees it before the message', () => {
+    const onChange = vi.fn();
+    render(<CustomEmailEditor subject="Live" body="Bonjou" onChange={onChange} />);
+    fireEvent.change(screen.getByLabelText('Ou collez le lien de l’image'), { target: { value: 'https://cdn.example.com/banner.png' } });
+    expect(onChange).toHaveBeenLastCalledWith('![](https://cdn.example.com/banner.png)\n\nBonjou');
+  });
+
+  it('keeps an HTML body in HTML and escapes the address', () => {
+    const onChange = vi.fn();
+    render(<CustomEmailEditor subject="Live" body="<p>Bonjou</p>" onChange={onChange} />);
+    fireEvent.change(screen.getByLabelText('Ou collez le lien de l’image'), { target: { value: 'https://cdn.example.com/a(1).png' } });
+    expect(onChange).toHaveBeenLastCalledWith('<p><img src="https://cdn.example.com/a%281%29.png" alt="" /></p>\n\n<p>Bonjou</p>');
+  });
+
+  it('pre-fills from a saved template and replaces the banner instead of stacking a second one', () => {
+    const onChange = vi.fn();
+    render(<CustomEmailEditor subject="Live" body={'![](https://cdn.example.com/old.png)\n\nBonjou'} onChange={onChange} />);
+    expect(screen.getByLabelText('Ou collez le lien de l’image')).toHaveValue('https://cdn.example.com/old.png');
+    fireEvent.change(screen.getByLabelText('Ou collez le lien de l’image'), { target: { value: 'https://cdn.example.com/new.png' } });
+    expect(onChange).toHaveBeenLastCalledWith('![](https://cdn.example.com/new.png)\n\nBonjou');
+  });
+
+  it('removes the banner when the field is emptied, keeping the message and its button', () => {
+    const onChange = vi.fn();
+    render(<CustomEmailEditor subject="Live" body={'![](https://cdn.example.com/old.png)\n\nBonjou\n\n[Rejoindre](https://example.com/live)'} onChange={onChange} />);
+    fireEvent.change(screen.getByLabelText('Ou collez le lien de l’image'), { target: { value: '' } });
+    expect(onChange).toHaveBeenLastCalledWith('Bonjou\n\n[Rejoindre](https://example.com/live)');
+  });
+
+  it('refuses an address it cannot display and says why', () => {
+    const onChange = vi.fn();
+    const { rerender } = render(<CustomEmailEditor subject="Live" body="Bonjou" onChange={onChange} />);
+    for (const value of ['https://cdn.example.com/logo.svg', 'javascript:alert(1)', 'pas-une-adresse']) {
+      fireEvent.change(screen.getByLabelText('Ou collez le lien de l’image'), { target: { value } });
+      expect(onChange).toHaveBeenLastCalledWith('Bonjou');
+      rerender(<CustomEmailEditor subject="Live" body="Bonjou" onChange={onChange} />);
+    }
+    expect(screen.getByRole('alert')).toHaveTextContent('Le format SVG ne s’affiche pas dans Gmail.');
+  });
+});

@@ -1,6 +1,7 @@
 import { useEffect, useId, useState } from 'react';
-import { Eye, Link2, Monitor, Smartphone, RefreshCw } from 'lucide-react';
+import { Eye, Link2, Monitor, Smartphone, RefreshCw, Image as ImageIcon } from 'lucide-react';
 import api from '../../lib/api';
+import { ImageUpload } from '../ui/ImageUpload';
 
 interface PreviewProps {
   templateId?: string;
@@ -72,6 +73,38 @@ const safeUrl = (value: string) => {
   } catch { return null; }
 };
 
+// The header image lives on the first line, where the server reads it as the
+// banner shown above the message instead of body content.
+const HTML_HEADER_IMAGE = /^[ \t]*(?:<p>[ \t]*)?<img\b[^>]*?\ssrc="([^"]*)"[^>]*>[ \t]*(?:<\/p>)?[ \t]*(?:\r?\n[ \t]*)*/i;
+const TEXT_HEADER_IMAGE = /^[ \t]*!\[[^\]\n]*\]\(([^\n]*)\)[ \t]*(?:(?:\r?\n[ \t]*)+|$)/;
+
+// Gmail does not render SVG reliably, so a banner that cannot be displayed is refused.
+const safeImageUrl = (value: string) => {
+  const url = safeUrl(value);
+  if (!url || !/^https?:$/.test(new URL(url).protocol) || /\.svg(?:[?#]|$)/i.test(url)) return null;
+  return url;
+};
+
+function findHeaderImage(body: string) {
+  const html = HTML_HEADER_IMAGE.exec(body);
+  if (html) return { url: unescapeHtml(html[1]), length: html[0].length };
+  const text = TEXT_HEADER_IMAGE.exec(body);
+  if (text) return { url: text[1].trim(), length: text[0].length };
+  return null;
+}
+
+function writeHeaderImage(body: string, url: string) {
+  const found = findHeaderImage(body);
+  const rest = found ? body.slice(found.length) : body;
+  const target = url.trim() ? safeImageUrl(url.trim()) : null;
+  if (!target) return rest;
+  const src = target.replace(/\(/g, '%28').replace(/\)/g, '%29');
+  const marker = isHtmlBody(rest)
+    ? `<p><img src="${escapeHtml(src)}" alt="" /></p>`
+    : `![](${src})`;
+  return `${marker}${rest ? '\n\n' : ''}${rest}`;
+}
+
 function findButton(body: string) {
   const html = HTML_BUTTON.exec(body);
   if (html) return { label: unescapeHtml(html[2]), url: unescapeHtml(html[1]), start: html.index };
@@ -96,11 +129,22 @@ export function CustomEmailEditor({ onChange, ...previewProps }: PreviewProps & 
   const id = useId();
   const existing = findButton(previewProps.body);
   const [button, setButton] = useState({ label: existing?.label ?? '', url: existing?.url ?? '' });
+  const [headerImage, setHeaderImage] = useState(findHeaderImage(previewProps.body)?.url ?? '');
 
   const update = (next: { label: string; url: string }) => {
     setButton(next);
     onChange(writeButton(previewProps.body, next.label, next.url));
   };
+
+  const updateHeaderImage = (next: string) => {
+    setHeaderImage(next);
+    onChange(writeHeaderImage(previewProps.body, next));
+  };
+
+  const headerImageValue = headerImage.trim();
+  const headerImageError = headerImageValue && !safeImageUrl(headerImageValue)
+    ? 'Utilisez un lien public en https vers une image PNG, JPG ou WEBP. Le format SVG ne s’affiche pas dans Gmail.'
+    : '';
 
   const label = button.label.trim();
   const url = button.url.trim();
@@ -119,6 +163,20 @@ export function CustomEmailEditor({ onChange, ...previewProps }: PreviewProps & 
       <div>
         <label htmlFor={`${id}-body`} className="block text-xs font-bold text-txt-2 uppercase tracking-widest mb-2">Votre message</label>
         <textarea id={`${id}-body`} value={previewProps.body} onChange={event => onChange(event.target.value)} rows={10} maxLength={100000} required placeholder={'Bonjour {{fullName}},\n\nÉcrivez votre message ici…'} className="w-full bg-elevated border border-border rounded-xl px-4 py-3 text-sm leading-relaxed focus:outline-none focus:border-accent transition-all resize-y" />
+      </div>
+      <div className="p-4 rounded-xl bg-elevated border border-border space-y-3">
+        <p className="flex items-center gap-1.5 text-xs font-bold text-txt-2 uppercase tracking-widest"><ImageIcon size={14} /> Image d’en-tête</p>
+        <p className="text-[11px] text-txt-3">
+          Elle s’affiche en haut de l’email, avant le message. Format paysage conseillé, par exemple 1280 x 400 pixels.
+        </p>
+        <ImageUpload value={safeImageUrl(headerImageValue) ? headerImageValue : ''} onChange={updateHeaderImage} />
+        <div>
+          <label htmlFor={`${id}-header-image`} className="block text-xs font-bold mb-2">Ou collez le lien de l’image</label>
+          <input id={`${id}-header-image`} type="text" value={headerImage} onChange={event => updateHeaderImage(event.target.value)} placeholder="https://…" className="w-full bg-surface border border-border rounded-xl px-3 py-2 text-sm" />
+        </div>
+        {headerImageError
+          ? <p role="alert" className="text-xs text-loss">{headerImageError}</p>
+          : <p className="text-[11px] text-txt-3">Laissez vide pour un email sans image d’en-tête.</p>}
       </div>
       <div className="p-4 rounded-xl bg-elevated border border-border space-y-3">
         <p className="flex items-center gap-1.5 text-xs font-bold text-txt-2 uppercase tracking-widest"><Link2 size={14} /> Bouton de l’email</p>
