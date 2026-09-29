@@ -12,7 +12,7 @@ const faqs = [
   },
   {
     q: 'Y a-t-il un essai gratuit ?',
-    a: "14 jours sur le plan Pro, sans carte bancaire, sans engagement. Vous pouvez exporter vos données à tout moment.",
+    a: "Oui : 7 jours d'accès gratuit à la création du compte, sans carte bancaire. Ensuite, un abonnement Pro ou VIP Incubator est nécessaire pour continuer. Vous pouvez exporter vos données à tout moment.",
   },
   {
     q: 'Comment fonctionne l\'IA ?',

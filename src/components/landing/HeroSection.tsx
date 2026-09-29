@@ -72,7 +72,7 @@ export const HeroSection: React.FC = () => {
           </Link>
         </div>
         <p className="text-center text-white/35 text-[11px] mb-10">
-          Plan gratuit disponible · Sans carte bancaire
+          7 jours d'accès gratuit · Sans carte bancaire
         </p>
 
         {/* Trust row */}
