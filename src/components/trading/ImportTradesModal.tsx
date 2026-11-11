@@ -3,6 +3,7 @@ import { Modal } from '../ui/Modal';
 import barChartIcon from '../../assets/animations/1f4ca.json';
 import { Upload, FileText, CheckCircle2, AlertTriangle, Cpu } from 'lucide-react';
 import { useToast } from '../../hooks/useToast';
+import { clickable } from '../../lib/a11y';
 
 interface ImportTradesModalProps {
   isOpen: boolean;
@@ -110,7 +111,7 @@ export const ImportTradesModal: React.FC<ImportTradesModalProps> = ({ isOpen, on
           <div 
             onDragOver={handleDragOver}
             onDrop={handleDrop}
-            onClick={() => fileInputRef.current?.click()}
+            {...clickable(() => fileInputRef.current?.click())}
             className={`border-2 border-dashed rounded-2xl p-8 flex flex-col items-center justify-center text-center cursor-pointer transition-all ${
               file ? 'border-win/50 bg-win/5' : 'border-border hover:border-accent/50 hover:bg-elevated/50'
             }`}

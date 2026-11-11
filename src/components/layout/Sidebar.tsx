@@ -156,7 +156,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen = false, onMobileCl
     <>
       {/* Backdrop (mobile uniquement, quand drawer ouvert) */}
       {mobileOpen && (
-        <div
+        <div aria-hidden="true"
           className="lg:hidden fixed inset-0 z-40 bg-bg/80 backdrop-blur-sm"
           onClick={onMobileClose}
         />

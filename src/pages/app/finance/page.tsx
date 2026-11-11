@@ -257,7 +257,7 @@ const NewFluxModal: React.FC<{
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-bg/80 backdrop-blur-sm" onClick={onClose} />
+      <div aria-hidden="true" className="absolute inset-0 bg-bg/80 backdrop-blur-sm" onClick={onClose} />
       <div className="relative w-full max-w-md surface rounded-lg overflow-hidden shadow-2xl">
         <div className={`px-5 py-3 border-b border-border flex items-center justify-between ${isRev ? 'bg-win/10' : 'bg-loss/10'}`}>
           <h2 className={`text-xs font-bold uppercase tracking-widest ${isRev ? 'text-win' : 'text-loss'}`}>

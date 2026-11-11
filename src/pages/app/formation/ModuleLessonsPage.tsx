@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { ChevronLeft, Lock, CheckCircle, Play, BookOpen, AlertCircle } from 'lucide-react';
 import api from '../../../lib/api';
 import { FeatureGate } from '../../../components/ui/FeatureGate';
+import { clickable } from '../../../lib/a11y';
 
 interface ModuleInfo {
   id: string;
@@ -187,7 +188,7 @@ const ModuleLessonsHub: React.FC = () => {
               return (
                 <div
                   key={lesson.id}
-                  onClick={() => !isLocked && navigate(`/app/formation/${slug}/${lesson.id}`)}
+                  {...clickable(() => !isLocked && navigate(`/app/formation/${slug}/${lesson.id}`))}
                   className={`
                     relative group py-5 flex items-center gap-4 md:gap-6 transition-colors duration-150
                     -mx-6 px-6

@@ -6,6 +6,7 @@ import { fr } from 'date-fns/locale';
 import { Modal } from '../ui/Modal';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
+import { clickable } from '../../lib/a11y';
 
 interface NotificationsDropdownProps {
   isOpen: boolean;
@@ -91,7 +92,7 @@ export const NotificationsDropdown: React.FC<NotificationsDropdownProps> = ({ is
                 <div 
                   key={notif.id}
                   className={`p-4 hover:bg-elevated/50 transition-colors cursor-pointer flex gap-4 ${notif.lu ? 'opacity-60' : 'bg-accent/5'}`}
-                  onClick={() => {
+                  {...clickable(() => {
                     if (!notif.lu) markAsRead.mutate(notif.id);
                     if (notif.type === 'NEW_MESSAGE') {
                       onClose();
@@ -103,7 +104,7 @@ export const NotificationsDropdown: React.FC<NotificationsDropdownProps> = ({ is
                     } else {
                       setSelectedNotif(notif);
                     }
-                  }}
+                  })}
                 >
                   <div className="shrink-0 mt-1">
                     <div className="w-8 h-8 rounded-full bg-elevated flex items-center justify-center">

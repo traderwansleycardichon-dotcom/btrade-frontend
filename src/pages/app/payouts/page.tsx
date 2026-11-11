@@ -408,6 +408,7 @@ const PayoutScopeSwitcher: React.FC<{
       {open && (
         <div
           onClick={e => e.stopPropagation()}
+          onKeyDown={e => e.stopPropagation()}
           className="absolute top-full left-0 mt-1 w-[280px] glass rounded-xl shadow-2xl z-50 py-1 max-h-[400px] overflow-y-auto"
         >
           <button
@@ -473,7 +474,7 @@ const NewPayoutModal: React.FC<{
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-bg/80 backdrop-blur-sm" onClick={onClose} />
+      <div aria-hidden="true" className="absolute inset-0 bg-bg/80 backdrop-blur-sm" onClick={onClose} />
       <div className="relative w-full max-w-md glass rounded-2xl overflow-hidden shadow-2xl">
         <div className="px-5 py-3 border-b border-border/50 flex items-center justify-between">
           <h2 className="text-xs font-bold uppercase tracking-widest">Enregistrer un retrait</h2>

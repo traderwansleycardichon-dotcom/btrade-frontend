@@ -8,6 +8,7 @@ import { ImageUpload } from '../../../components/ui/ImageUpload';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../../../lib/api';
 import { isPaidPlan, planName } from '../../../lib/membership';
+import { clickable } from '../../../lib/a11y';
 
 interface NavItem {
   label: string;
@@ -198,7 +199,7 @@ const SettingsPage: React.FC = () => {
               {section.items.map((item, i) => (
                 <div 
                   key={i} 
-                  onClick={item.action}
+                  {...(item.action ? clickable(item.action) : {})}
                   className={`flex justify-between items-center group/item ${item.action ? 'cursor-pointer' : ''}`}
                 >
                   <div>

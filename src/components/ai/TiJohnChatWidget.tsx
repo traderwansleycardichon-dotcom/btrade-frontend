@@ -6,6 +6,7 @@ import api from '../../lib/api';
 import { usePlan } from '../../hooks/usePlan';
 import { motion, AnimatePresence } from 'framer-motion';
 import TiJohnAvatar from '../../assets/ti-john-avatar.jpg';
+import { clickable } from '../../lib/a11y';
 
 const SUGGEST_GENERIC = [
   "Ki sa ki Risk/Reward ratio a ?",
@@ -231,7 +232,7 @@ const ChatInterface: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                   conversations.map(conv => (
                     <div 
                       key={conv.id} 
-                      onClick={() => handleLoadChat(conv.id)}
+                      {...clickable(() => handleLoadChat(conv.id))}
                       className={`group flex items-center justify-between p-3 rounded-lg cursor-pointer transition-colors ${conversationId === conv.id ? 'bg-accent/10 border border-accent/20' : 'hover:bg-bg/50'}`}
                     >
                       <div className="flex items-center gap-2 overflow-hidden">

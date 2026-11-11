@@ -154,7 +154,7 @@ const EconomicPage: React.FC = () => {
   const availableCountries = useMemo(() => {
     const set = new Set<string>();
     (events || []).forEach(e => e.pays && set.add(e.pays));
-    return Array.from(set).sort();
+    return Array.from(set).sort((a, b) => a.localeCompare(b));
   }, [events]);
 
   const stats = useMemo(() => {
@@ -431,7 +431,7 @@ const EventDetailDrawer: React.FC<{ event: MacroEvent; onClose: () => void; onDi
 
   return (
     <div className="fixed inset-0 z-50 flex">
-      <div className="flex-1 bg-bg/70 backdrop-blur-sm" onClick={onClose} />
+      <div aria-hidden="true" className="flex-1 bg-bg/70 backdrop-blur-sm" onClick={onClose} />
       <div className="w-[480px] surface border-l border-border h-full overflow-y-auto">
         <div className="px-5 py-3 border-b border-border flex items-center justify-between">
           <div className="flex items-center gap-2">
