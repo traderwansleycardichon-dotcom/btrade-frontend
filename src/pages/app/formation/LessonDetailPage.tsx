@@ -18,6 +18,7 @@ import {
 import api from '../../../lib/api';
 import { FeatureGate } from '../../../components/ui/FeatureGate';
 import { SecureVideoPlayer } from './SecureVideoPlayer';
+import { clickable } from '../../../lib/a11y';
 
 interface ModuleInfo {
   id: string;
@@ -813,7 +814,7 @@ const LessonPlayer: React.FC = () => {
                 return (
                   <div
                     key={l.id}
-                    onClick={() => {
+                    {...clickable(() => {
                       if (!isLocked && !isActive) {
                         setActiveTab('lecture');
                         setQuizResult(null);
@@ -822,7 +823,7 @@ const LessonPlayer: React.FC = () => {
                         setDevoirSuccess(false);
                         navigate(`/app/formation/${slug}/${l.id}`);
                       }
-                    }}
+                    })}
                     className={`
                       p-3 rounded-lg border text-left transition-all duration-150 flex items-start gap-2.5
                       ${isLocked 

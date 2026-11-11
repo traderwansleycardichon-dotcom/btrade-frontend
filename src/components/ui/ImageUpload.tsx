@@ -2,6 +2,7 @@ import React, { useRef, useState } from 'react';
 import { Upload, X, Loader2, Image as ImageIcon } from 'lucide-react';
 import api from '../../lib/api';
 import { useToast } from '../../hooks/useToast';
+import { clickable } from '../../lib/a11y';
 
 interface ImageUploadProps {
   value: string;
@@ -88,7 +89,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({ value, onChange, label
           </div>
         ) : (
           <div 
-            onClick={() => !uploading && fileInputRef.current?.click()}
+            {...clickable(() => !uploading && fileInputRef.current?.click())}
             className={`border-2 border-dashed rounded-xl p-6 flex flex-col items-center justify-center text-center cursor-pointer transition-colors aspect-video max-h-[200px]
               ${uploading ? 'bg-surface/50 border-border/50 cursor-not-allowed' : 'border-border hover:border-accent hover:bg-accent/5 bg-surface'}`}
           >

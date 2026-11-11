@@ -325,6 +325,7 @@ const AccountScopeSwitcher: React.FC<{
       {open && (
         <div
           onClick={e => e.stopPropagation()}
+          onKeyDown={e => e.stopPropagation()}
           className="absolute top-full left-0 mt-1 w-[280px] glass rounded-xl shadow-2xl z-50 py-1 max-h-[400px] overflow-y-auto"
         >
           <ScopeItem

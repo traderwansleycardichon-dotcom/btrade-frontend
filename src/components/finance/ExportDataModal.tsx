@@ -4,6 +4,7 @@ import barChartIcon from '../../assets/animations/1f4ca.json';
 import { useExport } from '../../hooks/useExport';
 import { useToast } from '../../hooks/useToast';
 import { FileText, Download, Calendar, CheckCircle2 } from 'lucide-react';
+import { clickable } from '../../lib/a11y';
 
 interface ExportDataModalProps {
   isOpen: boolean;
@@ -59,7 +60,7 @@ export const ExportDataModal: React.FC<ExportDataModalProps> = ({ isOpen, onClos
             <div className="grid grid-cols-2 gap-4">
               <div 
                 className={`p-4 rounded-xl border cursor-pointer flex items-center justify-between transition-all ${formData.format === 'pdf' ? 'border-accent bg-accent/5' : 'border-border bg-bg hover:border-accent/30'}`}
-                onClick={() => setFormData({...formData, format: 'pdf'})}
+                {...clickable(() => setFormData({...formData, format: 'pdf'}))}
               >
                 <div className="flex items-center gap-3">
                   <FileText className={formData.format === 'pdf' ? 'text-accent' : 'text-txt-3'} size={20} />
@@ -70,7 +71,7 @@ export const ExportDataModal: React.FC<ExportDataModalProps> = ({ isOpen, onClos
               
               <div 
                 className={`p-4 rounded-xl border cursor-pointer flex items-center justify-between transition-all ${formData.format === 'csv' ? 'border-accent bg-accent/5' : 'border-border bg-bg hover:border-accent/30'}`}
-                onClick={() => setFormData({...formData, format: 'csv'})}
+                {...clickable(() => setFormData({...formData, format: 'csv'}))}
               >
                 <div className="flex items-center gap-3">
                   <FileText className={formData.format === 'csv' ? 'text-accent' : 'text-txt-3'} size={20} />

@@ -5,6 +5,7 @@ import { GraduationCap, Play, BookOpen, Search, Award, CheckCircle, Lock, X, Pri
 import api from '../../../lib/api';
 import { FeatureGate } from '../../../components/ui/FeatureGate';
 import { useSettings } from '../../../contexts/SettingsContext';
+import { clickable } from '../../../lib/a11y';
 
 interface Module {
   id: string;
@@ -278,7 +279,7 @@ const FormationHub: React.FC = () => {
             return (
               <div
                 key={mod.id}
-                onClick={() => navigate(`/app/formation/${mod.slug}`)}
+                {...clickable(() => navigate(`/app/formation/${mod.slug}`))}
                 className={`
                   relative group py-6 md:py-7 flex items-center gap-4 md:gap-7 cursor-pointer
                   transition-colors duration-150 hover:bg-white/[0.016]
@@ -449,7 +450,7 @@ const FormationHub: React.FC = () => {
 
         {/* Certifications */}
         <div
-          onClick={() => certifiedModules > 0 && setIsCertListOpen(true)}
+          {...(certifiedModules > 0 ? clickable(() => setIsCertListOpen(true)) : {})}
           className={`p-7 bg-surface flex flex-col justify-between gap-4 ${
             certifiedModules > 0 ? 'cursor-pointer hover:bg-elevated transition-colors' : ''
           }`}
@@ -504,7 +505,7 @@ const FormationHub: React.FC = () => {
                 <div
                   key={mod.id}
                   className="flex items-center justify-between p-4 bg-elevated border border-border hover:border-win/25 rounded-xl transition-colors cursor-pointer"
-                  onClick={() => { setIsCertListOpen(false); setSelectedCertModuleId(mod.id); }}
+                  {...clickable(() => { setIsCertListOpen(false); setSelectedCertModuleId(mod.id); })}
                 >
                   <div className="flex items-center gap-3">
                     <span className="text-sm font-black font-mono text-txt-3 w-8 h-8 rounded-lg bg-elevated border border-border flex items-center justify-center">

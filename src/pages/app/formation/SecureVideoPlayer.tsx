@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Play, Pause, Volume2, VolumeX, Maximize, Minimize } from 'lucide-react';
+import { clickable } from '../../../lib/a11y';
 
 interface SecureVideoPlayerProps {
   videoId: string;
@@ -271,7 +272,7 @@ export const SecureVideoPlayer: React.FC<SecureVideoPlayerProps> = ({ videoId })
 
       {/* Transparent Clickable Overlay Covering the Entire Video Screen */}
       <div 
-        onClick={togglePlay}
+        {...clickable(togglePlay)}
         onDoubleClick={toggleFullscreen}
         className="absolute inset-0 w-full h-full cursor-pointer z-10 bg-transparent flex items-center justify-center"
       >

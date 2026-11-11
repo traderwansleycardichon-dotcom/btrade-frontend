@@ -4,6 +4,7 @@ import brainIcon from '../../assets/animations/1f9e0.json';
 import { usePsychology } from '../../hooks/usePsychology';
 import { useToast } from '../../hooks/useToast';
 import { Brain, FileText, Activity, Battery } from 'lucide-react';
+import { clickable } from '../../lib/a11y';
 
 interface AddPsychologyModalProps {
   isOpen: boolean;
@@ -78,7 +79,7 @@ export const AddPsychologyModal: React.FC<AddPsychologyModalProps> = ({ isOpen, 
             {MOODS.map(m => (
               <div 
                 key={m.value}
-                onClick={() => setFormData({...formData, mood: m.value})}
+                {...clickable(() => setFormData({...formData, mood: m.value}))}
                 className={`p-3 rounded-xl border text-center cursor-pointer transition-all ${
                   formData.mood === m.value 
                     ? 'border-accent bg-accent/10' 

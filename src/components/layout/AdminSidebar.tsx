@@ -116,7 +116,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onClose }) =
     <>
       {/* Mobile Overlay */}
       {isOpen && (
-        <div 
+        <div aria-hidden="true" 
           className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] lg:hidden animate-[fadeIn_0.2s_ease-out]" 
           onClick={onClose}
         />

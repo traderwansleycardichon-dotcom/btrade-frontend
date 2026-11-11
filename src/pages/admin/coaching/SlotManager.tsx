@@ -126,7 +126,7 @@ export default function SlotManager() {
 
   const handleAddTime = () => {
     if (newTime && !bulkTimes.includes(newTime)) {
-      setBulkTimes([...bulkTimes, newTime].sort());
+      setBulkTimes([...bulkTimes, newTime].sort((a, b) => a.localeCompare(b)));
       setNewTime('');
     }
   };
