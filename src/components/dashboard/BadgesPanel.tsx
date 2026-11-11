@@ -2,14 +2,23 @@ import React, { useEffect, useState } from 'react';
 import { Award, Star } from 'lucide-react';
 import api from '../../lib/api';
 
+interface UserBadge {
+  id: string;
+  badgeType: string;
+  unlockedAt: string;
+  metadata?: { reason?: string } | null;
+}
+
+const formatBadgeType = (badgeType?: string) => (badgeType ?? '').replaceAll('_', ' ');
+
 export const BadgesPanel: React.FC = () => {
-  const [badges, setBadges] = useState<any[]>([]);
+  const [badges, setBadges] = useState<UserBadge[]>([]);
 
   useEffect(() => {
     const fetchBadges = async () => {
       try {
         const { data } = await api.get('/api/badges');
-        setBadges(data);
+        setBadges(Array.isArray(data) ? data : []);
       } catch (err) {
         console.error("Impossible de charger les badges", err);
       }
@@ -29,13 +38,10 @@ export const BadgesPanel: React.FC = () => {
       </div>
       <div className="flex flex-wrap gap-3">
         {badges.map((b) => (
-          <div key={b.id} className="relative flex items-center gap-2 px-3 py-2 bg-gradient-to-br from-yellow-500/20 to-orange-500/10 border border-yellow-500/20 rounded-xl overflow-hidden group-hover:border-yellow-500/40 transition-colors" title={b.description}>
+          <div key={b.id} className="relative flex items-center gap-2 px-3 py-2 bg-gradient-to-br from-yellow-500/20 to-orange-500/10 border border-yellow-500/20 rounded-xl overflow-hidden group-hover:border-yellow-500/40 transition-colors" title={b.metadata?.reason}>
             <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
             <div className="flex flex-col">
-              <span className="text-xs font-bold text-txt">{b.type.replace('_', ' ')}</span>
-              {b.level > 1 && (
-                <span className="text-[9px] text-yellow-500 font-bold uppercase tracking-wider">Niveau {b.level}</span>
-              )}
+              <span className="text-xs font-bold text-txt">{formatBadgeType(b.badgeType)}</span>
             </div>
             <div className="absolute inset-0 dark:bg-white/5 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity" />
           </div>
